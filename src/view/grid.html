@@ -3,6 +3,7 @@
         background: #fff;
         box-shadow: 0 2px 3px 0 rgba(0, 0, 0, 0.1);
     }
+
 </style>
 <!--{block name="header"}-->
 <!--{notempty name='title'}-->
@@ -10,53 +11,74 @@
 <div class="layui-card-header box-thak-sh think-box-shadow">
     <span class="layui-icon layui-icon-next font-s10 color-desc margin-right-5"></span>{$title|default=''}
     <!--{if $Think.get.back eq 1}-->
-        <button style="position:absolute;right:5px;top: 5px" class="layui-btn layui-btn-sm layui-bg-black" href="javascript:;" onclick="history.back();"><i class="layui-icon">&#xe65a;</i>返回</button></span>
+    <button style="position:absolute;right:5px;top: 5px" class="layui-btn layui-btn-sm layui-bg-black"
+            href="javascript:;" onclick="history.back();"><i class="layui-icon">&#xe65a;</i>返回
+    </button>
+    </span>
     <!--{/if}-->
-         <div class="pull-right">
-             <!--{if !isset($hideAddButton)}-->
-        <button data-{$formOpen|default="open"}='{:url("form")}?back=1' type="button" data-title="添加" class='layui-btn layui-btn-sm layui-btn-primary'><i class="layui-icon layui-icon-add-1"></i>添加</button>
+    <div class="pull-right">
+        <!--{if !isset($hideAddButton)}-->
+        <button data-{$formOpen|default="open" }='{:url("form")}?back=1' type="button" data-title="添加"
+                class='layui-btn layui-btn-sm layui-btn-primary'><i class="layui-icon layui-icon-add-1"></i>添加
+        </button>
         <!--{/if}-->
         <!--{if !isset($hideDeletesButton)}-->
-        <span class="dropdown">
-<button  class='layui-btn layui-btn-sm layui-btn-danger' data-toggle="dropdown" ><i class="layui-icon layui-icon-delete"></i>批量删除<span class="caret"></span></button>
-<ul class="dropdown-menu">
-    <li><a id="batch_delete">删除选中</a></li>
-    <li><a id="batch_delete_all">清空</a></li>
-</ul>
-</span>
+        <span class="layui-nav layui-bg-red layui-btn layui-btn-sm layui-inline" style="z-index:1">
+             <li class="layui-nav-item ">
+                 <a href="javascript:;" class='layui-btn layui-btn-sm layui-btn-danger' style="color: #ffffff"><i
+                         class="layui-icon layui-icon-delete"></i>批量删除</a>
+            <dl class="layui-nav-child">
+                <dd lay-unselect><a id="batch_delete">删除选中</a></dd>
+                <dd lay-unselect><a id="batch_delete_all">清空</a></dd>
+
+            </dl>
+             </li>
+        </span>
+        <script>
+            layui.use('element', function () {
+                var element = layui.element; //导航的hover效果、二级菜单等功能，需要依赖element模块
+                element.render('nav');
+                $('.layui-nav').css('padding', 0);
+                $('.layui-nav-item a').css('padding-left', 10);
+                $('.layui-nav-item a').css('padding-right', 17);
+                $('.layui-nav-child').css('top', 30);
+
+            });
+        </script>
         <!--{/if}-->
         <!--{if !isset($hideExportButton)}-->
-        <span class="dropdown">
-<button type="button"  class="layui-btn layui-btn-sm layui-btn-primary" data-toggle="dropdown"><i class="layui-icon layui-icon-export"></i> 导 出 <span class="caret"></span></button>
+        <span class="layui-nav layui-bg-blue layui-btn layui-btn-sm layui-inline" style="z-index:1">
+             <li class="layui-nav-item ">
+                 <a href="javascript:;" class='layui-btn layui-btn-sm layui-btn-normal' style="color: #ffffff"><i
+                         class="layui-icon layui-icon-export"></i>导 出</a>
+            <dl class="layui-nav-child">
+                   <dd lay-unselect><a data-href='{:request()->url()}&export=true&export_type=all'>导出当前页</a></dd>
+                <dd lay-unselect><a id="excelPage">导出当前页</a></dd>
+                <dd lay-unselect><a id="excelSelect">导出选中行</a></dd>
 
-<ul class="dropdown-menu">
-
-    <li><a data-href='{:request()->url()}&export=true&export_type=all' data-title="产品评论">导出全部</a></li>
-
-    <li><a id="excelPage" data-title="规格入库">导出当前页</a></li>
-
-    <li><a id="excelSelect">导出选中行</a></li>
-
-</ul>
-</span>
+            </dl>
+             </li>
+        </span>
         <!--{/if}-->
     </div>
 </div>
 <!--{/neq}-->
 <!--{/notempty}-->
 <!--{/block}-->
-<!--{block name='content'}-->
-<div class="layui-card-body layui-anim layui-anim-upbit">
-<div class="layui-card-body layui-card">
-    <div class="layui-card-body">
-        <div class="think-box-shadow">
-            {$filter|raw}
-            {$table|raw}
+{block name='content'}
+<div class="layui-card-body layui-anim layui-anim-upbit ">
+    <div class="layui-card-body layui-card">
+        <div class="layui-card-body">
+            <div class="think-box-shadow">
+                {$filter|raw}
+                {$table|raw}
+            </div>
         </div>
     </div>
 </div>
-</div>
 <!--{/block}-->
 <script type="text/javascript">
-    {$import_js|raw}
+    {
+        $import_js | raw
+    }
 </script>
