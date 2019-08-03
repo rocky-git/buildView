@@ -9,7 +9,6 @@
 namespace buildView;
 
 
-use app\common\tools\Excel;
 use Faker\Provider\File;
 use think\exception\HttpResponseException;
 use think\facade\Request;

@@ -18,24 +18,24 @@ use think\model\relation\HasOne;
 /**
  * Class Form
  * @package app\common\tools\formview
- * @method Field text($lable, $field) 文本输入框;
- * @method Field hidden($lable, $field) 隐藏框框;
- * @method Field number($lable, $field) 数字输入框;
- * @method Field password($lable, $field) 密码输入框;
- * @method Field select($lable, $field) select选择框;
- * @method Field radio($lable, $field) radio单选框;
- * @method Field checkbox($lable, $field) checkbox复选框;
- * @method Field switch ($lable, $field) switch开关;
- * @method Field textarea($lable, $field) textarea文本框;
- * @method Field ckeditor($lable, $field) ckeditor编辑器;
- * @method Field image($lable, $field) 上传图片框;
- * @method Field file($lable, $field) 上传文件;
- * @method Field slider($lable, $field) 滑块框;
- * @method Field date($lable, $field) 日期框;
- * @method Field datetime($lable, $field) 日期时间框;
- * @method Field dateRange($lable, $field) 日期范围框;
- * @method Field timeRange($lable, $field) 时间范围框;
- * @method Field time($lable, $field) 时间框;
+ * @method Field text($field,$lable) 文本输入框;
+ * @method Field hidden($field,$lable) 隐藏框框;
+ * @method Field number($field,$lable) 数字输入框;
+ * @method Field password($field,$lable) 密码输入框;
+ * @method Field select($field,$lable) select选择框;
+ * @method Field radio($field,$lable) radio单选框;
+ * @method Field checkbox($field,$lable) checkbox复选框;
+ * @method Field switch ($field,$lable) switch开关;
+ * @method Field textarea($field,$lable) textarea文本框;
+ * @method Field ckeditor($field,$lable) ckeditor编辑器;
+ * @method Field image($field,$lable) 上传图片框;
+ * @method Field file($field,$lable) 上传文件;
+ * @method Field slider($field,$lable) 滑块框;
+ * @method Field date($field,$lable) 日期框;
+ * @method Field datetime($field,$lable) 日期时间框;
+ * @method Field dateRange($field,$lable) 日期范围框;
+ * @method Field timeRange($field,$lable) 时间范围框;
+ * @method Field time($field,$lable) 时间框;
  */
 class Form extends Field
 {
@@ -184,8 +184,8 @@ class Form extends Field
         $this->setOption('content', $html);
         return $this->render();
     }
-
-    protected function formItem($template, $lable, $field)
+    //添加formtime
+    protected function formItem($template,$field,$lable)
     {
         if ($this->model instanceof Model) {
             if (is_array($field)) {
@@ -221,6 +221,12 @@ class Form extends Field
         return $this->formItem($name, $arguments[0], $arguments[1]);
     }
 
+    /**
+     * 一对多
+     * @param $label 标签
+     * @param $relationMethod 关联方法
+     * @param \Closure $closure 
+     */
     public function hasMany($label, $relationMethod, \Closure $closure)
     {
         if (method_exists($this->model, $relationMethod)) {
@@ -234,13 +240,13 @@ class Form extends Field
             abort(100,'无效关联方法');
         }
     }
-
+    //tab布局
     public function tab($title, \Closure $closure)
     {
         array_push($this->formItem, ['type' => 'tab', 'title' => $title, 'closure' => $closure]);
         return $this;
     }
-
+    //获取字段数据
     protected function getData($field)
     {
         $fields = explode('.', $field);
@@ -255,12 +261,8 @@ class Form extends Field
         return $val;
     }
 
-    /**
-     * @param $html
-     * @param $hasManyHtml
-     * @return string
-     */
-    public function parseFormItem($html, $hasManyHtml)
+    //解析formhtml
+    private function parseFormItem($html, $hasManyHtml)
     {
         foreach ($this->formItem as $key => $form) {
             if ($form instanceof Field) {

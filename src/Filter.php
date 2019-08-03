@@ -16,9 +16,10 @@ class Filter
 {
     public $formItem = [];
     protected $filter;
+
     public function __construct($model)
     {
-        $this->filter = new \app\common\tools\Filter($model);
+        $this->filter = new FilterSearch($model);
     }
 
     /**
@@ -29,21 +30,24 @@ class Filter
      * @param $field 字段
      * @return $this
      */
-    public function like($lable, $field)
+    public function like($field, $lable)
     {
 
-        $field = $this->paseFilter($field,'like');
+        $field = $this->paseFilter($field, 'like');
         $this->template($lable, $field);
         return $this;
     }
-    protected function template($lable, $field, $template = 'text')
+
+    protected function template($field, $lable, $template = 'text')
     {
         $field = new Field($template, $lable, $field, Request::param($field));
         $field->layui('inline');
         array_push($this->formItem, $field);
         return $field;
     }
-    public function db(){
+
+    public function db()
+    {
         return $this->filter->query();
     }
 
@@ -55,9 +59,10 @@ class Filter
      * @param $field 字段
      * @return $this
      */
-    public function dateBetween($lable, $field){
-        $field = $this->paseFilter($field,'dateBetween');
-        $this->template($lable, $field,'dateRange');
+    public function dateBetween($field, $lable)
+    {
+        $field = $this->paseFilter($field, 'dateBetween');
+        $this->template($field, $lable, 'dateRange');
         return $this;
     }
 
@@ -69,27 +74,30 @@ class Filter
      * @param $field 字段
      * @return $this
      */
-    public function in($lable, $field){
+    public function in($field, $lable)
+    {
 
-        $field = $this->paseFilter($field,'in');
+        $field = $this->paseFilter($field, 'in');
         $this->template($lable, $field);
         return $this;
     }
-    protected function paseFilter($field,$method){
-        if(is_string($field)){
-            $fields = explode('.',$field);
+
+    protected function paseFilter($field, $method)
+    {
+        if (is_string($field)) {
+            $fields = explode('.', $field);
             $field = end($fields);
-            if(count($fields) > 1){
-                $field = '_'.$field;
-                $this->filter->relationWhere($fields[0],function ($q) use ($field,$method){
+            if (count($fields) > 1) {
+                $field = '_' . $field;
+                $this->filter->relationWhere($fields[0], function ($q) use ($field, $method) {
                     $q->$method($field);
                 });
-            }else{
+            } else {
                 $this->filter->$method($field);
             }
         }
-        if(is_array($field)){
-            foreach ($field as $val){
+        if (is_array($field)) {
+            foreach ($field as $val) {
                 $this->filter->$method($val);
             }
         }
@@ -105,66 +113,86 @@ class Filter
      * @param $field 字段
      * @return $this
      */
-    public function eq($lable, $field)
+    public function eq($field, $lable)
     {
-        $field = $this->paseFilter($field,'eq');
+        $field = $this->paseFilter($field, 'eq');
         $this->template($lable, $field);
         return $this;
     }
 
-    public function radio($options){
+    public function radio($options)
+    {
         $item = end($this->formItem);
         $item->template = __FUNCTION__;
         $item->options($options);
         return $this;
     }
-    public function select($options){
+
+    public function select($options)
+    {
         $item = end($this->formItem);
         $item->template = __FUNCTION__;
         $item->options($options);
         return $this;
     }
-    public function checkbox($options){
+
+    public function checkbox($options)
+    {
         $item = end($this->formItem);
         $item->template = __FUNCTION__;
         $item->options($options);
         return $this;
     }
-    public function multiple($bool=true){
+
+    public function multiple($bool = true)
+    {
         $item = end($this->formItem);
         $item->multiple(true);
         return $this;
     }
-    public function date(){
+
+    public function date()
+    {
         $item = end($this->formItem);
         $item->template = __FUNCTION__;
         return $this;
     }
-    public function time(){
+
+    public function time()
+    {
         $item = end($this->formItem);
         $item->template = __FUNCTION__;
         return $this;
     }
-    public function datetime(){
+
+    public function datetime()
+    {
         $item = end($this->formItem);
         $item->template = __FUNCTION__;
         return $this;
     }
-    public function dateRange(){
+
+    public function dateRange()
+    {
         $item = end($this->formItem);
         $item->template = __FUNCTION__;
         return $this;
     }
-    public function datetimeRange(){
+
+    public function datetimeRange()
+    {
         $item = end($this->formItem);
         $item->template = __FUNCTION__;
         return $this;
     }
-    public function timeRange(){
+
+    public function timeRange()
+    {
         $item = end($this->formItem);
         $item->template = __FUNCTION__;
         return $this;
     }
+
     public function render()
     {
         $html = '';

@@ -73,6 +73,11 @@ class Field
         return $this;
     }
 
+    /**
+     * md布局
+     * @param $num 
+     * @return $this
+     */
     public function md($num)
     {
         $this->md = $num;
