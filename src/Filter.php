@@ -34,7 +34,7 @@ class Filter
     {
 
         $field = $this->paseFilter($field, 'like');
-        $this->template($lable, $field);
+        $this->template( $field,$lable);
         return $this;
     }
 
@@ -78,7 +78,7 @@ class Filter
     {
 
         $field = $this->paseFilter($field, 'in');
-        $this->template($lable, $field);
+        $this->template( $field,$lable);
         return $this;
     }
 
@@ -116,7 +116,7 @@ class Filter
     public function eq($field, $lable)
     {
         $field = $this->paseFilter($field, 'eq');
-        $this->template($lable, $field);
+        $this->template( $field,$lable);
         return $this;
     }
 
