@@ -1,0 +1,47 @@
+<?php
+
+namespace {%namespace%};
+
+use think\Controller;
+use app\common\tools\buildView\Detail;
+use app\common\tools\buildView\Form;
+use app\common\tools\buildView\Grid;
+use {%model_namespace%};
+class {%className%} extends Controller
+{
+    /**
+     * 列表
+     *
+     * @return string
+     */
+    public function index()
+    {
+        $grid = new Grid(new {%model%});
+{%grid%}
+        return $grid->view();
+    }
+
+    /**
+     * 详情
+     *
+     * @return string
+     */
+    public function detail()
+    {
+        $detail = new Detail(new {%model%});
+{%detail%}
+        return $detail->view();
+    }
+
+    /**
+     * 添加/编辑
+     *
+     * @return string
+     */
+    public function form()
+    {
+        $form = new Form(new {%model%});
+{%form%}
+        return $form->view();
+    }
+}
