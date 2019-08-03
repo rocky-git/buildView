@@ -75,8 +75,12 @@ class Form extends Field
         }
         $this->setOption('aciontUrl', request()->url());
         $this->template = 'form';
+        $this->importJs();
     }
-
+    private function importJs(){
+        $js = file_get_contents(__DIR__ . '/view/admin.js');
+        $this->options['import_js'] = $js;
+    }
 
     /**
      * 设置标题

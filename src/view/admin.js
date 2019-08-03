@@ -259,7 +259,7 @@ $(function () {
                 var tpl = '<div class="uploadimage uploadimagemtl"><a class="layui-icon">&#x1006;</a></div>';
                 var $tpl = $(tpl).attr('data-tips-image', values[i]).css('backgroundImage', 'url(' + values[i] + ')');
                 $tpl.data('input', input).data('srcs', values).data('index', i);
-               
+
                 $tpl.on('click', 'a', function (e) {
                     e.stopPropagation();
                     var $cur = $(this).parent();
@@ -279,7 +279,7 @@ $(function () {
                         $cur.remove(), $.msg.close(dialogIndex);
                     });
                 });
-                
+
                 $(this).before($tpl);
             }
         }).trigger('change');
@@ -456,10 +456,10 @@ $(function () {
         };
     }
 
-   
+
 
     /*! 注册 data-load 事件行为 */
-    $body.on('click', '[data-load]', function () {
+    $body.off('click').on('click', '[data-load]', function () {
         var url = $(this).attr('data-load'), tips = $(this).attr('data-tips');
         if ($(this).attr('data-confirm')) {
             return $.msg.confirm($(this).attr('data-confirm'), _goLoad);
@@ -472,7 +472,7 @@ $(function () {
     });
 
     /*! 注册 data-serach 表单搜索行为 */
-    $body.on('submit', 'form.form-search', function () {
+    $body.off('submit').on('submit', 'form.form-search', function () {
         var url = $(this).attr('action').replace(/\&?page\=\d+/g, ''), split = url.indexOf('?') === -1 ? '?' : '&';
         if ((this.method || 'get').toLowerCase() === 'get') {
             return window.location.href = '#' + $.menu.parseUri(url + split + $(this).serialize());
@@ -576,7 +576,7 @@ $(function () {
     });
 
     /*! 注册 data-tips-text 事件行为 */
-    $body.on('mouseenter', '[data-tips-text]', function () {
+    $body.off('mouseenter').on('mouseenter', '[data-tips-text]', function () {
         var text = $(this).attr('data-tips-text'), placement = $(this).attr('data-tips-placement') || 'auto';
         $(this).tooltip({title: text, placement: placement}).tooltip('show');
     });
@@ -601,7 +601,4 @@ $(function () {
         }
     }, true);
     /*! 初始化 */
-    $.menu.listen();
-    $.validate.listen(this);
-
 });

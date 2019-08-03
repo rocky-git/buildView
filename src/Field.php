@@ -95,6 +95,7 @@ class Field
             }
         }
         $content = file_get_contents(__DIR__ . '/view/' . $this->template . '.html');
+       
         if ($this->md > 0) {
             $content = '<div class="layui-col-md' . $this->md . '">' . $content . '</div>';
         }

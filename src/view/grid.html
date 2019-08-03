@@ -1,19 +1,32 @@
-{extend name='admin@public/content'}
-{block name="button"}
-{if !isset($hideAddButton)}
-<button data-{$formOpen|default="open"}='{:url("form")}?back=1' type="button" data-title="添加" class='layui-btn layui-btn-sm layui-btn-primary'><i class="layui-icon layui-icon-add-1"></i>添加</button>
-{/if}
-{if !isset($hideDeletesButton)}
-<span class="dropdown">
+<style>
+    .think-box-shadow {
+        background: #fff;
+        box-shadow: 0 2px 3px 0 rgba(0, 0, 0, 0.1);
+    }
+</style>
+<!--{block name="header"}-->
+<!--{notempty name='title'}-->
+<!--{neq name="Think.get.open_type" value="modal"}-->
+<div class="layui-card-header box-thak-sh think-box-shadow">
+    <span class="layui-icon layui-icon-next font-s10 color-desc margin-right-5"></span>{$title|default=''}
+    <!--{if $Think.get.back eq 1}-->
+        <button style="position:absolute;right:5px;top: 5px" class="layui-btn layui-btn-sm layui-bg-black" href="javascript:;" onclick="history.back();"><i class="layui-icon">&#xe65a;</i>返回</button></span>
+    <!--{/if}-->
+         <div class="pull-right">
+             <!--{if !isset($hideAddButton)}-->
+        <button data-{$formOpen|default="open"}='{:url("form")}?back=1' type="button" data-title="添加" class='layui-btn layui-btn-sm layui-btn-primary'><i class="layui-icon layui-icon-add-1"></i>添加</button>
+        <!--{/if}-->
+        <!--{if !isset($hideDeletesButton)}-->
+        <span class="dropdown">
 <button  class='layui-btn layui-btn-sm layui-btn-danger' data-toggle="dropdown" ><i class="layui-icon layui-icon-delete"></i>批量删除<span class="caret"></span></button>
 <ul class="dropdown-menu">
     <li><a id="batch_delete">删除选中</a></li>
     <li><a id="batch_delete_all">清空</a></li>
 </ul>
 </span>
-{/if}
-{if !isset($hideExportButton)}
-<span class="dropdown">
+        <!--{/if}-->
+        <!--{if !isset($hideExportButton)}-->
+        <span class="dropdown">
 <button type="button"  class="layui-btn layui-btn-sm layui-btn-primary" data-toggle="dropdown"><i class="layui-icon layui-icon-export"></i> 导 出 <span class="caret"></span></button>
 
 <ul class="dropdown-menu">
@@ -26,12 +39,24 @@
 
 </ul>
 </span>
-{/if}
-{/block}
-
-{block name="content"}
-<div class="think-box-shadow">
-    {$filter|raw}
-    {$table|raw}
+        <!--{/if}-->
+    </div>
 </div>
-{/block}
+<!--{/neq}-->
+<!--{/notempty}-->
+<!--{/block}-->
+<!--{block name='content'}-->
+<div class="layui-card-body layui-anim layui-anim-upbit">
+<div class="layui-card-body layui-card">
+    <div class="layui-card-body">
+        <div class="think-box-shadow">
+            {$filter|raw}
+            {$table|raw}
+        </div>
+    </div>
+</div>
+</div>
+<!--{/block}-->
+<script type="text/javascript">
+    {$import_js|raw}
+</script>

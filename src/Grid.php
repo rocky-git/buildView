@@ -10,6 +10,7 @@ namespace buildView;
 
 
 use app\common\tools\Excel;
+use Faker\Provider\File;
 use think\exception\HttpResponseException;
 use think\facade\Request;
 use think\Model;
@@ -60,8 +61,13 @@ class Grid extends Field
         $this->setSort();
         $this->actionColumn = new Actions('actions_tools', '操作');
         $this->dataSave();
+        $this->importJs();
     }
-
+    private function importJs(){
+        $js = file_get_contents(__DIR__ . '/view/admin.js');
+        $this->options['import_js'] = $js;
+    }
+    //数据保存
     private function dataSave()
     {
         if (Request::isPost()) {
@@ -331,4 +337,5 @@ class Grid extends Field
         }
         return $this;
     }
+    
 }
