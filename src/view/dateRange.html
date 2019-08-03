@@ -1,0 +1,52 @@
+<div class="layui-form-item">
+    <label class="layui-form-label">{$label}</label>
+    <div class="layui-input-{$layui}">
+        {if isset($required)}<input type="hidden" required>{/if}
+        {if is_array($name)}
+        <div class="layui-inline">
+            <input   lay-verify="{$layVerify}" readonly lay-verType="tips" lay-reqText="请选择开始{$label}" name="{$name[0]}" id="{$name[0]}" value="{$value[0]|default=''}"  placeholder="请选择开始{$label}" class="layui-input">
+        </div>
+        <div class="layui-inline">-</div>
+        <div class="layui-inline">
+            <input   lay-verify="{$layVerify}" readonly  lay-verType="tips" lay-reqText="请选择结束{$label}" name="{$name[1]}" id="{$name[1]}" value="{$value[1]|default=''}"  placeholder="请选择结束{$label}" class="layui-input">
+        </div>
+        {else/}
+        <input  lay-verify="{$layVerify}" readonly lay-verType="tips" lay-reqText="请选择{$label}" name="{$name}" id="{$name}" value="{$value}"  placeholder="请选择{$label}" class="layui-input">
+        {/if}
+        {notempty name="$help"}
+        <div class="help-block">{$help}</div>
+        {/notempty}
+    </div>
+</div>
+<script>
+    layui.use('laydate', function(){
+        var laydate = layui.laydate;
+        //执行一个laydate实例
+        {if is_array($name)}
+        laydate.render({
+            elem: '#{$name[0]}' //指定元素
+            ,type: 'date'
+        {if isset($format)}
+    ,format:'{$format}'
+        {/if}
+        });
+        laydate.render({
+            elem: '#{$name[1]}' //指定元素
+            ,type: 'date'
+        {if isset($format)}
+    ,format:'{$format}'
+        {/if}
+        });
+        {else/}
+            laydate.render({
+                elem: '#{$name}' //指定元素
+                ,type: 'date'
+                ,range: true
+            {if isset($format)}
+        ,format:'{$format}'
+            {/if}
+            });
+            {/if}
+
+            });
+</script>

@@ -1,0 +1,33 @@
+<div class="layui-form-item">
+    <label class="layui-form-label">{$label}</label>
+    <div class="layui-input-{$layui}">
+        <input type="hidden" name="{$name}" value="{$value}">
+        <button type="button" id="{$name}" class="layui-btn layui-btn-primary"><i class="layui-icon layui-icon-vercode font-s14"></i>上传文件</button>
+        {notempty name="$help"}
+        <div class="help-block">{$help}</div>
+        {/notempty}
+        <!--<button data-file="one"  data-safe="true"  data-field="{$name}" type="button" class="layui-btn layui-btn-primary"><i class="layui-icon layui-icon-vercode font-s14"></i>上传文件</button>-->
+    </div>
+</div>
+<script>
+    if($("input[type=hidden][name={$name}]").val() != ''){
+        $("#{$name}").find('i').addClass('color-green layui-icon-vercode').removeClass('layui-icon-upload-drag');
+    }
+    layui.use('upload', function(){
+        var upload = layui.upload;
+        upload.render({
+            elem: '#{$name}'
+            ,url: "{:url('admin/Plugs/upload')}" //必填项
+            ,method: ''  //可选项。HTTP类型，默认post
+            ,data: {} //可选项。额外的参数，如：{id: 123, abc: 'xxx'}
+            ,accept:"{$uploadType|default='file'}"
+            ,done: function(res){
+                $("#{$name}").find('i').addClass('color-green layui-icon-vercode').removeClass('layui-icon-upload-drag');
+            },
+            error: function(){
+                $("#{$name}").find('i').removeClass('color-green layui-icon-vercode').addClass('layui-icon-upload-drag');
+                $.msg('上传失败');
+            }
+        });
+    });
+</script>

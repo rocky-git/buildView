@@ -1,0 +1,49 @@
+<div class="layui-form layui-box layui-inline text-left">
+    <select name="{$domId}"  lay-filter="{$domId}" lay-search  {if isset($multiple)}xm-select="{$domId}" xm-select-skin="normal" xm-select-direction="up" xm-select-search{/if}>
+    {foreach $options as $key=>$val}
+    <option value="{$key}" {eq name="$value" value="$key"}selected{/eq}>{$val}</option>
+    {/foreach}
+    </select>
+</div>
+{if isset($multiple)}
+<script type="text/javascript">
+    var formSelects = layui.formSelects;
+    formSelects.render('{$domId}',{
+        init:[{$value}],
+    });
+    function removeByValue(arr, val) {
+        for(var i=0; i<arr.length; i++) {
+            if(arr[i] == val) {
+                arr.splice(i, 1);
+                break;
+            }
+        }
+    }
+    formSelects.on('{$domId}',function(id, vals, val, isAdd, isDisabled){
+        var values = [];
+        vals.forEach(function(item){
+            values.push(item.value)
+        });
+        if(isAdd){
+            values.push(val.value)
+        }else{
+            removeByValue(values,val.value)
+        }
+        $.post('{:url(request()->url())}',{id:'{$id}',field:'{$name}',value:values.join(',')},function(res){
+            if(res.code !=1){
+                $.msg.tips(res.msg);
+            }
+        })
+    });
+</script>
+{else}
+<script type="text/javascript">
+    form.on('select({$domId})', function(data){
+        $.post('{:url(request()->url())}',{id:'{$id}',field:'{$name}',value:data.value},function(res){
+            if(res.code !=1){
+                $.msg.tips(res.msg);
+            }
+        })
+    });
+</script>
+{/if}

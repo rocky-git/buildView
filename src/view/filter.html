@@ -1,0 +1,44 @@
+<style>
+    .form-search .layui-form-label{
+        width: auto;
+        align-items:center;
+        display: flex;
+
+    }
+    .layui-elem-field legend{
+        color: #666;
+        padding: 0 10px;
+        font-size: 14px;
+    }
+    legend {
+        display: block;
+        padding-inline-start: 2px;
+        padding-inline-end: 2px;
+        border-width: initial;
+        border-style: none;
+        border-color: initial;
+        border-image: initial;
+    }
+</style>
+<fieldset class="layui-elem-field" >
+    <legend style="margin-bottom:0px">条件搜索</legend>
+    <div class="layui-field-box">
+    <form class="layui-form layui-form-pane form-search" action="{:request()->url()}" onsubmit="return filterSubmit()" method="get" autocomplete="off">
+        {$filter|raw}
+        <div class="layui-form-item layui-inline">
+            <button class="layui-btn layui-btn-primary"><i class="layui-icon">&#xe615;</i> 搜 索</button>
+        </div>
+    </form>
+    </div>
+</fieldset>
+
+<script>
+    form.render()
+    function filterSubmit(){
+        if (window.frames.length != parent.frames.length) {
+            return true;
+        }else{
+            return false;
+        }
+    }
+</script>

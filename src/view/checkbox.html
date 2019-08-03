@@ -1,0 +1,11 @@
+<div class="layui-form-item">
+    <label class="layui-form-label">{$label}</label>
+    <div class="layui-{$layui}">
+        {foreach $options as $key=>$val}
+        <input type="checkbox" style="display:none!important;" {$required}name="{$name}[]" title="{$val}" {eq name="$key" value="$value"}checked{/eq} value="{$key}"/>
+        {/foreach}
+        {notempty name="$help"}
+        <div class="help-block">{$help}</div>
+        {/notempty}
+    </div>
+</div>

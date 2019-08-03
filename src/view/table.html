@@ -1,0 +1,183 @@
+<style>
+    .layui-form input[type=checkbox]{
+        display:none!important;
+    }
+    .layui-table-page{
+        margin-bottom: 0px!important;
+    }
+    .layui-table-cell {
+        height: auto;
+
+
+
+    }
+    .layui-table-grid-down {
+        display: none;
+    }
+
+</style>
+{if isset($toolbar)}
+<div class="layui-row">
+    {$toolbar|raw}
+</div>
+{/if}
+<table class="layui-hide" id="{$tableId}" lay-filter="{$tableId}">
+</table>
+<div class="layui-form-item text-center">
+    <button type="button"  class='layui-btn' id="subbutton">确认选择</button>
+</div>
+<script>
+    if (window.frames.length != parent.frames.length) {
+        $('#subbutton').show();
+    }else{
+        $('#subbutton').hide();
+    }
+
+    //导出选中行
+    layui.use('table', function(){
+        var excel_limit =0;
+        var excel_page=0;
+        var table = layui.table;
+        table.render({
+            elem: '#{$tableId}'
+            ,url:'{:url(request()->url())}'
+            ,where:{
+                table:true
+            }
+            {if isset($totalRow)}
+            ,totalRow:true
+            {/if}
+             {if !isset($hidePage)}
+            ,page: {
+                limit:20
+                ,limits:[10, 20, 30, 40, 50, 60, 70, 80, 90, 100, 110, 120, 130, 140, 150, 160, 170, 180, 190, 200]
+            }
+            {/if}
+            ,cellMinWidth: 80 //全局定义常规单元格的最小宽度，layui 2.2.1 新增
+            ,cols: [{$name|raw}]
+            ,done:function(res,curr,count){
+                excel_limit = res.data.length;
+                excel_page = curr;
+                $(".layui-table-cell").mouseover(function() {
+                    if(this.offsetWidth<this.scrollWidth){
+                        var that = this;
+                        var text = $(this).text();
+                        layer.tips(text, that);
+                    }
+                });
+
+            }
+        });
+        //监听排序
+        table.on('sort({$tableId})', function(obj){
+            console.log(obj);
+            table.reload('{$tableId}',{
+                initSort: obj //记录初始排序，如果不设的话，将无法标记表头的排序状态。
+                ,where: { //请求参数（注意：这里面的参数可任意定义，并非下面固定的格式）
+                    table_sort:true,
+                    field: obj.field //排序字段
+                    ,order: obj.type //排序方式
+                }
+            });
+        });
+        //监听操作栏
+        table.on('tool({$tableId})', function(obj){
+            var data = obj.data;
+            if(obj.event === 'detail'){
+                var url = '{:url("detail")}?id='+data.id+'&form_open={$formOpen}&back=1';
+                if('{$formOpen|default="open"}' == 'open'){
+                    $.form.href(url, this);
+                }else{
+                    return $.form.modal(url, 'open_type=modal', $(this).attr('data-title') || '详情');
+                }
+            } else if(obj.event === 'del'){
+                layer.confirm('确认删除？', function(index){
+                    $.form.load('{:url(request()->url())}', {field: 'delete', value: data.id, id: data.id}, 'post');
+                    layer.close(index);
+                });
+            } else if(obj.event === 'edit'){
+                var url = '{:url("form")}?id='+data.id+'&back=1';
+                if('{$formOpen|default="open"}' == 'open'){
+                    $.form.href(url, this);
+                }else{
+                    return $.form.modal(url, 'open_type=modal', $(this).attr('data-title') || '编辑');
+                }
+            }
+        });
+        // 全部删除
+        $('#batch_delete_all').click(function () {
+            $.msg.confirm('确定要删除这些数据吗？', function () {
+                $.form.load("{:url(request()->url())}", {field: 'delete', id: 'all'}, 'post');
+            });
+        })
+        //批量删除
+        $('#batch_delete').click(function () {
+            var checkStatus = table.checkStatus('{$tableId}')
+                ,data = checkStatus.data,arr = new Array();;
+            for(var i = 0;i<data.length;i++){
+                arr.push(data[i]['id']);
+            }
+            var ids =  arr.join(",");
+            if (ids.length < 1) {
+                return $.msg.tips('请选择需要操作的数据！');
+            }
+            $.msg.confirm('确定要删除这些数据吗？', function () {
+                $.form.load("{:url(request()->url())}", {field: 'delete', value: data.id, id: ids}, 'post');
+            });
+        })
+        //监听行内编辑
+        table.on('edit({$tableId})', function(obj){
+            $.form.load("{:url(request()->url())}", {field: obj.field, value: obj.value, id: obj.data.id}, 'post');
+        });
+        //导出当前页
+        $('#excelPage').click(function(){
+            window.location.href = '{:request()->url()}&export=true&export_type=page&page='+excel_page+'&limit='+excel_limit;
+        });
+        //导出选中
+        $('#excelSelect').click(function(){
+            var checkStatus = table.checkStatus('{$tableId}')
+                ,data = checkStatus.data,arr = new Array();;
+            for(var i = 0;i<data.length;i++){
+                arr.push(data[i]['id']);
+            }
+            var ids =  arr.join(",");
+            if (ids.length < 1) {
+                return $.msg.tips('请选择需要操作的数据！');
+            }
+            window.location.href = '{:request()->url()}&export=true&export_type=select&ids='+ids;
+        });
+        //监听多行选择
+        table.on('checkbox({$tableId})', function(obj){
+            var checkStatus = table.checkStatus('{$tableId}')
+                ,data = checkStatus.data,arr = new Array();;
+            for(var i = 0;i<data.length;i++){
+                arr.push(data[i]['id']);
+            }
+            var ids =  arr.join(",");
+            $('button[data-batch=true]').attr('data-update',ids);
+        });
+        //iframe中的提交
+        $('#subbutton').click(function(){
+            var checkStatus = table.checkStatus('{$tableId}')
+                ,data = checkStatus.data,arr = new Array();;
+            for(var i = 0;i<data.length;i++){
+                arr.push(data[i]['id']);
+            }
+            var ids =  arr.join(",");
+            if (ids.length < 1) {
+                return $.msg.tips('请选择需要操作的数据！');
+            }
+            $.post("{$iframeUrl}",{select_ids:ids,value:'{$iframeValue}'},function(data,status){
+                if(data.code == 200){
+                    $.msg.success('添加成功', 1, function(){
+                        top.$.form.reload();
+                        parent.layer.close(parent.layer.getFrameIndex(window.name));
+                    });
+                }else{
+                    $.msg.error(data.msg, 2);
+                }
+            });
+        });
+    });
+
+</script>

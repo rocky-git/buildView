@@ -1,0 +1,21 @@
+<div class="layui-form-item">
+    <label class="layui-form-label">{$label}</label>
+    <div class="layui-input-{$layui}">
+        <select name="{$name}" lay-search {$required} {if isset($multiple)}xm-select="{$name}" xm-select-search{/if}>
+            {foreach $options as $key=>$val}
+            <option value="{$key}" {eq name="$value" value="$key"}selected{/eq}>{$val}</option>
+            {/foreach}
+        </select>
+        {notempty name="$help"}
+        <div class="help-block">{$help}</div>
+        {/notempty}
+    </div>
+</div>
+{if isset($multiple)}
+<script type="text/javascript">
+    var formSelects = layui.formSelects;
+    formSelects.render('{$name}',{
+        init:[{$value}],
+    });
+</script>
+{/if}

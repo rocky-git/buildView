@@ -1,0 +1,17 @@
+<div class="layui-form-item">
+    <label class="layui-form-label">{$label}</label>
+    <div class="layui-input-{$layui}">
+        {if isset($required)}<input type="hidden" required>{/if}
+        <input type="hidden" name="{$name}" lay-verify="{$layVerify}" lay-verType="tips" lay-reqText="请选择{$label}" value="{$value}" data-width="{$width|default=''}" data-height="{$height|default=''}">
+        {notempty name="$help"}
+        <div class="help-block">{$help}</div>
+        {/notempty}
+    </div>
+</div>
+<script>
+    {if isset($multiple)}
+    $('input[type=hidden][name="{$name}"]').uploadMultipleImage();
+    {else/}
+        $('input[type=hidden][name="{$name}"]').uploadOneImage();
+        {/if}
+</script>

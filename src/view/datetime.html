@@ -1,0 +1,23 @@
+<div class="layui-form-item">
+    <label class="layui-form-label">{$label}</label>
+    <div class="layui-input-{$layui}">
+        {if isset($required)}<input type="hidden" required>{/if}
+        <input  lay-verify="{$layVerify}" readonly lay-verType="tips" lay-reqText="请选择{$label}" name="{$name}" id="{$name}" value="{$value}"  placeholder="请选择{$label}" class="layui-input">
+        {notempty name="$help"}
+        <div class="help-block">{$help}</div>
+        {/notempty}
+    </div>
+</div>
+<script>
+    layui.use('laydate', function(){
+        var laydate = layui.laydate;
+        //执行一个laydate实例
+        laydate.render({
+            elem: '#{$name}' //指定元素
+            ,type: 'datetime'
+            {if isset($format)}
+                ,format:'{$format}'
+            {/if}
+        });
+    });
+</script>

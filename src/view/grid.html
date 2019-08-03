@@ -1,0 +1,37 @@
+{extend name='admin@public/content'}
+{block name="button"}
+{if !isset($hideAddButton)}
+<button data-{$formOpen|default="open"}='{:url("form")}?back=1' type="button" data-title="添加" class='layui-btn layui-btn-sm layui-btn-primary'><i class="layui-icon layui-icon-add-1"></i>添加</button>
+{/if}
+{if !isset($hideDeletesButton)}
+<span class="dropdown">
+<button  class='layui-btn layui-btn-sm layui-btn-danger' data-toggle="dropdown" ><i class="layui-icon layui-icon-delete"></i>批量删除<span class="caret"></span></button>
+<ul class="dropdown-menu">
+    <li><a id="batch_delete">删除选中</a></li>
+    <li><a id="batch_delete_all">清空</a></li>
+</ul>
+</span>
+{/if}
+{if !isset($hideExportButton)}
+<span class="dropdown">
+<button type="button"  class="layui-btn layui-btn-sm layui-btn-primary" data-toggle="dropdown"><i class="layui-icon layui-icon-export"></i> 导 出 <span class="caret"></span></button>
+
+<ul class="dropdown-menu">
+
+    <li><a data-href='{:request()->url()}&export=true&export_type=all' data-title="产品评论">导出全部</a></li>
+
+    <li><a id="excelPage" data-title="规格入库">导出当前页</a></li>
+
+    <li><a id="excelSelect">导出选中行</a></li>
+
+</ul>
+</span>
+{/if}
+{/block}
+
+{block name="content"}
+<div class="think-box-shadow">
+    {$filter|raw}
+    {$table|raw}
+</div>
+{/block}

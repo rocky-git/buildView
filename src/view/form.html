@@ -1,0 +1,20 @@
+{extend name='admin@public/content'}
+{block name="content"}
+
+<form class="layui-form layui-box think-box-shadow" action="{$aciontUrl}" data-auto="true" method="post" autocomplete="off">
+    <div class="layui-card-body">
+        {$content|raw}
+        <div class="hr-line-dashed"></div>
+        <div class="layui-form-item text-center">
+            {$hiddenId|raw}
+            <button class="layui-btn" lay-submit type='submit'>保存数据</button>
+        </div>
+    </div>
+    </form>
+{/block}
+{block name='script'}
+<script>
+    {$script|raw}
+    window.form.render();
+</script>
+{/block}

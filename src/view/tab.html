@@ -1,0 +1,14 @@
+<div class="layui-tab">
+    <ul class="layui-tab-title">
+        {foreach $tabTitles as $key=>$title}
+        <li {eq name="$key" value="0"}class="layui-this"{/eq}>{$title}</li>
+        {/foreach}
+    </ul>
+    <div class="layui-tab-content">
+        {foreach $tabContents as $key=>$content}
+        <div class="layui-tab-item {eq name="$key" value="0"}layui-show{/eq}">
+            {$content|raw}
+        </div>
+        {/foreach}
+    </div>
+</div>

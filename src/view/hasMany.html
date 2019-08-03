@@ -1,0 +1,22 @@
+<fieldset class="layui-elem-field layui-field-title">
+    <legend>{$label}</legend>
+    <div class="layui-field-box">
+        <div class="layui-row" id="hasMany{$name}">
+            {$value|raw}
+        </div>
+        <div class="layui-input-block"><button type="button" class="layui-btn layui-btn-normal" data-hasMany="hasManyAdd">添加</button></div>
+    </div>
+</fieldset>
+<script>
+    $('button[data-hasMany=hasManyDel]').click(function(){
+        $(this).parent().parent().parent('.layui-row').remove();
+    });
+    $('button[data-hasMany=hasManyAdd]').click(function(){
+        var hasManyjsHtml = '{$hasManyjsHtml|raw}';
+        hasManyjsHtml = decodeURIComponent(hasManyjsHtml.replace(/\+/g, '%20'));
+        $('#hasMany{$name}').append(hasManyjsHtml);
+        $('button[data-hasMany=hasManyDel]').click(function(){
+            $(this).parent().parent().parent('.layui-row').remove();
+        });
+    });
+</script>

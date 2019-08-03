@@ -1,0 +1,15 @@
+<div class="layui-form-item">
+    <label class="layui-form-label">{$label}</label>
+    <div class="layui-input-{$layui}">
+        {notempty name="$help"}
+        <div class="help-block">{$help}</div>
+        {/notempty}
+        {if isset($required)}<input type="hidden" required>{/if}
+        <textarea name="{$name}" placeholder="请输入{$label}" lay-verify="{$layVerify}" lay-verType="tips" lay-reqText="请输入{$label}" class="layui-textarea">{$value}</textarea>
+    </div>
+</div>
+<script>
+    require(['ckeditor'], function () {
+        window.createEditor('textarea[name="{$name}"]', {height: {$height|default='500'}});
+    });
+</script>
