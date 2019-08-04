@@ -83,6 +83,7 @@
         //监听操作栏
         table.on('tool({$tableId})', function(obj){
             var data = obj.data;
+
             if(obj.event === 'detail'){
                 var url = '{:url("detail")}?id='+data.id+'&form_open={$formOpen}&back=1';
                 if('{$formOpen|default="open"}' == 'open'){
@@ -96,6 +97,8 @@
                     layer.close(index);
                 });
             } else if(obj.event === 'edit'){
+
+
                 var url = '{:url("form")}?id='+data.id+'&back=1';
                 if('{$formOpen|default="open"}' == 'open'){
                     $.form.href(url, this);

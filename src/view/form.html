@@ -1,9 +1,4 @@
-<style>
-    .think-box-shadow {
-        background: #fff;
-        box-shadow: 0 2px 3px 0 rgba(0, 0, 0, 0.1);
-    }
-</style>
+
 {block name="content"}
 <form class="layui-form layui-box think-box-shadow" action="{$aciontUrl}" data-auto="true" method="post" autocomplete="off">
     <div class="layui-card-body">
@@ -17,9 +12,7 @@
     </form>
 {/block}
 
-<script type="text/javascript">
-    {$import_js|raw}
-</script>
+
 <script>
     {$script|raw}
     window.form.render();

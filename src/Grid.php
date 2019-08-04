@@ -60,11 +60,7 @@ class Grid extends Field
         $this->setSort();
         $this->actionColumn = new Actions('actions_tools', '操作');
         $this->dataSave();
-        $this->importJs();
-    }
-    private function importJs(){
-        $js = file_get_contents(__DIR__ . '/view/admin.js');
-        $this->options['import_js'] = $js;
+
     }
     //数据保存
     private function dataSave()
@@ -278,7 +274,8 @@ class Grid extends Field
         $this->table->setOption('toolbar', implode('', $this->toolsArr));
         $this->table->name(json_encode($this->tableTitles));
         $this->setOption('table', $this->table->render());
-        return $this->render();
+        $builder = new Builder();
+        return $builder->render($this->render());
     }
 
     private function issetField($data, $field)

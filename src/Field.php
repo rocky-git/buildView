@@ -32,7 +32,6 @@ class Field
     protected $md = 0;
     protected $appendHtml = '';
     protected $layuiVerify = ['required', 'phone', 'email', 'url', 'number', 'date', 'identity'];
-
     public function __construct($template, $label, $name, $value)
     {
         $this->template = $template;

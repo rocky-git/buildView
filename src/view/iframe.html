@@ -1,38 +1,75 @@
-<!DOCTYPE html>
-<html lang="zh-cn">
-<head>
-    <meta charset="utf-8">
-    <meta name="renderer" content="webkit">
-    <title>{block name="title"}{$title|default=''}{if !empty($title)} · {/if}{:sysconf('site_name')}{/block}</title>
-    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
-    <link href="{:sysconf('browser_icon')}" rel="shortcut icon">
-    <link href="__STATIC__/plugs/awesome/css/font-awesome.min.css?v={:date('ymd')}" rel="stylesheet">
-    <link href="__STATIC__/plugs/bootstrap/css/bootstrap.min.css?v={:date('ymd')}" rel="stylesheet">
-    <link href="__STATIC__/plugs/layui/css/layui.css?v={:date('ymd')}" rel="stylesheet">
-    <link href="__STATIC__/theme/css/console.css?v={:date('ymd')}" rel="stylesheet">
-    <link href="__STATIC__/theme/css/animate.css?v={:date('ymd')}" rel="stylesheet">
-    <link rel="stylesheet" type="text/css" href="__STATIC__/plugs/formSelect/formSelects-v4.css"/>
-    {block name="style"}{/block}
-    <style>.btn{font-size:12.5px;}</style>
-    <script>window.ROOT_URL = '__ROOT__';</script>
-    <script src="__STATIC__/plugs/jquery/pace.min.js"></script>
-    <script src="__STATIC__/plugs/layui/layui.all.js"></script>
-    <script src="__STATIC__/admin.js"></script>
-    <script src="__STATIC__/plugs/jqui/jquery-ui.min.js"></script>
-    <script src="__STATIC__/admin/echarts.min.js"></script>
-    <script src="__STATIC__/admin/highcharts.js"></script>
-    <script src="__STATIC__/plugs/formSelect/formSelects-v4.min.js"></script>
-</head>
-<body class="framework mini">
-{block name="content"}
-<div class="think-box-shadow">
-    {$filter|raw}
-    {$table|raw}
+<link rel="stylesheet" href="/vendor/rockys/build-view/src/plugs/layui/css/layui.css">
+<script src="/vendor/rockys/build-view/src/plugs/layui/layui.all.js"></script>
+<!--{block name="header"}-->
+<!--{notempty name='title'}-->
+<!--{neq name="Think.get.open_type" value="modal"}-->
+<div class="layui-card-header box-thak-sh think-box-shadow">
+    <span class="layui-icon layui-icon-next font-s10 color-desc margin-right-5"></span>{$title|default=''}
+    <!--{if $Think.get.back eq 1}-->
+    <button style="position:absolute;right:5px;top: 5px" class="layui-btn layui-btn-sm layui-bg-black"
+            href="javascript:;" onclick="history.back();"><i class="layui-icon">&#xe65a;</i>返回
+    </button>
+    </span>
+    <!--{/if}-->
+    <div class="pull-right">
+        <!--{if !isset($hideAddButton)}-->
+        <button data-{$formOpen|default="open" }='{:url("form")}?back=1' type="button" data-title="添加"
+                class='layui-btn layui-btn-sm layui-btn-primary'><i class="layui-icon layui-icon-add-1"></i>添加
+        </button>
+        <!--{/if}-->
+        <!--{if !isset($hideDeletesButton)}-->
+        <span class="layui-nav layui-bg-red layui-btn layui-btn-sm layui-inline" style="z-index:1">
+             <li class="layui-nav-item ">
+                 <a href="javascript:;" class='layui-btn layui-btn-sm layui-btn-danger' style="color: #ffffff"><i
+                         class="layui-icon layui-icon-delete"></i>批量删除</a>
+            <dl class="layui-nav-child">
+                <dd lay-unselect><a id="batch_delete">删除选中</a></dd>
+                <dd lay-unselect><a id="batch_delete_all">清空</a></dd>
+
+            </dl>
+             </li>
+        </span>
+        <script>
+            layui.use('element', function () {
+                var element = layui.element; //导航的hover效果、二级菜单等功能，需要依赖element模块
+                element.render('nav');
+                $('.layui-nav').css('padding', 0);
+                $('.layui-nav-item a').css('padding-left', 10);
+                $('.layui-nav-item a').css('padding-right', 17);
+                $('.layui-nav-child').css('top', 30);
+
+            });
+        </script>
+        <!--{/if}-->
+        <!--{if !isset($hideExportButton)}-->
+        <span class="layui-nav layui-bg-blue layui-btn layui-btn-sm layui-inline" style="z-index:1">
+             <li class="layui-nav-item ">
+                 <a href="javascript:;" class='layui-btn layui-btn-sm layui-btn-normal' style="color: #ffffff"><i
+                         class="layui-icon layui-icon-export"></i>导 出</a>
+            <dl class="layui-nav-child">
+                   <dd lay-unselect><a data-href='{:request()->url()}&export=true&export_type=all'>导出当前页</a></dd>
+                <dd lay-unselect><a id="excelPage">导出当前页</a></dd>
+                <dd lay-unselect><a id="excelSelect">导出选中行</a></dd>
+
+            </dl>
+             </li>
+        </span>
+        <!--{/if}-->
+    </div>
 </div>
-{/block}
-<script src="__STATIC__/plugs/require/require.js"></script>
-<script src="__STATIC__/app.js"></script>
-{block name="script"}{/block}
-</body>
-</html>
+<!--{/neq}-->
+<!--{/notempty}-->
+<!--{/block}-->
+{block name='content'}
+<div class="layui-card-body layui-anim layui-anim-upbit">
+    <div class="layui-card-body layui-card think-box-shadow">
+        <div class="layui-card-body">
+            <div class="">
+                {$filter|raw}
+                {$table|raw}
+            </div>
+        </div>
+    </div>
+</div>
+<!--{/block}-->
 

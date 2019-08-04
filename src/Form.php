@@ -75,12 +75,9 @@ class Form extends Field
         }
         $this->setOption('aciontUrl', request()->url());
         $this->template = 'form';
-        $this->importJs();
+        
     }
-    private function importJs(){
-        $js = file_get_contents(__DIR__ . '/view/admin.js');
-        $this->options['import_js'] = $js;
-    }
+    
 
     /**
      * 设置标题
@@ -178,11 +175,11 @@ class Form extends Field
         $tabs = array_count_values($types);
         $this->tabCount = $tabs['tab'];
         $html = $this->parseFormItem($html, $hasManyHtml);
-
-
+        
         $this->dataSave();
         $this->setOption('content', $html);
-        return $this->render();
+        $builder = new Builder();
+        return $builder->render($this->render());
     }
     //添加formtime
     protected function formItem($template,$field,$lable)
