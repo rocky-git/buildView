@@ -16,16 +16,7 @@
         </button>
         <!--{/if}-->
         <!--{if !isset($hideDeletesButton)}-->
-        <style>
-            .layui-nav-child dd{
-                height: 30px;
-                line-height: 30px;
-            }
-            .layui-nav-chil dd a:hover{
-                font-weight: bold;;
-                color: #000000;
-            }
-        </style>
+
         <span class="layui-nav layui-bg-red layui-btn layui-btn-sm layui-inline" style="z-index:1">
              <li class="layui-nav-item ">
                  <a href="javascript:;" class='layui-btn layui-btn-sm layui-btn-danger' style="color: #ffffff"><i
@@ -36,16 +27,6 @@
             </dl>
              </li>
         </span>
-        <script>
-            layui.use('element', function () {
-                var element = layui.element; //导航的hover效果、二级菜单等功能，需要依赖element模块
-                element.render('nav');
-                $('.layui-nav').css('padding', 0);
-                $('.layui-nav-item a').css('padding-left', 10);
-                $('.layui-nav-item a').css('padding-right', 30);
-                $('.layui-nav-child').css('top', 30);
-            });
-        </script>
         <!--{/if}-->
         <!--{if !isset($hideExportButton)}-->
         <span class="layui-nav layui-bg-blue layui-btn layui-btn-sm layui-inline" style="z-index:1">
@@ -61,6 +42,26 @@
              </li>
         </span>
         <!--{/if}-->
+        <style>
+            .layui-nav-child dd{
+                height: 30px;
+                line-height: 30px;
+            }
+            .layui-nav-chil dd a:hover{
+                font-weight: bold;;
+                color: #000000;
+            }
+        </style>
+        <script>
+            layui.use('element', function () {
+                var element = layui.element; //导航的hover效果、二级菜单等功能，需要依赖element模块
+                element.render('nav');
+                $('.layui-nav').css('padding', 0);
+                $('.layui-nav-item a').css('padding-left', 10);
+                $('.layui-nav-item a').css('padding-right', 30);
+                $('.layui-nav-child').css('top', 30);
+            });
+        </script>
     </div>
 </div>
 <!--{/neq}-->

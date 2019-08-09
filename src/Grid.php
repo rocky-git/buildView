@@ -61,9 +61,9 @@ class Grid extends Field
         $this->actionColumn = new Actions('actions_tools', '操作');
         $this->dataSave();
     }
-    //隐藏操作列详情
-    public function hideActionDetail(){
-        $this->actionColumn->hideDetail();
+    public function actions(\Closure $closure)
+    {
+        $this->actionColumn->setClosure($closure);
     }
     //数据保存
     private function dataSave()

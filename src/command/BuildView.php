@@ -115,10 +115,10 @@ class BuildView extends Make
             }
             list($grid,$detail,$form) = $this->getTableInfo($model);
             file_put_contents($pathname, $this->buildClass($classname_model,'model'));
-            $classname_model = $this->getClassName('common','model\\BaseModel');
-            $pathname = $this->getPathName($classname_model);
+            $classname_models = $this->getClassName('common','model\\BaseModel');
+            $pathname = $this->getPathName($classname_models);
             if (!is_file($pathname)) {
-                file_put_contents($pathname, $this->buildClass($classname_model,'baseModel'));
+                file_put_contents($pathname, $this->buildClass($classname_models,'baseModel'));
             }
         }
         $name = trim($input->getArgument('name'));
