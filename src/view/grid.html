@@ -16,6 +16,16 @@
         </button>
         <!--{/if}-->
         <!--{if !isset($hideDeletesButton)}-->
+        <style>
+            .layui-nav-child dd{
+                height: 30px;
+                line-height: 30px;
+            }
+            .layui-nav-chil dd a:hover{
+                font-weight: bold;;
+                color: #000000;
+            }
+        </style>
         <span class="layui-nav layui-bg-red layui-btn layui-btn-sm layui-inline" style="z-index:1">
              <li class="layui-nav-item ">
                  <a href="javascript:;" class='layui-btn layui-btn-sm layui-btn-danger' style="color: #ffffff"><i
@@ -23,7 +33,6 @@
             <dl class="layui-nav-child">
                 <dd lay-unselect><a id="batch_delete">删除选中</a></dd>
                 <dd lay-unselect><a id="batch_delete_all">清空</a></dd>
-
             </dl>
              </li>
         </span>
@@ -33,9 +42,8 @@
                 element.render('nav');
                 $('.layui-nav').css('padding', 0);
                 $('.layui-nav-item a').css('padding-left', 10);
-                $('.layui-nav-item a').css('padding-right', 17);
+                $('.layui-nav-item a').css('padding-right', 30);
                 $('.layui-nav-child').css('top', 30);
-
             });
         </script>
         <!--{/if}-->
@@ -45,7 +53,7 @@
                  <a href="javascript:;" class='layui-btn layui-btn-sm layui-btn-normal' style="color: #ffffff"><i
                          class="layui-icon layui-icon-export"></i>导 出</a>
             <dl class="layui-nav-child">
-                   <dd lay-unselect><a data-href='{:request()->url()}&export=true&export_type=all'>导出当前页</a></dd>
+                 <dd lay-unselect><a data-href='{:request()->url()}&export=true&export_type=all'>导出全部</a></dd>
                 <dd lay-unselect><a id="excelPage">导出当前页</a></dd>
                 <dd lay-unselect><a id="excelSelect">导出选中行</a></dd>
 
@@ -62,10 +70,8 @@
 <div class="layui-card-body layui-anim layui-anim-upbit">
     <div class="layui-card-body layui-card think-box-shadow">
         <div class="layui-card-body">
-            <div class="">
                 {$filter|raw}
                 {$table|raw}
-            </div>
         </div>
     </div>
 </div>

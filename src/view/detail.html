@@ -1,7 +1,23 @@
-{extend name='admin@public/content'}
+<!--{block name="header"}-->
+<!--{notempty name='title'}-->
+<!--{neq name="Think.get.open_type" value="modal"}-->
+<div class="layui-card-header box-thak-sh think-box-shadow">
+    <span class="layui-icon layui-icon-next font-s10 color-desc margin-right-5"></span>{$title|default=''}
+    <!--{if $Think.get.back eq 1}-->
+    <button style="position:absolute;right:5px;top: 5px" class="layui-btn layui-btn-sm layui-bg-black"
+            href="javascript:;" onclick="history.back();"><i class="layui-icon">&#xe65a;</i>返回
+    </button>
+    </span>
+    <!--{/if}-->
+</div>
+<!--{/neq}-->
+<!--{/notempty}-->
+<!--{/block}-->
 {block name="content"}
-<div class="layui-row layui-col-space15 layui-form">
-    {$detail|raw}
+<div class="layui-card-body layui-anim layui-anim-upbit">
+    <div class="layui-row layui-col-space15 layui-form">
+        {$detail|raw}
+    </div>
 </div>
 <script>window.form.render();</script>
 {/block}

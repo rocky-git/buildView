@@ -29,6 +29,7 @@ class BuildView extends Make
     protected function getStubs($name)
     {
         $stubPath = __DIR__ . DIRECTORY_SEPARATOR . 'buildview' . DIRECTORY_SEPARATOR;
+       
         return $stubPath . $name.'.stub';
     }
     protected function getClassName($module,$name)
@@ -114,6 +115,11 @@ class BuildView extends Make
             }
             list($grid,$detail,$form) = $this->getTableInfo($model);
             file_put_contents($pathname, $this->buildClass($classname_model,'model'));
+            $classname_model = $this->getClassName('common','model\\BaseModel');
+            $pathname = $this->getPathName($classname_model);
+            if (!is_file($pathname)) {
+                file_put_contents($pathname, $this->buildClass($classname_model,'baseModel'));
+            }
         }
         $name = trim($input->getArgument('name'));
         $classname = $this->getClassName('admin','controller\\'.$name);

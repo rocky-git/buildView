@@ -3,9 +3,9 @@
 namespace {%namespace%};
 
 use think\Controller;
-use app\common\tools\buildView\Detail;
-use app\common\tools\buildView\Form;
-use app\common\tools\buildView\Grid;
+use buildView\Detail;
+use buildView\Form;
+use buildView\Grid;
 use {%model_namespace%};
 class {%className%} extends Controller
 {

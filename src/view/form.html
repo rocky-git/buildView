@@ -1,18 +1,33 @@
-
+<!--{block name="header"}-->
+<!--{notempty name='title'}-->
+<!--{neq name="Think.get.open_type" value="modal"}-->
+<div class="layui-card-header box-thak-sh think-box-shadow">
+    <span class="layui-icon layui-icon-next font-s10 color-desc margin-right-5"></span>{$title|default=''}
+    <!--{if $Think.get.back eq 1}-->
+    <button style="position:absolute;right:5px;top: 5px" class="layui-btn layui-btn-sm layui-bg-black"
+            href="javascript:;" onclick="history.back();"><i class="layui-icon">&#xe65a;</i>返回
+    </button>
+    </span>
+    <!--{/if}-->
+</div>
+<!--{/neq}-->
+<!--{/notempty}-->
+<!--{/block}-->
 {block name="content"}
-<form class="layui-form layui-box think-box-shadow" action="{$aciontUrl}" data-auto="true" method="post" autocomplete="off">
-    <div class="layui-card-body">
-        {$content|raw}
-        <div class="hr-line-dashed"></div>
-        <div class="layui-form-item text-center">
-            {$hiddenId|raw}
-            <button class="layui-btn" lay-submit type='submit'>保存数据</button>
+<div class="layui-card-body layui-anim layui-anim-upbit">
+    <form class="layui-form layui-card-body think-box-shadow" action="{$aciontUrl}" data-auto="true" method="post" autocomplete="off">
+        <div class="layui-card-body">
+            {$content|raw}
+            <div class="hr-line-dashed"></div>
+            <div class="layui-form-item text-center">
+                {$hiddenId|raw}
+                <button class="layui-btn" lay-submit type='submit'>保存数据</button>
+            </div>
         </div>
-    </div>
     </form>
+</div>
+
 {/block}
-
-
 <script>
     {$script|raw}
     window.form.render();

@@ -32,17 +32,73 @@ class Field
     protected $md = 0;
     protected $appendHtml = '';
     protected $layuiVerify = ['required', 'phone', 'email', 'url', 'number', 'date', 'identity'];
+    protected $buildForm = null;
     public function __construct($template, $label, $name, $value)
     {
         $this->template = $template;
-
         $this->setOption('label', $label);
         $this->setOption('name', $name);
         $this->setOption('value', $value);
         $this->setOption('layui', 'block');
 
     }
-
+    public function setBuildForm($form){
+        $this->buildForm = $form;
+    }
+    /**
+     * 设置验证规则
+     * @Author: rocky
+     * 2019/8/9 10:59
+     * @param $rule 验证规则
+     * @param $msg 验证提示
+     * @param $type 0新增更新，1新增，2更新
+     */
+     private function setRule($rule, $msg,$type=0)
+    {
+        $rule = [
+            $this->name => $rule
+        ];
+        $ruleMsg = [];
+        foreach ($msg as $key => $m) {
+            $ruleMsg[$this->name . '.' . $key] = $m;
+        }
+        if (!is_null($this->buildForm)) {
+            $this->buildForm->setRules($rule, $ruleMsg,$type);
+        }
+    }
+    /**
+     * 表单新增更新验证规则
+     * @Author: rocky
+     * 2019/8/9 10:50
+     * @param $rule 验证规则
+     * @param $msg 验证提示
+     */
+    public function rule($rule,$msg=[]){
+        $this->setRule($rule, $msg);
+        return $this;
+    }
+    /**
+     * 表单新增验证规则
+     * @Author: rocky
+     * 2019/8/9 10:50
+     * @param $rule 验证规则
+     * @param $msg 验证提示
+     */
+    public function createRule($rule,$msg=[]){
+        $this->setRule($rule, $msg,1);
+        return $this;
+    }
+    /**
+     * 表单更新验证规则
+     * @Author: rocky
+     * 2019/8/9 10:50
+     * @param $rule 验证规则
+     * @param $msg 验证提示
+     */
+    public function updateRule($rule,$msg=[]){
+        $this->setRule($rule, $msg,2);
+        return $this;
+    }
     public function __call($name, $arguments)
     {
         if (!method_exists($this, $name)) {
@@ -56,12 +112,12 @@ class Field
     {
         return $this->options[$name];
     }
-
+    
     protected function setOption($key, $val)
     {
         $this->options[$key] = $val;
     }
-
+    //追加html
     public function append($html)
     {
         if ($html instanceof Button) {
@@ -113,4 +169,6 @@ class Field
         }
         return View::display($content, $this->options);
     }
+
+
 }

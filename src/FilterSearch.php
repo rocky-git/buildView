@@ -131,9 +131,9 @@ class FilterSearch
                 if ($callback instanceof \Closure) {
                     $class = 'app\\common\\model\\' . $this->camelize($relation_table);
                     if (class_exists($class)) {
-                        $this->relationModel = new Filter(new $class);
+                        $this->relationModel = new self(new $class);
                     } else {
-                        $this->relationModel = new Filter($relation_table);
+                        $this->relationModel = new self($relation_table);
                     }
                     call_user_func($callback, $this->relationModel);
                 }

@@ -60,7 +60,10 @@ class Grid extends Field
         $this->setSort();
         $this->actionColumn = new Actions('actions_tools', '操作');
         $this->dataSave();
-
+    }
+    //隐藏操作列详情
+    public function hideActionDetail(){
+        $this->actionColumn->hideDetail();
     }
     //数据保存
     private function dataSave()
@@ -304,10 +307,7 @@ class Grid extends Field
         return $this;
     }
 
-    public function actions(\Closure $closure)
-    {
-        $this->actionColumn->setClosure($closure);
-    }
+  
 
     /**
      * 设置列

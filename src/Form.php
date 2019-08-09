@@ -7,9 +7,12 @@
  */
 
 namespace buildView;
+
 use think\Collection;
+use think\Db;
 use think\exception\HttpResponseException;
 use think\facade\Request;
+use think\facade\Validate;
 use think\Model;
 use think\model\relation\BelongsTo;
 use think\model\relation\HasMany;
@@ -18,24 +21,24 @@ use think\model\relation\HasOne;
 /**
  * Class Form
  * @package app\common\tools\formview
- * @method Field text($field,$lable) 文本输入框;
- * @method Field hidden($field,$lable) 隐藏框框;
- * @method Field number($field,$lable) 数字输入框;
- * @method Field password($field,$lable) 密码输入框;
- * @method Field select($field,$lable) select选择框;
- * @method Field radio($field,$lable) radio单选框;
- * @method Field checkbox($field,$lable) checkbox复选框;
- * @method Field switch ($field,$lable) switch开关;
- * @method Field textarea($field,$lable) textarea文本框;
- * @method Field ckeditor($field,$lable) ckeditor编辑器;
- * @method Field image($field,$lable) 上传图片框;
- * @method Field file($field,$lable) 上传文件;
- * @method Field slider($field,$lable) 滑块框;
- * @method Field date($field,$lable) 日期框;
- * @method Field datetime($field,$lable) 日期时间框;
- * @method Field dateRange($field,$lable) 日期范围框;
- * @method Field timeRange($field,$lable) 时间范围框;
- * @method Field time($field,$lable) 时间框;
+ * @method Field text($field, $lable) 文本输入框;
+ * @method Field hidden($field, $lable) 隐藏框框;
+ * @method Field number($field, $lable) 数字输入框;
+ * @method Field password($field, $lable) 密码输入框;
+ * @method Field select($field, $lable) select选择框;
+ * @method Field radio($field, $lable) radio单选框;
+ * @method Field checkbox($field, $lable) checkbox复选框;
+ * @method Field switch ($field, $lable) switch开关;
+ * @method Field textarea($field, $lable) textarea文本框;
+ * @method Field ckeditor($field, $lable) ckeditor编辑器;
+ * @method Field image($field, $lable) 上传图片框;
+ * @method Field file($field, $lable) 上传文件;
+ * @method Field slider($field, $lable) 滑块框;
+ * @method Field date($field, $lable) 日期框;
+ * @method Field datetime($field, $lable) 日期时间框;
+ * @method Field dateRange($field, $lable) 日期范围框;
+ * @method Field timeRange($field, $lable) 时间范围框;
+ * @method Field time($field, $lable) 时间框;
  */
 class Form extends Field
 {
@@ -49,7 +52,20 @@ class Form extends Field
     protected $tabField = null;
     protected $tabNum = 0;
     protected $tabCount = 0;
+    //保存前回调
     protected $beforeSave = null;
+    //创建验证规则
+    protected $createRules = [
+        'rule' => [],
+        'msg' => [],
+    ];
+    //更新验证规则
+    protected $updateRules = [
+        'rule' => [],
+        'msg' => [],
+    ];
+    protected $configTable = 'SystemConfig';
+
     /**
      * Form constructor.
      * @param 模型
@@ -66,7 +82,7 @@ class Form extends Field
             $this->setOption('title', '添加');
             if ($id !== false) {
                 $this->data = $this->model->exists(true)->find($id);
-                if(empty($this->data)){
+                if (empty($this->data)) {
                     throw new HttpResponseException(json(['code' => 0, 'msg' => '数据不存在！', 'data' => []]));
                 }
                 $this->setOption('hiddenId', '<input type="hidden" value="' . $id . '" name="' . $this->model->getPk() . '">');
@@ -75,9 +91,36 @@ class Form extends Field
         }
         $this->setOption('aciontUrl', request()->url());
         $this->template = 'form';
-        
+
     }
-    
+
+    /**
+     * 设置表单验证规则
+     * @Author: rocky
+     * 2019/8/9 10:45
+     * @param $rule 验证规则
+     * @param $msg 验证提示
+     * @param int $type 0新增更新，1新增，2更新
+     */
+    public function setRules($rule, $msg, $type = 0)
+    {
+        switch ($type) {
+            case 0:
+                $this->createRules['rule'] = array_merge($this->createRules['rule'], $rule);
+                $this->createRules['msg'] = array_merge($this->createRules['msg'], $msg);
+                $this->updateRules['rule'] = array_merge($this->updateRules['rule'], $rule);
+                $this->updateRules['msg'] = array_merge($this->updateRules['msg'], $msg);
+                break;
+            case 1:
+                $this->createRules['rule'] = array_merge($this->createRules['rule'], $rule);
+                $this->createRules['msg'] = array_merge($this->createRules['msg'], $msg);
+                break;
+            case 2:
+                $this->updateRules['rule'] = array_merge($this->updateRules['rule'], $rule);
+                $this->updateRules['msg'] = array_merge($this->updateRules['msg'], $msg);
+                break;
+        }
+    }
 
     /**
      * 设置标题
@@ -87,7 +130,14 @@ class Form extends Field
     {
         $this->setOption('title', $title);
     }
-
+    /**
+     * 设置配置表名
+     * @param $configTable 表名
+     */
+    public function setConfigTable($configTable)
+    {
+        $this->configTable = $configTable;
+    }
     /**
      * 设置JS
      * @param $title 设置JS
@@ -106,6 +156,22 @@ class Form extends Field
         $this->setOption('aciontUrl', $url);
     }
 
+    //表单提交验证规则
+    private function checkRule($post)
+    {
+        if (array_key_exists($this->model->getPk(), $post)) {
+            //更新
+            $validate = Validate::make($this->updateRules['rule'], $this->updateRules['msg']);
+        } else {
+            //新增
+            $validate = Validate::make($this->createRules['rule'], $this->createRules['msg']);
+        }
+        $result = $validate->check($post);
+        if (!$result) {
+            throw new HttpResponseException(json(['code' => 0, 'msg' => $validate->getError(), 'data' => []]));
+        }
+    }
+
     /**
      * 数据保存
      * @Author: rocky
@@ -117,21 +183,22 @@ class Form extends Field
     {
         if (Request::isPost()) {
             $post = Request::post();
-            if(!is_null($this->beforeSave)){
-                $beforePost = call_user_func($this->beforeSave,Request::post());
-                $post = array_merge($post,$beforePost);
+            if (!is_null($this->beforeSave)) {
+                $beforePost = call_user_func($this->beforeSave, Request::post());
+                $post = array_merge($post, $beforePost);
             }
             if ($this->model instanceof Model) {
+                $this->checkRule($post);
                 $res = $this->model->save($post);
                 foreach ($this->relationArr as $relation) {
                     if ($this->model->$relation() instanceof BelongsTo || $this->model->$relation() instanceof HasOne) {
                         $relationData = $post[$relation];
-                        if(empty($this->data)){
+                        if (empty($this->data)) {
                             $this->model->$relation()->save($relationData);
-                        }else{
+                        } else {
                             $this->data->$relation->save($relationData);
                         }
-                    }elseif($this->model->$relation() instanceof HasMany){
+                    } elseif ($this->model->$relation() instanceof HasMany) {
                         $res = $this->model->save($post);
                         $realtionUpdateIds = $post[$relation]['id'];
                         $ids = Collection::make($this->data->$relation)->column('id');
@@ -150,8 +217,16 @@ class Form extends Field
                     }
                 }
             } else {
-                foreach ($post as $key => $val) {
-                    $res = sysconf($key, $val);
+                //不传入模型的时候默认配置表
+                foreach ($post as $name => $value) {
+                    if (Db::name($this->configTable)->where('name', $name)->count() > 0) {
+                        $res = Db::name($this->configTable)->where('name', $name)->setField('value', $value);
+                    } else {
+                        $res = Db::name($this->configTable)->insert([
+                            'name' => $name,
+                            'value' => $value
+                        ]);
+                    }
                 }
             }
             if ($res) {
@@ -159,7 +234,6 @@ class Form extends Field
             } else {
                 throw new HttpResponseException(json(['code' => 0, 'msg' => '数据保存失败, 请稍候再试!', 'data' => []]));
             }
-
         }
     }
 
@@ -175,14 +249,15 @@ class Form extends Field
         $tabs = array_count_values($types);
         $this->tabCount = $tabs['tab'];
         $html = $this->parseFormItem($html, $hasManyHtml);
-        
+
         $this->dataSave();
         $this->setOption('content', $html);
         $builder = new Builder();
         return $builder->render($this->render());
     }
-    //添加formtime
-    protected function formItem($template,$field,$lable)
+
+    //添加formitem
+    protected function formItem($template, $field, $lable)
     {
         if ($this->model instanceof Model) {
             if (is_array($field)) {
@@ -193,21 +268,22 @@ class Form extends Field
                 $val = $this->getData($field);
             }
         } else {
-            $val = sysconf($field);
+            $val = Db::name($this->configTable)->where('name', $field)->value('value');
         }
-        $names = explode('.',$field);
-        if(count($names) > 1){
+        $names = explode('.', $field);
+        if (count($names) > 1) {
             $relationMethod = $names[0];
             if (method_exists($this->model, $relationMethod)) {
                 if ($this->model->$relationMethod() instanceof BelongsTo || $this->model->$relationMethod() instanceof HasOne) {
-                    if(!in_array($names[0], $this->relationArr)){
-                        array_push($this->relationArr,$names[0]);
+                    if (!in_array($names[0], $this->relationArr)) {
+                        array_push($this->relationArr, $names[0]);
                     }
                 }
             }
             $field = "{$relationMethod}[{$names[1]}]";
         }
         $item = new Field($template, $lable, $field, $val);
+        $item->setBuildForm($this);
         array_push($this->formItem, $item);
         return $item;
     }
@@ -222,36 +298,38 @@ class Form extends Field
      * 一对多
      * @param $label 标签
      * @param $relationMethod 关联方法
-     * @param \Closure $closure 
+     * @param \Closure $closure
      */
     public function hasMany($label, $relationMethod, \Closure $closure)
     {
         if (method_exists($this->model, $relationMethod)) {
-            if($this->model->$relationMethod() instanceof HasMany){
+            if ($this->model->$relationMethod() instanceof HasMany) {
                 array_push($this->relationArr, $relationMethod);
                 array_push($this->formItem, ['type' => 'hasMany', 'label' => $label, 'relationMethod' => $relationMethod, 'closure' => $closure]);
-            }else{
-                abort(100,'关联方法不是一对多');
+            } else {
+                abort(100, '关联方法不是一对多');
             }
-        }else{
-            abort(100,'无效关联方法');
+        } else {
+            abort(100, '无效关联方法');
         }
     }
+
     //tab布局
     public function tab($title, \Closure $closure)
     {
         array_push($this->formItem, ['type' => 'tab', 'title' => $title, 'closure' => $closure]);
         return $this;
     }
+
     //获取字段数据
     protected function getData($field)
     {
         $fields = explode('.', $field);
         $val = $this->data;
         foreach ($fields as $f) {
-            if(isset($val[$f])){
+            if (isset($val[$f])) {
                 $val = $val[$f];
-            }else{
+            } else {
                 $val = '';
             }
         }
@@ -317,7 +395,7 @@ class Form extends Field
                         $this->tabField->setOption('tabTitles', $this->tabTitles);
                         $this->tabField->setOption('tabContents', $this->tabContents);
                     }
-                    if ($this->tabCount  == 1 || $this->tabCount  == $this->tabNum) {
+                    if ($this->tabCount == 1 || $this->tabCount == $this->tabNum) {
 
                         $html = $this->tabField->render();
 
@@ -328,8 +406,10 @@ class Form extends Field
         }
         return $html;
     }
+
     //保存前回调
-    public function saving(\Closure $closure){
+    public function saving(\Closure $closure)
+    {
         $this->beforeSave = $closure;
     }
 }
