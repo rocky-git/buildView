@@ -1,0 +1,215 @@
+<style>
+
+
+
+    .layuiadmin-badge {
+        position: absolute;
+        right: 15px
+    }
+
+    .layuiadmin-card-list {
+        padding: 15px;
+    }
+
+    .layuiadmin-big-font {
+        font-size: 36px;
+        color: #666;
+        line-height: 36px;
+        padding: 5px 0 10px;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        word-break: break-all;
+        white-space: nowrap
+    }
+
+    .layuiadmin-span-color {
+        font-size: 14px;
+        position: absolute;
+        right: 15px
+    }
+
+
+    .circle_bg{
+        width:110px;height: 110px;padding:5px;background-image:-webkit-linear-gradient(left, red 0%, blue 30%);box-shadow: 0 0 5px
+    }
+    .circle_box{
+        width:103px;height: 103px;text-align: center;background: #ffffff
+    }
+    .circle_font{
+        padding-top: 10px;color: #000000;font-size: 16px
+    }
+</style>
+
+        <div class="layui-row">
+            {foreach $headerAnalyze as $val}
+            <div class="layui-col-md{$md}">
+                <div class="layui-card-body">
+                <div class="layui-card layui-card-body">
+                    <div class="layui-card-header">
+                        {$val.text}
+                        <span class="layui-badge layui-bg-blue layuiadmin-badge">日</span>
+                    </div>
+                    <div class="layui-card-body layuiadmin-card-list">
+                        <p class="layuiadmin-big-font">{$val.todayCount}</p>
+                        <p>
+                            总计{$val.text} <span class="layui-text">{$val.count}</span>
+                            <span class="layuiadmin-span-color"><i class="fa fa-bar-chart" style="font-size: 30px; color: green;cursor: pointer" data-open="{:request()->baseUrl()}?{:request()->query()}&chartTable={$val.table}"></i></span>
+                        </p>
+
+                    </div>
+                </div>
+                </div>
+            </div>
+            {/foreach}
+        </div>
+
+<div class="layui-card-body layui-anim layui-anim-upbit">
+    <div class="layui-card-body layui-card think-box-shadow">
+        <div class="layui-card-body">
+        {$filter|raw}
+
+            <div class="layui-form-item layui-inline">
+                <button type="button" class="layui-btn layui-btn-sm layui-btn-checked" id="today">今天</button>
+                <button type="button" class="layui-btn layui-btn-sm layui-btn-primary" id="week">今周</button>
+                <button type="button" class="layui-btn layui-btn-sm layui-btn-primary" id="month">本月</button>
+                <button type="button" class="layui-btn layui-btn-sm layui-btn-primary" id="quarter">季度</button>
+                <button type="button" class="layui-btn layui-btn-sm layui-btn-primary" id="year">年</button>
+            </div>
+            <div class="layui-form-item layui-inline">
+                <label class="layui-form-label">日期范围</label>
+                <div class="layui-input-inline">
+                    <input name="create_at" id="create_at" value="{$Think.get.create_at}" placeholder="请选择日期"
+                           class="layui-input">
+                </div>
+            </div>
+
+        <div id="totalArr" class="layui-col-space15 layui-row"></div>
+        <div id="container" style="width:100%;height:390px;display: inline-flex;"></div>
+    </div>
+</div>
+</div>
+<script>
+    var obj = {};
+    var type = 'today';
+    $('.layui-form').removeClass().addClass('layui-form').on('submit',function () {
+        var arr = $(this).serializeArray();
+        arr.forEach(function(item){
+            obj[item.name] = item.value;
+        });
+        postChart();
+    });
+    initChart = function(title,text,series,dateArr,textType){
+        chart = echarts.init(document.getElementById('container'));
+        chart.resize({
+            width: $('#container').width() ,
+        });
+        window.onresize = chart.resize;
+        chart.setOption({
+            title: {
+                text: title
+            },
+            tooltip: {trigger: 'axis'},
+            grid: {top: '10%', left: '3%', right: '8%', bottom: '3%', containLabel: true},
+            xAxis: [{
+                type: 'category',
+                scale: false,
+                boundaryGap: false,
+                axisLabel: {
+                    color: '#2f9de2',
+                },
+                data: dateArr
+            }],
+            yAxis: [{
+                type: 'value',
+                scale: true,
+                max: function (value) {
+                    return Math.ceil(value.max / 50) * 2 + 10;
+                },
+                axisLabel: {
+                    color: '#2f9de2',
+                    formatter: "{value}"
+                },
+                splitLine: {
+                    lineStyle: {
+                        type: 'dashed',
+                        color: '#cccccc'
+                    }
+                }
+            }],
+            legend: {data: textType},
+            series: series
+        });
+    }
+    postChart();
+    window.form.render();
+    window.laydate.render({range: true, elem: '#create_at',done:function(value){
+            if(value != ''){
+                type='range';
+                postChart(value)
+            }
+        }});
+    $(function () {
+        $('#today').click(function () {
+            $(this).siblings('button').addClass('layui-btn-primary').removeClass('layui-btn-checked');
+            $(this).removeClass('layui-btn-primary').addClass('layui-btn-checked');
+
+            type='today';
+            postChart()
+        });
+        $('#week').click(function () {
+            $(this).siblings('button').addClass('layui-btn-primary').removeClass('layui-btn-checked');
+            $(this).removeClass('layui-btn-primary').addClass('layui-btn-checked');
+            type='week';
+            postChart()
+        });
+        $('#month').click(function () {
+            $(this).siblings('button').addClass('layui-btn-primary').removeClass('layui-btn-checked');
+            $(this).removeClass('layui-btn-primary').addClass('layui-btn-checked');
+            type='month';
+            postChart()
+        });
+        $('#quarter').click(function () {
+            $(this).siblings('button').addClass('layui-btn-primary').removeClass('layui-btn-checked');
+            $(this).removeClass('layui-btn-primary').addClass('layui-btn-checked');
+            type='quarter';
+            postChart()
+        });
+        $('#year').click(function () {
+            $(this).siblings('button').addClass('layui-btn-primary').removeClass('layui-btn-checked');
+            $(this).removeClass('layui-btn-primary').addClass('layui-btn-checked');
+            type='year';
+            postChart()
+        });
+    });
+    function postChart(daterange=0){
+        var index = layer.load(0,{time:5000});
+        $('#totalArr').html('');
+        $('#container').hide();
+        Object.assign(obj,{datetype: type,daterange:daterange});
+        $.post("{:request()->url()}",obj, function (data, status) {
+            if (data.code == 200) {
+                var res = data.data;
+
+                res.totalArr.forEach(function(item){
+                    $('#totalArr').append('<div class="layui-col-sm6 layui-col-md4">\n' +
+                        '                   <div class="layui-circle circle_bg layui-anim layui-anim-scaleSpring" style="margin: 0 auto">\n' +
+                        '                        <div class="layui-circle circle_box"  >\n' +
+                        '                            <p ><div class="layuiadmin-big-font circle_font" >'+item.count+'</div><div>'+item.text+'</div></p>\n' +
+                        '                        </div>\n' +
+                        '                    </div>\n' +
+                        '                </div>');
+                });
+                var textType = [];
+                res.series.forEach(function(item){
+                    textType.push(item.name);
+                });
+                initChart(res.title,res.text,res.series,res.dateArr,textType);
+                $('#container').show();
+                layer.close(index);
+            }
+        });
+    }
+
+
+
+</script>
