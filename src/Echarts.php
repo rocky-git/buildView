@@ -10,6 +10,7 @@ namespace buildView;
 
 
 use think\Db;
+use think\db\Query;
 use think\exception\HttpResponseException;
 use think\facade\Request;
 
@@ -44,6 +45,7 @@ class Echarts extends Field
     protected $headerAnalyze = [];
     protected $charts = [];
     protected $chartTable = '';
+
     public function __construct()
     {
 
@@ -59,7 +61,6 @@ class Echarts extends Field
      */
     public function create($model, $title, $filter, $type = 'line', $dateField = 'create_at')
     {
-
         $this->clone_db = null;
         if ($model instanceof Model) {
             $db = $this->model->db();
@@ -69,11 +70,10 @@ class Echarts extends Field
             $db = Db::name($model);
         }
         $this->db = $db;
-        if(empty($this->chartTable)){
-            $this->chartTable = Request::get('chartTable',false);
+        if (empty($this->chartTable)) {
+            $this->chartTable = Request::get('chartTable', false);
         }
-
-        if($this->chartTable == $db->getTable()){
+        if ($this->chartTable == $db->getTable()) {
             $this->chartTable = Request::get('chartTable');
             $this->charts[$db->getTable()] = [
                 'db' => $db,
@@ -81,38 +81,46 @@ class Echarts extends Field
                 'type' => $type,
                 'dateField' => $dateField
             ];
-            if(array_key_exists($this->chartTable,$this->charts)){
+            if (array_key_exists($this->chartTable, $this->charts)) {
                 $this->db = $this->charts[$this->chartTable]['db'];
-                $this->title =  $this->charts[$this->chartTable]['title'];
+                $this->title = $this->charts[$this->chartTable]['title'];
                 $this->dateField = $this->charts[$this->chartTable]['dateField'];
                 $this->type = $this->charts[$this->chartTable]['type'];
+                if ($filter instanceof \Closure) {
+                    $this->filter = new Filter($this->db);
+                    $this->filter->setRequest('post');
+                    call_user_func($filter, $this->filter);
+                    $this->db = $this->filter->db();
+                }
             }
-            if ($filter instanceof \Closure) {
-                $this->filter = new Filter($this->db);
-                $this->filter->setRequest('post');
-                call_user_func($filter, $this->filter);
-                $this->db = $this->filter->db();
-            }
-            
-        }else{
-            if(empty($this->chartTable)) {
+        } else {
+            if (empty($this->chartTable)) {
                 $this->chartTable = $db->getTable();
+                if ($filter instanceof \Closure) {
+                    $this->filter = new Filter($this->db);
+                    $this->filter->setRequest('post');
+                    call_user_func($filter, $this->filter);
+                    $this->db = $this->filter->db();
+                }
             }
             $this->db = $db;
-            $this->title =  $title;
+            $this->title = $title;
             $this->dateField = $dateField;
             $this->type = $type;
+
         }
+
         return $this;
     }
 
-    public function setHeader($text, $type, $field,$db_callback=null)
+    public function setHeader($text, $type, $field, $db_callback = null)
     {
         $this->model();
         if ($db_callback instanceof \Closure) {
             call_user_func($db_callback, $this->model());
         }
         $where = $this->db->getOptions('where');
+
         $table = $this->db->getTable();
         $this->headerAnalyze[] = [
             'table' => $this->db->getTable(),
@@ -120,11 +128,10 @@ class Echarts extends Field
             'todayCount' => Db::name($table)->setOption('where', $where)->whereTime($this->dateField, 'd')->$type($field),
             'count' => Db::name($table)->setOption('where', $where)->$type($field)
         ];
-        $this->setOption('headerAnalyze',$this->headerAnalyze);
+        $this->setOption('headerAnalyze', $this->headerAnalyze);
         return $this;
     }
 
-   
 
     public function __call($name, $arguments)
     {
@@ -170,17 +177,17 @@ class Echarts extends Field
     public function view()
     {
 
-        if (Request::isPost() ) {
+        if (Request::isPost()) {
             throw new HttpResponseException(json([
                 'code' => 200,
                 'data' => $this->data,
             ]));
-        }else{
+        } else {
             if (!is_null($this->filter)) {
                 $this->setOption('filter', $this->filter->render());
             }
-            $md =  12 / count($this->headerAnalyze);
-            $this->setOption('md',$md);
+            $md = 12 / count($this->headerAnalyze);
+            $this->setOption('md', $md);
             return $this->render();
         }
 
@@ -193,7 +200,6 @@ class Echarts extends Field
      */
     private function analyze($type, $field)
     {
-
         $post = Request::post();
         $data = [];
         $data['title'] = $this->title;
@@ -205,12 +211,13 @@ class Echarts extends Field
                 $dates = $this->get_week();
                 $data['dateArr'] = $dates;
                 foreach ($dates as $key => $date) {
-
-                    $count = Db::name($table)->setOption('where', $where)->whereBetweenTime($this->dateField, $date)->$type($field);
+                    $count = Db::name($table)->setOption('where', $where)->whereBetween($this->dateField, ["{$date} 00:00:00", "{$date} 23:59:59"])->$type($field);
                     array_push($countArr, $count);
                 }
-                $weekCount = Db::name($table)->setOption('where', $where)->whereTime($this->dateField, 'today')->$type($field);
-                $lastWeekCount = Db::name($table)->setOption('where', $where)->whereTime($this->dateField, 'yesterday')->$type($field);
+                $toDay = date('Y-m-d');
+                $yesterday = date("Y-m-d",strtotime("-1 day"));
+                $weekCount = Db::name($table)->setOption('where', $where)->whereBetween($this->dateField, ["{$toDay} 00:00:00", "{$toDay} 23:59:59"])->$type($field);
+                $lastWeekCount = Db::name($table)->setOption('where', $where)->whereBetween($this->dateField, ["{$yesterday} 00:00:00", "{$yesterday} 23:59:59"])->$type($field);
                 $weekCountPercent = $this->computePercent($weekCount, $lastWeekCount);
                 $this->data['totalArr'] = array_merge($this->data['totalArr'], [
                     [
@@ -232,7 +239,7 @@ class Echarts extends Field
                 $dates = $this->get_week();
                 $data['dateArr'] = $dates;
                 foreach ($dates as $key => $date) {
-                    $count = Db::name($table)->setOption('where', $where)->whereBetweenTime($this->dateField, $date)->$type($field);
+                    $count = Db::name($table)->setOption('where', $where)->whereBetween($this->dateField, ["{$date} 00:00:00", "{$date} 23:59:59"])->$type($field);
                     array_push($countArr, $count);
                 }
                 $weekCount = Db::name($table)->setOption('where', $where)->whereTime($this->dateField, 'week')->$type($field);
@@ -260,7 +267,7 @@ class Echarts extends Field
                     $data['dateArr'][$key] = ($key + 1) . '日';
                 }
                 foreach ($dates as $key => $date) {
-                    $count = Db::name($table)->setOption('where', $where)->whereBetweenTime($this->dateField, $date)->$type($field);
+                    $count = Db::name($table)->setOption('where', $where)->whereBetween($this->dateField, ["{$date} 00:00:00", "{$date} 23:59:59"])->$type($field);
                     array_push($countArr, $count);
                 }
                 $weekCount = Db::name($table)->setOption('where', $where)->whereTime($this->dateField, 'month')->$type($field);
@@ -363,7 +370,7 @@ class Echarts extends Field
                 $endDate = $dates[1];
                 $data['dateArr'] = $this->prDates($startDate, $endDate);
                 foreach ($data['dateArr'] as $key => $date) {
-                    $count = Db::name($table)->setOption('where', $where)->whereBetweenTime($this->dateField, $date)->$type($field);
+                    $count = Db::name($table)->setOption('where', $where)->whereBetween($this->dateField, ["{$date} 00:00:00", "{$date} 23:59:59"])->$type($field);
                     array_push($countArr, $count);
                 }
                 break;

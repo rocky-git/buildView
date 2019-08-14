@@ -10,7 +10,6 @@
     .layuiadmin-card-list {
         padding: 15px;
     }
-
     .layuiadmin-big-font {
         font-size: 36px;
         color: #666;
@@ -30,10 +29,10 @@
 
 
     .circle_bg{
-        width:110px;height: 110px;padding:5px;background-image:-webkit-linear-gradient(left, red 0%, blue 30%);box-shadow: 0 0 5px
+        width:115px;height: 115px;padding:5px;background-image:-webkit-linear-gradient(left, red 0%, blue 30%);box-shadow: 0 0 5px
     }
     .circle_box{
-        width:103px;height: 103px;text-align: center;background: #ffffff
+        width:108px;height: 108px;text-align: center;background: #ffffff
     }
     .circle_font{
         padding-top: 10px;color: #000000;font-size: 16px
@@ -68,7 +67,7 @@
         <div class="layui-card-body">
         {$filter|raw}
 
-            <div class="layui-form-item layui-inline">
+            <div class="layui-form-item layui-inline" id="dateButtonDiv">
                 <button type="button" class="layui-btn layui-btn-sm layui-btn-checked" id="today">今天</button>
                 <button type="button" class="layui-btn layui-btn-sm layui-btn-primary" id="week">今周</button>
                 <button type="button" class="layui-btn layui-btn-sm layui-btn-primary" id="month">本月</button>
@@ -96,7 +95,7 @@
         arr.forEach(function(item){
             obj[item.name] = item.value;
         });
-        postChart();
+        postChart($('#create_at').val());
     });
     initChart = function(title,text,series,dateArr,textType){
         chart = echarts.init(document.getElementById('container'));
@@ -122,9 +121,7 @@
             yAxis: [{
                 type: 'value',
                 scale: true,
-                max: function (value) {
-                    return Math.ceil(value.max / 50) * 2 + 10;
-                },
+
                 axisLabel: {
                     color: '#2f9de2',
                     formatter: "{value}"
@@ -144,12 +141,13 @@
     window.form.render();
     window.laydate.render({range: true, elem: '#create_at',done:function(value){
             if(value != ''){
-                type='range';
+                $('#dateButtonDiv').find('button').addClass('layui-btn-primary').removeClass('layui-btn-checked');
                 postChart(value)
             }
         }});
     $(function () {
         $('#today').click(function () {
+            $('#create_at').val('');
             $(this).siblings('button').addClass('layui-btn-primary').removeClass('layui-btn-checked');
             $(this).removeClass('layui-btn-primary').addClass('layui-btn-checked');
 
@@ -157,24 +155,28 @@
             postChart()
         });
         $('#week').click(function () {
+            $('#create_at').val('');
             $(this).siblings('button').addClass('layui-btn-primary').removeClass('layui-btn-checked');
             $(this).removeClass('layui-btn-primary').addClass('layui-btn-checked');
             type='week';
             postChart()
         });
         $('#month').click(function () {
+            $('#create_at').val('');
             $(this).siblings('button').addClass('layui-btn-primary').removeClass('layui-btn-checked');
             $(this).removeClass('layui-btn-primary').addClass('layui-btn-checked');
             type='month';
             postChart()
         });
         $('#quarter').click(function () {
+            $('#create_at').val('');
             $(this).siblings('button').addClass('layui-btn-primary').removeClass('layui-btn-checked');
             $(this).removeClass('layui-btn-primary').addClass('layui-btn-checked');
             type='quarter';
             postChart()
         });
         $('#year').click(function () {
+            $('#create_at').val('');
             $(this).siblings('button').addClass('layui-btn-primary').removeClass('layui-btn-checked');
             $(this).removeClass('layui-btn-primary').addClass('layui-btn-checked');
             type='year';

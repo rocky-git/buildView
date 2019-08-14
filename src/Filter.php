@@ -16,12 +16,14 @@ class Filter
 {
     public $formItem = [];
     protected $filter;
-
+    protected $requestMethod = 'get';
     public function __construct($model)
     {
         $this->filter = new FilterSearch($model);
     }
-
+    public function setRequest($request){
+        $this->requestMethod = $request;
+    }
     /**
      * like筛选
      * @Author: rocky
@@ -65,7 +67,6 @@ class Filter
         $this->template($field, $lable, 'dateRange');
         return $this;
     }
-
     /**
      * in筛选
      * @Author: rocky
@@ -90,15 +91,15 @@ class Filter
             if (count($fields) > 1) {
                 $field = '_' . $field;
                 $this->filter->relationWhere($fields[0], function ($q) use ($field, $method) {
-                    $q->$method($field);
+                    $q->$method($field,$this->requestMethod);
                 });
             } else {
-                $this->filter->$method($field);
+                $this->filter->$method($field,$this->requestMethod);
             }
         }
         if (is_array($field)) {
             foreach ($field as $val) {
-                $this->filter->$method($val);
+                $this->filter->$method($val,$this->requestMethod);
             }
         }
 

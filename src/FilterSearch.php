@@ -41,7 +41,8 @@ class FilterSearch
     protected $relationModel;
     //方法
     protected $method = ['like', 'eq', 'dateBetween', 'findIn', 'in'];
-
+    //数据库字段
+    protected $tableFields = [];
     /**
      * Filter constructor.
      * @param $model 模型或表名
@@ -53,38 +54,48 @@ class FilterSearch
             $this->model = $model;
             $this->db = $this->model->db();
         }elseif($model instanceof Query){
+
             $this->db = $model;
+
             $this->model = $model->getModel();
         } else {
             $this->db = Db::name($model);
         }
+
+        $this->tableFields = $this->db->getTableFields();
+
         $this->request = request();
+
     }
 
     private function filterField($method, $fields, $request = 'get')
     {
+
         $data = $this->request->$request();
         foreach (is_array($fields) ? $fields : explode(',', $fields) as $field) {
             if (isset($data[$field]) && $data[$field] !== '') {
-                $dbField = $this->getField($field);
-                switch ($method) {
-                    case 'like':
-                        $this->db->whereLike($dbField, "%$data[$field]%");
-                        break;
-                    case 'eq':
-                        $this->db->where($dbField, $data[$field]);
-                        break;
-                    case 'dateBetween':
-                        list($start, $end) = explode(' - ', $data[$field]);
-                        $this->db->whereBetween($dbField, ["{$start} 00:00:00", "{$end} 23:59:59"]);
-                        break;
-                    case 'findIn':
-                        $this->db->where("FIND_IN_SET($data[$field],$dbField)");
-                        break;
-                    case 'in':
-                        $this->db->whereIn($dbField, $data[$field]);
-                        break;
 
+                $dbField = $this->getField($field);
+                if(in_array($dbField,$this->tableFields)){
+                    switch ($method) {
+                        case 'like':
+                            $this->db->whereLike($dbField, "%$data[$field]%");
+                            break;
+                        case 'eq':
+                            $this->db->where($dbField, $data[$field]);
+
+                            break;
+                        case 'dateBetween':
+                            list($start, $end) = explode(' - ', $data[$field]);
+                            $this->db->whereBetween($dbField, ["{$start} 00:00:00", "{$end} 23:59:59"]);
+                            break;
+                        case 'findIn':
+                            $this->db->where("FIND_IN_SET($data[$field],$dbField)");
+                            break;
+                        case 'in':
+                            $this->db->whereIn($dbField, $data[$field]);
+                            break;
+                    }
                 }
             }
         }
@@ -166,6 +177,7 @@ class FilterSearch
     {
         if (in_array($name, $this->method)) {
             array_unshift($arguments, $name);
+
             call_user_func_array([$this, 'filterField'], $arguments);
         } else {
             if (method_exists($this->db, $name)) {
