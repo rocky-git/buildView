@@ -206,11 +206,6 @@ class Grid extends Field
         if(Request::get('table_sort')){
             $this->db->order(Request::get('field'),Request::get('order'));
         }
-        if ($this->isPage) {
-            $this->data = $this->db->page(Request::get('page'), Request::get('limit'))->select();
-        } else {
-            $this->data = $this->db->select();
-        }
         if (Request::get('export')) {
             switch (Request::get('export_type')) {
                 case 'all':
@@ -222,6 +217,12 @@ class Grid extends Field
                 case 'select':
                     $this->data = $this->model->whereIn('id', Request::get('ids'))->select();
                     break;
+            }
+        }else{
+            if ($this->isPage) {
+                $this->data = $this->db->page(Request::get('page'), Request::get('limit'))->select();
+            } else {
+                $this->data = $this->db->select();
             }
         }
         //导出表格表头
