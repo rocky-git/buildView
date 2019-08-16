@@ -185,7 +185,9 @@ class Form extends Field
             $post = Request::post();
             if (!is_null($this->beforeSave)) {
                 $beforePost = call_user_func($this->beforeSave, Request::post());
-                $post = array_merge($post, $beforePost);
+                if(is_array($beforePost)){
+                    $post = array_merge($post, $beforePost);
+                }
             }
             if ($this->model instanceof Model) {
                 $this->checkRule($post);

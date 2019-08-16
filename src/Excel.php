@@ -27,7 +27,7 @@ class Excel
      * @throws \PhpOffice\PhpSpreadsheet\Exception
      * @throws \PhpOffice\PhpSpreadsheet\Writer\Exception
      */
-    public static function exprot($title, $columnTitle, $data, $callback)
+    public static function exprot($title, $columnTitle, $data, $callback='')
     {
         $letter = array('A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z');
         $PHPExcel = new Spreadsheet();
@@ -44,7 +44,7 @@ class Excel
                 $val = call_user_func($callback, $val);
             }
             foreach ($columnTitle as $fkey => $fval) {
-                $worksheet->setCellValueByColumnAndRow($i, $key + 2, $val[$fkey]);
+                $worksheet->setCellValueByColumnAndRow($i, $key + 2, slef::filterEmoji($val[$fkey]));
                 $i++;
             }
             $i = 1;
@@ -79,5 +79,13 @@ class Excel
         $writer->save('php://output');
         exit;
     }
-
+    private static function filterEmoji($str)
+    {
+        $str = preg_replace_callback( '/./u',
+            function (array $match) {
+                return strlen($match[0]) >= 4 ? '' : $match[0];
+            },
+            $str);
+        return $str;
+    }
 }

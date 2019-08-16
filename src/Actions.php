@@ -22,9 +22,9 @@ class Actions
     public $field;
     public $title;
     protected $closure = null;
-    protected $detailButton = '<a class="layui-btn layui-btn-primary layui-btn-xs" lay-event="detail" ><i class="layui-icon layui-icon-about"></i>详情</a>';
-    protected $editButton = '<a class="layui-btn layui-btn-xs" lay-event="edit"><i class="layui-icon layui-icon-edit"></i>编辑</a>';
-    protected $delButton = '<a class="layui-btn layui-btn-danger layui-btn-xs" lay-event="del"><i class="layui-icon layui-icon-delete"></i>删除</a>';
+    protected $detailButton = '<a class="layui-btn layui-btn-primary layui-btn-sm" lay-event="detail" ><i class="layui-icon layui-icon-about"></i>详情</a>';
+    protected $editButton = '<a class="layui-btn layui-btn-sm" lay-event="edit"><i class="layui-icon layui-icon-edit"></i>编辑</a>';
+    protected $delButton = '<a class="layui-btn layui-btn-danger layui-btn-sm" lay-event="del"><i class="layui-icon layui-icon-delete"></i>删除</a>';
     protected $hideDetailButton = false;
     protected $hideEditButton = false;
     protected $hideDelButton = false;
