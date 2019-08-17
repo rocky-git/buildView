@@ -11,7 +11,8 @@ class {%className%} extends Controller
 {
     /**
      * 列表
-     *
+     * @auth true
+     * @menu true
      * @return string
      */
     public function index()
@@ -23,7 +24,8 @@ class {%className%} extends Controller
 
     /**
      * 详情
-     *
+     * @auth true
+     * @menu true
      * @return string
      */
     public function detail()
@@ -35,7 +37,8 @@ class {%className%} extends Controller
 
     /**
      * 添加/编辑
-     *
+     * @auth true
+     * @menu true
      * @return string
      */
     public function form()

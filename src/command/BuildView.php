@@ -107,7 +107,6 @@ class BuildView extends Make
             $pathname = $this->getPathName($classname_model);
             if (is_file($pathname)) {
                 $output->writeln('<error>' . $classname_model . ' already exists!</error>');
-                return false;
             }
 
             if (!is_dir(dirname($pathname))) {
