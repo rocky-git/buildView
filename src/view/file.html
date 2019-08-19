@@ -2,11 +2,11 @@
     <label class="layui-form-label">{$label}</label>
     <div class="layui-input-{$layui}">
         <input type="hidden" name="{$name}" value="{$value}">
-        <button type="button" id="{$name}" class="layui-btn layui-btn-primary"><i class="layui-icon layui-icon-vercode font-s14"></i>上传文件</button>
+        <!--<button type="button" id="{$name}" class="layui-btn layui-btn-primary"><i class="layui-icon layui-icon-vercode font-s14"></i>上传文件</button>-->
         {notempty name="$help"}
         <div class="help-block">{$help}</div>
         {/notempty}
-        <!--<button data-file="one"  data-safe="true"  data-field="{$name}" type="button" class="layui-btn layui-btn-primary"><i class="layui-icon layui-icon-vercode font-s14"></i>上传文件</button>-->
+        <button data-file="one"  data-safe="true"  data-field="{$name}" type="button" class="layui-btn layui-btn-primary"><i class="layui-icon layui-icon-vercode font-s14"></i>上传文件</button>
     </div>
 </div>
 <script>

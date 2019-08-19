@@ -22,12 +22,12 @@ class Builder
     public $css = [
     
         '/vendor/rockys/build-view/src/plugs/theme/css/console.css',
-        '/vendor/rockys/build-view/src/plugs/formSelect/formSelects-v4.css',
+//        '/vendor/rockys/build-view/src/plugs/formSelect/formSelects-v4.css',
     ];
     public $js = [
       
         'admin' => '/vendor/rockys/build-view/src/plugs/admin.js',
-        'formSelect'=> '/vendor/rockys/build-view/src/plugs/formSelect/formSelects-v4.min.js',
+//        'formSelect'=> '/vendor/rockys/build-view/src/plugs/formSelect/formSelects-v4.min.js',
     ];
 
 

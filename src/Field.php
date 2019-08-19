@@ -154,8 +154,14 @@ class Field
                 $this->options[$key] = "{$key}='{$option}' ";
             }
         }
-        $content = file_get_contents(__DIR__ . '/view/' . $this->template . '.html');
-       
+        $path = __DIR__ . '/view/' . $this->template . '.html';
+        if(file_exists($path)){
+            $content = file_get_contents($path);
+        }else{
+            $path = app()->getModulePath().'view/build_view/'. $this->template . '.html';
+          
+            $content = file_get_contents($path);
+        }
         if ($this->md > 0) {
             $content = '<div class="layui-col-md' . $this->md . '">' . $content . '</div>';
         }
@@ -169,6 +175,4 @@ class Field
         }
         return View::display($content, $this->options);
     }
-
-
 }

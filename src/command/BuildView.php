@@ -29,10 +29,10 @@ class BuildView extends Make
     protected function getStubs($name)
     {
         $stubPath = __DIR__ . DIRECTORY_SEPARATOR . 'buildview' . DIRECTORY_SEPARATOR;
-       
+
         return $stubPath . $name.'.stub';
     }
-    protected function getClassName($module,$name)
+    protected function getClassNames($module,$name)
     {
         return parent::getClassName($this->getNamespace('app', $module) . '\\' . $name) . (Config::get('controller_suffix') ? ucfirst(Config::get('url_controller_layer')) : '');
     }
@@ -41,7 +41,7 @@ class BuildView extends Make
     {
         return parent::getNamespace($appNamespace, $module) ;
     }
-    protected function buildClass($name,$type,$model='',$model_namespace='',$grid='',$detail='',$form='')
+    protected function buildClasss($name,$type,$model='',$model_namespace='',$grid='',$detail='',$form='')
     {
         $stub = file_get_contents($this->getStubs($type));
         $namespace = trim(implode('\\', array_slice(explode('\\', $name), 0, -1)), '\\');
@@ -87,15 +87,15 @@ class BuildView extends Make
             }elseif (strstr($val['Type'],'text')){
                 $form .= "\t\t".'$form->ckeditor(\''.$val['Field'].'\',\''.$label.'\');'.PHP_EOL;
             }else{
-                $form .= "\t\t".'$form->text(\''.$val['Field'].'\',\''.$label.'\');'.PHP_EOL;   
+                $form .= "\t\t".'$form->text(\''.$val['Field'].'\',\''.$label.'\');'.PHP_EOL;
             }
 
         }
-       return [
-           $grid,
-           $detail,
-           $form,
-       ];
+        return [
+            $grid,
+            $detail,
+            $form,
+        ];
     }
     protected function execute(Input $input, Output $output)
     {
@@ -103,7 +103,7 @@ class BuildView extends Make
         if($input->hasOption('model')){
             $model = $input->getOption('model');
             $this->getTableInfo($model);
-            $classname_model = $this->getClassName('common','model\\'.$model);
+            $classname_model = $this->getClassNames('common','model\\'.$model);
             $pathname = $this->getPathName($classname_model);
             if (is_file($pathname)) {
                 $output->writeln('<error>' . $classname_model . ' already exists!</error>');
@@ -113,15 +113,15 @@ class BuildView extends Make
                 mkdir(dirname($pathname), 0755, true);
             }
             list($grid,$detail,$form) = $this->getTableInfo($model);
-            file_put_contents($pathname, $this->buildClass($classname_model,'model'));
-            $classname_models = $this->getClassName('common','model\\BaseModel');
+            file_put_contents($pathname, $this->buildClasss($classname_model,'model'));
+            $classname_models = $this->getClassNames('common','model\\BaseModel');
             $pathname = $this->getPathName($classname_models);
             if (!is_file($pathname)) {
-                file_put_contents($pathname, $this->buildClass($classname_models,'baseModel'));
+                file_put_contents($pathname, $this->buildClasss($classname_models,'baseModel'));
             }
         }
         $name = trim($input->getArgument('name'));
-        $classname = $this->getClassName('admin','controller\\'.$name);
+        $classname = $this->getClassNames('admin','controller\\'.$name);
         $pathname = $this->getPathName($classname);
         if (is_file($pathname)) {
             $output->writeln('<error>' . $classname . ' already exists!</error>');
@@ -131,7 +131,7 @@ class BuildView extends Make
         if (!is_dir(dirname($pathname))) {
             mkdir(dirname($pathname), 0755, true);
         }
-        file_put_contents($pathname, $this->buildClass($classname,'controller',$model,$classname_model,$grid,$detail,$form));
+        file_put_contents($pathname, $this->buildClasss($classname,'controller',$model,$classname_model,$grid,$detail,$form));
         $output->writeln('<info>' . $this->type . ' created successfully.</info>');
     }
 }
