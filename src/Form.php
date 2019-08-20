@@ -15,6 +15,7 @@ use think\facade\Request;
 use think\facade\Validate;
 use think\Model;
 use think\model\relation\BelongsTo;
+use think\model\relation\BelongsToMany;
 use think\model\relation\HasMany;
 use think\model\relation\HasOne;
 
@@ -192,6 +193,7 @@ class Form extends Field
             if ($this->model instanceof Model) {
                 $this->checkRule($post);
                 $res = $this->model->save($post);
+
                 foreach ($this->relationArr as $relation) {
                     if ($this->model->$relation() instanceof BelongsTo || $this->model->$relation() instanceof HasOne) {
                         $relationData = $post[$relation];
@@ -201,7 +203,6 @@ class Form extends Field
                             $this->data->$relation->save($relationData);
                         }
                     } elseif ($this->model->$relation() instanceof HasMany) {
-                        $res = $this->model->save($post);
                         $realtionUpdateIds = $post[$relation]['id'];
                         $ids = Collection::make($this->data->$relation)->column('id');
                         $deleteIds = array_diff($ids, $realtionUpdateIds);
@@ -216,6 +217,13 @@ class Form extends Field
                             $this->model->$relation()->whereIn('id', $deleteIds)->delete();
                         }
                         $this->model->$relation()->saveAll($relationData);
+                    } elseif ($this->model->$relation() instanceof BelongsToMany) {
+                        $relationData = $post[$relation];
+                        if(empty($this->data)){
+                           $this->data = $this->model->find($post[$this->model->getPk()]);
+                        }
+                        $this->data->$relation()->detach();
+                        $this->data->$relation()->saveAll($relationData);
                     }
                 }
             } else {
@@ -267,7 +275,22 @@ class Form extends Field
                     $val[] = $this->getData($value);
                 }
             } else {
-                $val = $this->getData($field);
+                if($template == 'checkbox'){
+                    if($this->model->$field() instanceof BelongsToMany){
+                        array_push($this->relationArr, $field);
+                        $pk = $this->model->$field()->getPk();
+                        $relationData = $this->data->$field;
+                        if(is_null($relationData)){
+                            $val = [];
+                        }else{
+                            $val =$relationData->column($pk);
+                        }
+                    }else{
+                        abort(999, '不是多对多关系');
+                    }
+                }else{
+                    $val = $this->getData($field);
+                }
             }
         } else {
             $val = Db::name($this->configTable)->where('name', $field)->value('value');
