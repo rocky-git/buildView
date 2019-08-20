@@ -13,6 +13,7 @@ use Faker\Provider\File;
 use think\exception\HttpResponseException;
 use think\facade\Request;
 use think\Model;
+use think\model\relation\HasMany;
 
 class Grid extends Field
 {
@@ -52,6 +53,7 @@ class Grid extends Field
         } else {
             abort(999, '不是有效的模型');
         }
+
         $this->template = 'grid';
         $this->setOption('title', '列表');
         $this->column($model->getPk(), 'id')->hide();
@@ -79,12 +81,11 @@ class Grid extends Field
                         }else{
                             $res = $this->model->whereIn($this->model->getPk(), $deleteIds)->setField('is_deleted', 1);
                         }
-
                     } else {
                         if($deleteIds == 'all'){
-                            $res = $this->model->where('1=1')->delete();
+                            $res =  $this->deleteHasManyData(0);
                         }else{
-                            $res = $this->model->whereIn($this->model->getPk(),$deleteIds)->delete();
+                            $res = $this->deleteHasManyData($deleteIds);
                         }
                     }
                     if ($res) {
@@ -104,6 +105,50 @@ class Grid extends Field
         }
     }
 
+    /**
+     * 删除包含一对多关联数据
+     * @Author: rocky
+     * 2019/8/20 13:56
+     * @throws \ReflectionException
+     */
+    private function deleteHasManyData($deleteIds){
+        $reflection = new \ReflectionClass($this->model);
+        $methods = $reflection->getMethods(\ReflectionMethod::IS_PUBLIC);
+        $className = $reflection->getName();
+        $relation = [];
+        foreach ($methods as $method){
+            if($method->class == $className){
+                $name = $method->name;
+                if($this->model->$name() instanceof HasMany){
+                    array_push($relation,$name);
+                }
+            }
+        }
+        if(count($relation) > 0){
+            if($deleteIds == 0){
+                $deleteIds =  $this->model->column('id');
+                foreach ($deleteIds as $deleteId){
+                    $db = $this->model->get($deleteId,$relation);
+                    $res = $db->together($relation)->delete();
+                }
+            }else{
+                $deleteIds = explode(',',$deleteIds);
+                foreach ($deleteIds as $deleteId){
+                    if(!empty($deleteId)){
+                        $db = $this->model->get($deleteId,$relation);
+                        $res = $db->together($relation)->delete();
+                    }
+                }
+            }
+        }else{
+            if($deleteIds == 0){
+                $res = $this->model->where('1=1')->delete();
+            }else{
+                $res = $this->model->whereIn($this->model->getPk(),$deleteIds)->delete();
+            }
+        }
+        return $res;
+    }
     /**
      * 设置iframe中提交的参数
      * @Author: rocky
