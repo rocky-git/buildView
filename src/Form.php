@@ -219,11 +219,15 @@ class Form extends Field
                         $this->model->$relation()->saveAll($relationData);
                     } elseif ($this->model->$relation() instanceof BelongsToMany) {
                         $relationData = $post[$relation];
+                        if(is_string($relationData)){
+                            $relationData = explode(',',$relationData);
+                        }
                         if(empty($this->data)){
-                           $this->data = $this->model->find($post[$this->model->getPk()]);
+                           $pk  = $this->model->getPk();
+                           $this->data = $this->model->find($this->model->$pk);
                         }
                         $this->data->$relation()->detach();
-                        $this->data->$relation()->saveAll($relationData);
+                        $res = $this->data->$relation()->saveAll($relationData);
                     }
                 }
             } else {
@@ -275,18 +279,20 @@ class Form extends Field
                     $val[] = $this->getData($value);
                 }
             } else {
-                if($template == 'checkbox'){
-                    if($this->model->$field() instanceof BelongsToMany){
-                        array_push($this->relationArr, $field);
-                        $pk = $this->model->$field()->getPk();
-                        $relationData = $this->data->$field;
-                        if(is_null($relationData)){
-                            $val = [];
-                        }else{
-                            $val =$relationData->column($pk);
+                if($template == 'checkbox' || $template == 'select'){
+                    if(method_exists($this->model,$field)){
+                        if($this->model->$field() instanceof BelongsToMany){
+                            array_push($this->relationArr, $field);
+                            $pk = $this->model->$field()->getPk();
+                            $relationData = $this->data->$field;
+                            if(is_null($relationData)){
+                                $val = [];
+                            }else{
+                                $val =$relationData->column($pk);
+                            }
                         }
-                    }else{
-                        abort(999, '不是多对多关系');
+                    } else{
+                        $val = $this->getData($field);
                     }
                 }else{
                     $val = $this->getData($field);

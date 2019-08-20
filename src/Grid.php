@@ -13,6 +13,7 @@ use Faker\Provider\File;
 use think\exception\HttpResponseException;
 use think\facade\Request;
 use think\Model;
+use think\model\relation\BelongsToMany;
 use think\model\relation\HasMany;
 
 class Grid extends Field
@@ -115,21 +116,28 @@ class Grid extends Field
         $reflection = new \ReflectionClass($this->model);
         $methods = $reflection->getMethods(\ReflectionMethod::IS_PUBLIC);
         $className = $reflection->getName();
+        $manyRelations =[];
         $relation = [];
         foreach ($methods as $method){
             if($method->class == $className){
                 $name = $method->name;
                 if($this->model->$name() instanceof HasMany){
                     array_push($relation,$name);
+                }elseif($this->model->$name() instanceof BelongsToMany){
+                    array_push($manyRelations,$name);
                 }
             }
         }
-        if(count($relation) > 0){
+
+        if(count($relation) > 0 || count($manyRelations) > 0){
             if($deleteIds == 0){
                 $deleteIds =  $this->model->column('id');
                 foreach ($deleteIds as $deleteId){
                     $db = $this->model->get($deleteId,$relation);
                     $res = $db->together($relation)->delete();
+                    foreach ($manyRelations as $manyRelation){
+                        $db->$manyRelation()->detach();
+                    }
                 }
             }else{
                 $deleteIds = explode(',',$deleteIds);
@@ -137,6 +145,9 @@ class Grid extends Field
                     if(!empty($deleteId)){
                         $db = $this->model->get($deleteId,$relation);
                         $res = $db->together($relation)->delete();
+                        foreach ($manyRelations as $manyRelation){
+                            $db->$manyRelation()->detach();
+                        }
                     }
                 }
             }

@@ -15,7 +15,7 @@
 <script type="text/javascript">
     var formSelects = layui.formSelects;
     formSelects.render('{$name}',{
-        init:[{$value}],
+        init:{$value|raw|json_encode},
     });
 </script>
 {/if}

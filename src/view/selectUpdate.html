@@ -9,7 +9,7 @@
 <script type="text/javascript">
     var formSelects = layui.formSelects;
     formSelects.render('{$domId}',{
-        init:[{$value}],
+        init:{$value|raw|json_encode},
     });
     function removeByValue(arr, val) {
         for(var i=0; i<arr.length; i++) {
