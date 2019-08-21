@@ -17,6 +17,7 @@ use think\facade\View;
  * @method $this default() 默认值
  * @method $this layui() 布局
  * @method $this options($array) 选项数据
+ * @method $this load($field,$url) select联动
  * @method $this multiple($bool) 开启多选/多图
  * @method $this min() 最小值
  * @method $this max() 最大值
@@ -102,7 +103,11 @@ class Field
     public function __call($name, $arguments)
     {
         if (!method_exists($this, $name)) {
-            $val = array_shift($arguments);
+            if(count($arguments) == 1){
+                $val = array_shift($arguments);
+            }else{
+                $val = $arguments;
+            }
             $this->setOption($name, $val);
         }
         return $this;
