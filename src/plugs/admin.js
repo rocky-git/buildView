@@ -300,13 +300,23 @@ $(function () {
         $('form[data-auto]').map(function () {
             if ($(this).attr('data-listen') !== 'true') {
                 var callbackname = $(this).attr('data-callback');
-                $(this).attr('data-listen', 'true').validate(function (data) {
-                    var method = this.getAttribute('method') || 'POST';
-                    var tips = this.getAttribute('data-tips') || undefined;
-                    var url = this.getAttribute('action') || window.location.href;
-                    var callback = window[callbackname || '_default_callback'] || undefined;
-                    var time = this.getAttribute('data-time') || undefined;
-                    $.form.load(url, data, method, callback, true, tips, time);
+                form.on('submit(*)', function(data){
+                    var validate = true;
+                    var form = data.form;
+                    $(form).find('input').map(function(){
+                       if(!this.checkValidity() && validate){
+                           validate = false;
+                       }
+                    });
+                    if(validate){
+                        var method = form.getAttribute('method') || 'POST';
+                        var tips = form.getAttribute('data-tips') || undefined;
+                        var url = form.getAttribute('action') || window.location.href;
+                        var callback = window[callbackname || '_default_callback'] || undefined;
+                        var time = form.getAttribute('data-time') || undefined;
+                        $.form.load(url, data.field, method, callback, true, tips, time);
+                        return false;
+                    }
                 });
                 $(this).find('[data-form-loaded]').map(function () {
                     $(this).html(this.getAttribute('data-form-loaded') || this.innerHTML);

@@ -14,6 +14,14 @@
 <!--{/notempty}-->
 <!--{/block}-->
 {block name="content"}
+<style type="text/css">
+    input::-webkit-outer-spin-button,
+    input::-webkit-inner-spin-button{
+        -webkit-appearance: none !important;
+        margin: 0;
+    }
+    input[type="number"]{-moz-appearance:textfield;}
+</style>
 <div class="layui-card-body layui-anim layui-anim-upbit">
     <form class="layui-form layui-card-body think-box-shadow layui-box" action="{$aciontUrl}" method="post" data-auto="true" autocomplete="off">
         <div class="layui-card-body">
@@ -21,7 +29,7 @@
             <div class="hr-line-dashed"></div>
             <div class="layui-form-item text-center">
                 {$hiddenId|raw}
-                <button class="layui-btn" lay-submit type='submit'>保存数据</button>
+                <button class="layui-btn" lay-submit type='submit' lay-filter="*">保存数据</button>
             </div>
         </div>
     </form>
