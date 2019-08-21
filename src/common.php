@@ -9,3 +9,5 @@
 \think\Console::addDefaultCommands([
     'buildView\command\BuildView',
 ]);
+$lang = 'zh-cn';
+\think\facade\Lang::load(__DIR__ .'/lang/'.$lang.'.php');

@@ -71,7 +71,7 @@ class Excel
         }
         $row = count($data) + 1;
         $worksheet->getStyle("A1:{$letter[count($columnTitle)-1]}{$row}")->applyFromArray($styleArray);
-        $filename = "{$title}导出" . date('_YmdHi') . '分.xls';
+        $filename = $title. date('_YmdHi') . '分.xls';
         header('Content-Type: application/vnd.ms-excel');
         header('Content-Disposition: attachment;filename="' . $filename . '"');
         header('Cache-Control: max-age=0');

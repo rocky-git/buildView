@@ -43,12 +43,12 @@
                 <div class="layui-card layui-card-body">
                     <div class="layui-card-header">
                         {$val.text}
-                        <span class="layui-badge layui-bg-blue layuiadmin-badge">日</span>
+                        <span class="layui-badge layui-bg-blue layuiadmin-badge">{:lang('build_view_echart_day')}</span>
                     </div>
                     <div class="layui-card-body layuiadmin-card-list">
                         <p class="layuiadmin-big-font">{$val.todayCount}</p>
                         <p>
-                            总计{$val.text} <span class="layui-text">{$val.count}</span>
+                            {:lang('build_view_echart_total')}{$val.text} <span class="layui-text">{$val.count}</span>
                             <span class="layuiadmin-span-color"><i class="fa fa-bar-chart" style="font-size: 30px; color: green;cursor: pointer" data-open="{:request()->baseUrl()}?{:request()->query()}&chartTable={$val.table}"></i></span>
                         </p>
 
@@ -65,16 +65,16 @@
         {$filter|raw}
 
             <div class="layui-form-item layui-inline" id="dateButtonDiv">
-                <button type="button" class="layui-btn layui-btn-sm layui-btn-checked" id="today">今天</button>
-                <button type="button" class="layui-btn layui-btn-sm layui-btn-primary" id="week">今周</button>
-                <button type="button" class="layui-btn layui-btn-sm layui-btn-primary" id="month">本月</button>
-                <button type="button" class="layui-btn layui-btn-sm layui-btn-primary" id="quarter">季度</button>
-                <button type="button" class="layui-btn layui-btn-sm layui-btn-primary" id="year">年</button>
+                <button type="button" class="layui-btn layui-btn-sm layui-btn-checked" id="today">{:lang('build_view_echart_today')}</button>
+                <button type="button" class="layui-btn layui-btn-sm layui-btn-primary" id="week">{:lang('build_view_echart_week')}</button>
+                <button type="button" class="layui-btn layui-btn-sm layui-btn-primary" id="month">{:lang('build_view_echart_month')}</button>
+                <button type="button" class="layui-btn layui-btn-sm layui-btn-primary" id="quarter">{:lang('build_view_echart_quarter')}</button>
+                <button type="button" class="layui-btn layui-btn-sm layui-btn-primary" id="year">{:lang('build_view_echart_year')}</button>
             </div>
             <div class="layui-form-item layui-inline">
-                <label class="layui-form-label">日期范围</label>
+                <label class="layui-form-label">{:lang('build_view_please_date_range')}</label>
                 <div class="layui-input-inline">
-                    <input name="create_at" id="create_at" value="{$Think.get.create_at}" placeholder="请选择日期"
+                    <input name="create_at" id="create_at" value="{$Think.get.create_at}" placeholder="{:lang('build_view_please_select')}{:lang('build_view_please_date')}"
                            class="layui-input">
                 </div>
             </div>

@@ -80,14 +80,14 @@ class Form extends Field
                 abort(999, '不是有效的模型');
             }
             $id = Request::get('id', false);
-            $this->setOption('title', '添加');
+            $this->setOption('title', lang('build_view_add_btn'));
             if ($id !== false) {
                 $this->data = $this->model->exists(true)->find($id);
                 if (empty($this->data)) {
                     throw new HttpResponseException(json(['code' => 0, 'msg' => '数据不存在！', 'data' => []]));
                 }
                 $this->setOption('hiddenId', '<input type="hidden" value="' . $id . '" name="' . $this->model->getPk() . '">');
-                $this->setOption('title', '编辑');
+                $this->setOption('title', lang('build_view_grid_edit'));
             }
         }
         $this->setOption('aciontUrl', request()->url());
@@ -244,9 +244,9 @@ class Form extends Field
                 }
             }
             if ($res) {
-                throw new HttpResponseException(json(['code' => 1, 'msg' => '数据保存成功', 'data' => []]));
+                throw new HttpResponseException(json(['code' => 1, 'msg' => lang('build_view_action_success'), 'data' => []]));
             } else {
-                throw new HttpResponseException(json(['code' => 0, 'msg' => '数据保存失败, 请稍候再试!', 'data' => []]));
+                throw new HttpResponseException(json(['code' => 0, 'msg' =>  lang('build_view_action_error'), 'data' => []]));
             }
         }
     }
@@ -387,7 +387,7 @@ class Form extends Field
                             $f->name("{$form['relationMethod']}[{$f->field}][]");
                             $hasManyjsHtml = $hasManyjsHtml . $f->render();
                         }
-                        $hasManyjsHtml = '<div class="layui-row">' . $hasManyjsHtml . '<div class="layui-form-item"><div class="layui-input-block"><button type="button" class="layui-btn layui-btn-danger" data-hasMany="hasManyDel">移除</button></div></div></div>';
+                        $hasManyjsHtml = '<div class="layui-row">' . $hasManyjsHtml . '<div class="layui-form-item"><div class="layui-input-block"><button type="button" class="layui-btn layui-btn-danger" data-hasMany="hasManyDel">'.lang('build_view_action_remove_btn').'</button></div></div></div>';
                         foreach ($this->data[$form['relationMethod']] as $val) {
                             $hasItemHtml = '';
                             $idField = new Field('hidden', 'id', "{$form['relationMethod']}[id][]", $val['id']);

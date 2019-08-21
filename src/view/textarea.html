@@ -2,7 +2,7 @@
     <label class="layui-form-label">{$label}</label>
     <div class="layui-input-{$layui}">
         {if isset($required)}<input type="hidden" required>{/if}
-        <textarea lay-verify="{$layVerify}" lay-verType="tips" lay-reqText="请输入{$label}" name="{$name}" placeholder="请输入{$label}" class="layui-textarea">{$value}</textarea>
+        <textarea lay-verify="{$layVerify}" lay-verType="tips" lay-reqText="{:lang('build_view_please_input')}{$label}" name="{$name}" placeholder="{:lang('build_view_please_input')}{$label}" class="layui-textarea">{$value}</textarea>
         {notempty name="$help"}
         <div class="help-block">{$help}</div>
         {/notempty}

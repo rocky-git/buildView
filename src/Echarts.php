@@ -221,15 +221,15 @@ class Echarts extends Field
                 $weekCountPercent = $this->computePercent($weekCount, $lastWeekCount);
                 $this->data['totalArr'] = array_merge($this->data['totalArr'], [
                     [
-                        'text' => '今天' . $this->text,
+                        'text' => lang('build_view_echart_today') . $this->text,
                         'count' => $weekCount,
                     ],
                     [
-                        'text' => '昨天' . $this->text,
+                        'text' => lang('build_view_echart_yesterday'). $this->text,
                         'count' => $lastWeekCount,
                     ],
                     [
-                        'text' => '同比昨天' . $this->text,
+                        'text' => lang('build_view_echart_compared').lang('build_view_echart_yesterday') . $this->text,
                         'count' => $weekCountPercent,
                     ]
                 ]);
@@ -247,15 +247,15 @@ class Echarts extends Field
                 $weekCountPercent = $this->computePercent($weekCount, $lastWeekCount);
                 $this->data['totalArr'] = array_merge($this->data['totalArr'], [
                     [
-                        'text' => '本周' . $this->text,
+                        'text' => lang('build_view_echart_week') . $this->text,
                         'count' => $weekCount,
                     ],
                     [
-                        'text' => '上周' . $this->text,
+                        'text' => lang('build_view_echart_lastweek') . $this->text,
                         'count' => $lastWeekCount,
                     ],
                     [
-                        'text' => '同比上周' . $this->text,
+                        'text' => lang('build_view_echart_compared').lang('build_view_echart_lastweek') . $this->text,
                         'count' => $weekCountPercent,
                     ]
                 ]);
@@ -264,7 +264,7 @@ class Echarts extends Field
                 $dates = $this->getMonth();
                 $data['dateArr'] = $dates;
                 foreach ($data['dateArr'] as $key => $date) {
-                    $data['dateArr'][$key] = ($key + 1) . '日';
+                    $data['dateArr'][$key] = ($key + 1) . lang('build_view_echart_day');
                 }
                 foreach ($dates as $key => $date) {
                     $count = Db::name($table)->setOption('where', $where)->whereBetween($this->dateField, ["{$date} 00:00:00", "{$date} 23:59:59"])->$type($field);
@@ -275,15 +275,15 @@ class Echarts extends Field
                 $weekCountPercent = $this->computePercent($weekCount, $lastWeekCount);
                 $this->data['totalArr'] = array_merge($this->data['totalArr'], [
                     [
-                        'text' => '本月' . $this->text,
+                        'text' => lang('build_view_echart_month'). $this->text,
                         'count' => $weekCount,
                     ],
                     [
-                        'text' => '上月' . $this->text,
+                        'text' => lang('build_view_echart_lastmonth') . $this->text,
                         'count' => $lastWeekCount,
                     ],
                     [
-                        'text' => '同比上月' . $this->text,
+                        'text' => lang('build_view_echart_compared').lang('build_view_echart_lastmonth') . $this->text,
                         'count' => $weekCountPercent,
                     ]
                 ]);
@@ -308,32 +308,32 @@ class Echarts extends Field
                 $weekCountPercent = $this->computePercent($weekCount, $lastWeekCount);
                 $this->data['totalArr'] = array_merge($this->data['totalArr'], [
                     [
-                        'text' => '本季' . $this->text,
+                        'text' => lang('build_view_echart_thisquarter') . $this->text,
                         'count' => $weekCount,
                     ],
                     [
-                        'text' => '上季' . $this->text,
+                        'text' => lang('build_view_echart_lasquarter') . $this->text,
                         'count' => $lastWeekCount,
                     ],
                     [
-                        'text' => '同比上季' . $this->text,
+                        'text' => lang('build_view_echart_compared').lang('build_view_echart_lasquarter') . $this->text,
                         'count' => $weekCountPercent,
                     ]
                 ]);
                 $count = Db::name($table)->setOption('where', $where)->whereTime($this->dateField, [date('Y-01-01'), date('Y-03-31')])->$type($field);
-                $data['dateArr'][] = '第1季';
+                $data['dateArr'][] = lang('build_view_echart_the').'1 '.lang('build_view_echart_quarter');
                 array_push($countArr, $count);
                 $count = Db::name($table)->setOption('where', $where)->whereTime($this->dateField, [date('Y-04-01'), date('Y-06-30')])->$type($field);
 
-                $data['dateArr'][] = '第2季';
+                $data['dateArr'][] =lang('build_view_echart_the'). '2 '.lang('build_view_echart_quarter');
                 array_push($countArr, $count);
 
                 $count = Db::name($table)->setOption('where', $where)->whereTime($this->dateField, [date('Y-07-01'), date('Y-09-30')])->$type($field);
-                $data['dateArr'][] = '第3季';
+                $data['dateArr'][] =lang('build_view_echart_the'). '3 '.lang('build_view_echart_quarter');
                 array_push($countArr, $count);
 
                 $count = Db::name($table)->setOption('where', $where)->whereTime($this->dateField, [date('Y-10-01'), date('Y-12-31')])->$type($field);
-                $data['dateArr'][] = '第4季';
+                $data['dateArr'][] =lang('build_view_echart_the'). '4 '.lang('build_view_echart_quarter');
                 array_push($countArr, $count);
                 break;
             case 'year':
@@ -344,20 +344,20 @@ class Echarts extends Field
                 $weekCountPercent = $this->computePercent($weekCount, $lastWeekCount);
                 $this->data['totalArr'] = array_merge($this->data['totalArr'], [
                     [
-                        'text' => '今年' . $this->text,
+                        'text' => lang('build_view_echart_thisyear') . $this->text,
                         'count' => $weekCount,
                     ],
                     [
-                        'text' => '往年' . $this->text,
+                        'text' =>lang('build_view_echart_compared'). lang('build_view_echart_last_year') . $this->text,
                         'count' => $lastWeekCount,
                     ],
                     [
-                        'text' => '同比往年' . $this->text,
+                        'text' => lang('build_view_echart_last_year') . $this->text,
                         'count' => $weekCountPercent,
                     ]
                 ]);
                 for ($i = 1; $i <= 12; $i++) {
-                    $data['dateArr'][] = $i . '月';
+                    $data['dateArr'][] = $i . lang('build_view_echart_months');
                     $todayNum = date("t", strtotime(date('Y-m')));
                     $count = Db::name($table)->setOption('where', $where)->whereTime($this->dateField, [date("Y-{$i}-01"), date("Y-{$i}-{$todayNum}")])->$type($field);
                     array_push($countArr, $count);

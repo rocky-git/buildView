@@ -22,9 +22,9 @@ class Actions
     public $field;
     public $title;
     protected $closure = null;
-    protected $detailButton = '<a class="layui-btn layui-btn-primary layui-btn-sm" lay-event="detail" ><i class="layui-icon layui-icon-about"></i>详情</a>';
-    protected $editButton = '<a class="layui-btn layui-btn-sm" lay-event="edit"><i class="layui-icon layui-icon-edit"></i>编辑</a>';
-    protected $delButton = '<a class="layui-btn layui-btn-danger layui-btn-sm" lay-event="del"><i class="layui-icon layui-icon-delete"></i>删除</a>';
+    protected $detailButton = '';
+    protected $editButton = '';
+    protected $delButton = '';
     protected $hideDetailButton = false;
     protected $hideEditButton = false;
     protected $hideDelButton = false;
@@ -35,6 +35,9 @@ class Actions
     ];
     public function __construct($field, $title)
     {
+        $this->detailButton = '<a class="layui-btn layui-btn-primary layui-btn-sm" lay-event="detail" ><i class="layui-icon layui-icon-about"></i>'.lang('build_view_grid_detail').'</a>';
+        $this->delButton = '<a class="layui-btn layui-btn-danger layui-btn-sm" lay-event="del"><i class="layui-icon layui-icon-delete"></i>'.lang('build_view_grid_del').'</a>';
+        $this->editButton = '<a class="layui-btn layui-btn-sm" lay-event="edit"><i class="layui-icon layui-icon-edit"></i>'.lang('build_view_grid_edit').'</a>';
         $this->field = $field;
         $this->title = $title;
         $this->cols['field'] = $this->field;
@@ -117,23 +120,23 @@ class Actions
         }
 
         if (!$this->hideDetailButton) {
-            $width+=80;
+            $width+=100;
             $this->columnHtml .= $this->detailButton;
         }
         if (!$this->hideEditButton) {
-            $width+=80;
+            $width+=100;
             $this->columnHtml .= $this->editButton;
         }
         if (!$this->hideDelButton) {
-            $width+=80;
+            $width+=100;
             $this->columnHtml .= $this->delButton;
         }
         foreach ($this->prependArr as $val){
-            $width+=80;
+            $width+=100;
             $this->columnHtml  = $val . $this->columnHtml;
         }
         foreach ($this->appendArr as $val){
-            $width+=80;
+            $width+=100;
             $this->columnHtml .= $val;
         }
         $this->cols['width'] = $width;

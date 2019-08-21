@@ -5,7 +5,7 @@
         <div class="help-block">{$help}</div>
         {/notempty}
         {if isset($required)}<input type="hidden" required>{/if}
-        <textarea name="{$name}" placeholder="请输入{$label}" lay-verify="{$layVerify}" lay-verType="tips" lay-reqText="请输入{$label}" class="layui-textarea">{$value}</textarea>
+        <textarea name="{$name}" placeholder="{:lang('build_view_please_input')}{$label}" lay-verify="{$layVerify}" lay-verType="tips" lay-reqText="{:lang('build_view_please_input')}{$label}" class="layui-textarea">{$value}</textarea>
     </div>
 </div>
 <script>

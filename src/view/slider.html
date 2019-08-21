@@ -1,7 +1,7 @@
 <div class="layui-form-item">
     <label class="layui-form-label color-green">{$label}</label>
     <div class="layui-input-{$layui}">
-        <input readonly autocomplete="off" type="text" {$required}name="{$name}" value="{$value}"  placeholder="请输入{$label}" class="layui-input">
+        <input readonly autocomplete="off" type="text" {$required}name="{$name}" value="{$value}"  placeholder="{:lang('build_view_please_input')}{$label}" class="layui-input">
         <div id="{$name}"></div>
         {notempty name="$help"}
         <div class="help-block">{$help}</div>

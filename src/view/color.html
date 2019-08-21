@@ -2,7 +2,7 @@
     <label class="layui-form-label">{$label}</label>
     <div class="layui-input-inline" style="width: 120px">
         {if isset($required)}<input type="hidden" required>{/if}
-        <input autocomplete="off" type="text" {$min}{$max}name="{$name}" value="{$value}" lay-verify="{$layVerify}" lay-verType="tips" lay-reqText="请选择颜色" placeholder="请选择颜色" class="layui-input">
+        <input autocomplete="off" type="text" {$min}{$max}name="{$name}" value="{$value}" lay-verify="{$layVerify}" lay-verType="tips" lay-reqText="{:lang('build_view_please_select')}{:lang('build_view_please_color')}" placeholder="{:lang('build_view_please_select')}{:lang('build_view_please_color')}" class="layui-input">
         {notempty name="$help"}
         <div class="help-block">{$help}</div>
         {/notempty}

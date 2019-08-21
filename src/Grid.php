@@ -56,12 +56,12 @@ class Grid extends Field
         }
 
         $this->template = 'grid';
-        $this->setOption('title', '列表');
+        $this->setOption('title', lang('build_view_grid_list'));
         $this->column($model->getPk(), 'id')->hide();
         $this->table = new Field('table', '', '', '');
         $this->table->setOption('tableId', 'table_content' . time());
         $this->setSort();
-        $this->actionColumn = new Actions('actions_tools', '操作');
+        $this->actionColumn = new Actions('actions_tools', lang('build_view_grid_action'));
         $this->dataSave();
     }
     public function actions(\Closure $closure)
@@ -90,17 +90,17 @@ class Grid extends Field
                         }
                     }
                     if ($res) {
-                        throw new HttpResponseException(json(['code' => 1, 'msg' => '删除成功', 'data' => []]));
+                        throw new HttpResponseException(json(['code' => 1, 'msg' => lang('build_view_action_del_success'), 'data' => []]));
                     } else {
-                        throw new HttpResponseException(json(['code' => 0, 'msg' => '删除失败, 请稍候再试！', 'data' => []]));
+                        throw new HttpResponseException(json(['code' => 0, 'msg' => lang('build_view_action_error'), 'data' => []]));
                     }
                     break;
                 default:
                     $res = $this->model->whereIn($this->model->getPk(), Request::post('id'))->setField($action, Request::post('value'));
                     if ($res) {
-                        throw new HttpResponseException(json(['code' => 1, 'msg' => '操作成功', 'data' => []]));
+                        throw new HttpResponseException(json(['code' => 1, 'msg' =>  lang('build_view_action_success'), 'data' => []]));
                     } else {
-                        throw new HttpResponseException(json(['code' => 0, 'msg' => '操作失败, 请稍候再试！', 'data' => []]));
+                        throw new HttpResponseException(json(['code' => 0, 'msg' =>  lang('build_view_action_error'), 'data' => []]));
                     }
             }
         }

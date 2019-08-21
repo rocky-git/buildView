@@ -26,7 +26,7 @@ class Column
     protected $closure = null;
     protected $using = [];
     protected $fromFeild = null;
-    protected $defaultValue = '无';
+    protected $defaultValue = '--';
     public $totalRow = false;
     private $color = null;
     protected $layui_bg = [

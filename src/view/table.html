@@ -24,7 +24,7 @@
 <table class="layui-hide" id="{$tableId}" lay-filter="{$tableId}">
 </table>
 <div class="layui-form-item text-center">
-    <button type="button"  class='layui-btn' id="subbutton">确认选择</button>
+    <button type="button"  class='layui-btn' id="subbutton">{:lang('build_view_table_confirm_btn')}</button>
 </div>
 <script>
     if (window.frames.length != parent.frames.length) {
@@ -90,10 +90,10 @@
                 if('{$formOpen|default="open"}' == 'open'){
                     $.form.href(url, this);
                 }else{
-                    return $.form.modal(url, 'open_type=modal', $(this).attr('data-title') || '详情');
+                    return $.form.modal(url, 'open_type=modal', $(this).attr('data-title') || "{:lang('build_view_grid_detail')}");
                 }
             } else if(obj.event === 'del'){
-                layer.confirm('确认删除？', function(index){
+                layer.confirm("{:lang('build_view_table_delete_tip')}", function(index){
                     $.form.load('{:url(request()->url())}', {field: 'delete', value: data.id, id: data.id}, 'post');
                     layer.close(index);
                 });
@@ -104,13 +104,13 @@
                 if('{$formOpen|default="open"}' == 'open'){
                     $.form.href(url, this);
                 }else{
-                    return $.form.modal(url, 'open_type=modal', $(this).attr('data-title') || '编辑');
+                    return $.form.modal(url, 'open_type=modal', $(this).attr('data-title') || "{:lang('build_view_grid_edit')}");
                 }
             }
         });
         // 全部删除
         $('#batch_delete_all').click(function () {
-            $.msg.confirm('确定要删除这些数据吗？', function () {
+            $.msg.confirm("{:lang('build_view_table_delete_all_tip')}", function () {
                 $.form.load("{:url(request()->url())}", {field: 'delete', id: 'all'}, 'post');
             });
         })
@@ -123,7 +123,7 @@
             }
             var ids =  arr.join(",");
             if (ids.length < 1) {
-                return $.msg.tips('请选择需要操作的数据！');
+                return $.msg.tips("{:lang('build_view_please_select')}{:lang('build_view_table_confirm_tip')}");
             }
             $.msg.confirm('确定要删除这些数据吗？', function () {
                 $.form.load("{:url(request()->url())}", {field: 'delete', value: data.id, id: ids}, 'post');
@@ -146,7 +146,7 @@
             }
             var ids =  arr.join(",");
             if (ids.length < 1) {
-                return $.msg.tips('请选择需要操作的数据！');
+                return $.msg.tips("{:lang('build_view_please_select')}{:lang('build_view_table_confirm_tip')}");
             }
             window.location.href = '{:request()->url()}&export=true&export_type=select&ids='+ids;
         });
@@ -169,11 +169,11 @@
             }
             var ids =  arr.join(",");
             if (ids.length < 1) {
-                return $.msg.tips('请选择需要操作的数据！');
+                return $.msg.tips("{:lang('build_view_please_select')}{:lang('build_view_table_confirm_tip')}");
             }
             $.post("{$iframeUrl}",{select_ids:ids,value:'{$iframeValue}'},function(data,status){
                 if(data.code == 200){
-                    $.msg.success('添加成功', 1, function(){
+                    $.msg.success("{:lang('build_view_action_success')}", 1, function(){
                         top.$.form.reload();
                         parent.layer.close(parent.layer.getFrameIndex(window.name));
                     });

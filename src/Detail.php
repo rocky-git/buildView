@@ -53,7 +53,7 @@ class Detail extends Field
             }
         }
         $this->template = 'detail';
-        $this->setOption('title', '详情');
+        $this->setOption('title', lang('build_view_grid_detail'));
 
     }
 
@@ -62,9 +62,9 @@ class Detail extends Field
         if (Request::isPost()) {
             $res = $this->model->where($this->model->getPk(), Request::post('id'))->setField(Request::post('field'), Request::post('value'));
             if ($res) {
-                throw new HttpResponseException(json(['code' => 1, 'msg' => '操作成功', 'data' => []]));
+                throw new HttpResponseException(json(['code' => 1, 'msg' => lang('build_view_action_success'), 'data' => []]));
             } else {
-                throw new HttpResponseException(json(['code' => 0, 'msg' => '操作失败, 请稍候再试！', 'data' => []]));
+                throw new HttpResponseException(json(['code' => 0, 'msg' => lang('build_view_action_error'), 'data' => []]));
             }
         } else {
             $html = '';
