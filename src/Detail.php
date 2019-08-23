@@ -31,7 +31,10 @@ class Detail extends Field
     protected $columns = [];
     //布局
     protected $layoutArr = [];
-
+    //重新设置query条件
+    protected $queryFind = false;
+    //查询主键条件
+    protected $id = 0;
     /**
      * Form constructor.
      * @param 模型
@@ -47,7 +50,8 @@ class Detail extends Field
         }
         $id = Request::get('id', false);
         if ($id) {
-            $this->data = $this->model->find($id);
+            $this->id = $id;
+            $this->data = $this->model->find($id);;
             if(empty($this->data)){
                 throw new HttpResponseException(json(['code' => 0, 'msg' => '数据不存在！', 'data' => []]));
             }
@@ -146,10 +150,19 @@ class Detail extends Field
         return $html;
     }
 
-
+    /**
+     * 获取模型当前数据
+     * @Author: rocky
+     * 2019/8/22 14:56
+     * @return array|mixed
+     */
+    public function getModelData(){
+        return $this->data;
+    }
     //获取当前模型
     public function model()
     {
+        $this->queryFind = true;
         return $this->db->getModel();
     }
 
@@ -186,6 +199,10 @@ class Detail extends Field
      */
     public function column($field, $label)
     {
+        if($this->queryFind){
+            $this->queryFind = false;
+            $this->data = $this->db->find($this->id);
+        }
         $column = new Column($field, $label);
         array_push($this->columns, $column);
         return $column;

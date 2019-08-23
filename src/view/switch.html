@@ -1,7 +1,7 @@
 <div class="layui-form-item">
     <label class="layui-form-label">{$label}</label>
     <div class="layui-input-{$layui}">
-        <input type="checkbox" style="display:none!important;" lay-filter="switch-{$name}" {$required}name="switch-{$name}" {eq name="$value" value="$swithcStates['on']['value']|default='1'"}checked{/eq} lay-text="{$swithcStates['on']['text']|default='打开'}|{$swithcStates['off']['text']|default='关闭'}" lay-skin="switch">
+        <input type="checkbox" style="display:none!important;" lay-filter="switch-{$name}" {$required}name="switch-{$name}" {eq name="$value" value="$swithcStates['on']['value']|default='1'"}checked{/eq} lay-text="{$swithcStates['on']['text']|default=lang('build_view_grid_switch_on')}|{$swithcStates['off']['text']|default=lang('build_view_grid_switch_off')}" lay-skin="switch">
         <input name="{$name}" type="hidden" value="{$value}">
         {notempty name="$help"}
         <div class="help-block">{$help}</div>
@@ -12,14 +12,14 @@
      {eq name="$value" value="$swithcStates['on']['value']|default='1'"}
         $('input[name={$name}]').val('{$value}');
      {else/}
-         $('input[name={$name}]').val("{$swithcStates['off']['value']|default='0'}");
+         $('input[name={$name}]').val("{$swithcStates['off']['value']|default='-1'}");
          {/eq}
     form.on('switch(switch-{$name})', function(data){
         var value ='';
         if(data.elem.checked){
             value = "{$swithcStates['on']['value']|default='1'}";
         }else{
-            value = "{$swithcStates['off']['value']|default='0'}";
+            value = "{$swithcStates['off']['value']|default='-1'}";
         }
         $('input[name={$name}]').val(value);
     });

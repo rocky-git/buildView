@@ -149,7 +149,7 @@ class Field
      */
     public function render()
     {
-        if (empty($this->options['value'])) {
+        if (empty($this->options['value'])  && !is_numeric($this->options['value'])) {
             if (isset($this->options['default'])) {
                 $this->options['value'] = $this->options['default'];
             }

@@ -303,6 +303,11 @@ $(function () {
                 form.on('submit(*)', function(data){
                     var validate = true;
                     var form = data.form;
+                    if (typeof CKEDITOR === 'object' && typeof CKEDITOR.instances === 'object') {
+                        for (var instance in CKEDITOR.instances) {
+                            CKEDITOR.instances[instance].updateElement();
+                        }
+                    }
                     $(form).find('input').map(function(){
                        if(!this.checkValidity() && validate){
                            validate = false;
@@ -314,7 +319,7 @@ $(function () {
                         var url = form.getAttribute('action') || window.location.href;
                         var callback = window[callbackname || '_default_callback'] || undefined;
                         var time = form.getAttribute('data-time') || undefined;
-                        $.form.load(url, data.field, method, callback, true, tips, time);
+                        $.form.load(url,$(form).serialize(), method, callback, true, tips, time);
                         return false;
                     }
                 });

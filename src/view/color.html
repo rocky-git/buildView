@@ -2,22 +2,26 @@
     <label class="layui-form-label">{$label}</label>
     <div class="layui-input-inline" style="width: 120px">
         {if isset($required)}<input type="hidden" required>{/if}
-        <input autocomplete="off" type="text" {$min}{$max}name="{$name}" value="{$value}" lay-verify="{$layVerify}" lay-verType="tips" lay-reqText="{:lang('build_view_please_select')}{:lang('build_view_please_color')}" placeholder="{:lang('build_view_please_select')}{:lang('build_view_please_color')}" class="layui-input">
+        <input autocomplete="off" type="text" {$min}{$max}name="{$name}" data-name="name_{$build_view_rand}" value="{$value}" lay-verify="{$layVerify}" lay-verType="tips" lay-reqText="{:lang('build_view_please_select')}{:lang('build_view_please_color')}" placeholder="{:lang('build_view_please_select')}{:lang('build_view_please_color')}" class="layui-input">
         {notempty name="$help"}
         <div class="help-block">{$help}</div>
         {/notempty}
     </div>
-    <div class="layui-inline" style="left: -11px;"><div id="{$name}_color"></div></div>
+    <div class="layui-inline" style="left: -11px;"><div id="color_{$build_view_rand}"></div></div>
 </div>
 <script>
     layui.use('colorpicker', function(){
+        let i = Math.ceil(Math.random()*100000)
+        $('[data-name=name_{$build_view_rand}]').attr('data-name','newname_'+i);
+        $(document.getElementById('color_{$build_view_rand}')).attr('id','newname_'+i)
+        let input = $('[data-name=newname_'+i+']');
         //表单赋值
         var colorpicker = layui.colorpicker;
         colorpicker.render({
-            elem: '#{$name}_color'
+            elem: '#'+'newname_'+i
             ,color: '{$value}'
             ,done: function(color){
-                $('input[name={$name}]').val(color);
+                input.val(color);
             }
         });
     });

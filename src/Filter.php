@@ -136,7 +136,13 @@ class Filter
         $item->options($options);
         return $this;
     }
-
+    public function selectGroup($options)
+    {
+        $item = end($this->formItem);
+        $item->template = __FUNCTION__;
+        $item->options($options);
+        return $this;
+    }
     public function checkbox($options)
     {
         $item = end($this->formItem);

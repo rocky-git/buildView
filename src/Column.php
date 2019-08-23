@@ -74,7 +74,6 @@ class Column
             $this->value = $this->using[$this->value];
             $this->columnHtml = $this->value;
         }
-
         if (empty($this->htmlAttr)) {
             $this->columnHtml = $this->value;
         } else {
@@ -86,7 +85,9 @@ class Column
                 }
                 if(is_array($this->value)){
                     foreach ($this->value as $value){
-                        $this->columnHtml .= str_replace('_VALUE_', $value, $val);
+                        if(!empty($value) || is_numeric($value) ){
+                            $this->columnHtml .= str_replace('_VALUE_', $value, $val);
+                        }
                     }
 
                     if(!empty($this->value) || is_numeric($this->value) ){
@@ -95,6 +96,7 @@ class Column
                 }else{
 
                     if(!empty($this->value) || is_numeric($this->value) ){
+                        $val = str_replace('_RAND_', rand(100000,999999), $val);
                         $this->columnHtml = str_replace('_VALUE_', $this->value, $val);
                     }
                 }
@@ -238,7 +240,18 @@ class Column
         }
         $this->htmlAttr[] = "<img src='_VALUE_' data-tips-image='' height='{$height}' width='{$width}' {$radius}>";
     }
-
+    public function rate($length){
+        $this->htmlAttr[] = <<<EOF
+<div data-rate='_RAND_'></div><script>
+  layui.rate.render({
+      elem: $('[data-rate=_RAND_]')  //绑定元素
+      ,value:'_VALUE_'
+      ,length:{$length}
+      ,readonly:true
+    });
+  </script>
+EOF;
+    }
     //徽章显示
     public function badge($options = 'blue')
     {

@@ -8,13 +8,14 @@
     </div>
 </fieldset>
 <script>
+    var hasMany{$name} = '{$hasManyjsHtml|raw}';
+    hasMany{$name} = decodeURIComponent(hasMany{$name}.replace(/\+/g, '%20'));
     $('button[data-hasMany=hasManyDel]').click(function(){
         $(this).parent().parent().parent('.layui-row').remove();
     });
     $('button[data-hasMany=hasManyAdd]').click(function(){
-        var hasManyjsHtml = '{$hasManyjsHtml|raw}';
-        hasManyjsHtml = decodeURIComponent(hasManyjsHtml.replace(/\+/g, '%20'));
-        $('#hasMany{$name}').append(hasManyjsHtml);
+
+        $('#hasMany{$name}').append(hasMany{$name});
         $('button[data-hasMany=hasManyDel]').click(function(){
             $(this).parent().parent().parent('.layui-row').remove();
         });

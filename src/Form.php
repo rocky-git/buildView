@@ -27,6 +27,7 @@ use think\model\relation\HasOne;
  * @method Field number($field, $lable) 数字输入框;
  * @method Field password($field, $lable) 密码输入框;
  * @method Field select($field, $lable) select选择框;
+ * @method Field selectGroup($field, $lable) select分组选择框;
  * @method Field radio($field, $lable) radio单选框;
  * @method Field checkbox($field, $lable) checkbox复选框;
  * @method Field switch ($field, $lable) switch开关;
@@ -40,11 +41,12 @@ use think\model\relation\HasOne;
  * @method Field dateRange($field, $lable) 日期范围框;
  * @method Field timeRange($field, $lable) 时间范围框;
  * @method Field time($field, $lable) 时间框;
+ * @method Field color($field, $lable) 颜色框;
  */
 class Form extends Field
 {
     protected $formItem = [];
-    protected $model;
+    protected $model = null;
     protected $data = [];
     protected $tabArr = [];
     protected $relationArr = [];
@@ -172,7 +174,15 @@ class Form extends Field
             throw new HttpResponseException(json(['code' => 0, 'msg' => $validate->getError(), 'data' => []]));
         }
     }
-
+    /**
+     * 获取模型当前数据
+     * @Author: rocky
+     * 2019/8/22 14:56
+     * @return array|mixed
+     */
+    public function getModelData(){
+        return $this->data;
+    }
     /**
      * 数据保存
      * @Author: rocky
@@ -203,9 +213,15 @@ class Form extends Field
                             $this->data->$relation->save($relationData);
                         }
                     } elseif ($this->model->$relation() instanceof HasMany) {
+                        if(empty($this->data)){
+                            $pk  = $this->model->getPk();
+                            $this->data = $this->model->find($this->model->$pk);
+                        }
                         $realtionUpdateIds = $post[$relation]['id'];
-                        $ids = Collection::make($this->data->$relation)->column('id');
-                        $deleteIds = array_diff($ids, $realtionUpdateIds);
+                        $deleteIds = $this->data->$relation->column('id');
+                        if(is_array($realtionUpdateIds)){
+                            $deleteIds = array_diff($deleteIds, $realtionUpdateIds);
+                        }
                         $relationData = [];
                         $fields = array_keys($post[$relation]);
                         foreach ($fields as $field) {
@@ -223,8 +239,8 @@ class Form extends Field
                             $relationData = explode(',',$relationData);
                         }
                         if(empty($this->data)){
-                           $pk  = $this->model->getPk();
-                           $this->data = $this->model->find($this->model->$pk);
+                            $pk  = $this->model->getPk();
+                            $this->data = $this->model->find($this->model->$pk);
                         }
                         $this->data->$relation()->detach();
                         $res = $this->data->$relation()->saveAll($relationData);
@@ -243,7 +259,7 @@ class Form extends Field
                     }
                 }
             }
-            if ($res) {
+            if ($res || $this->model == null) {
                 throw new HttpResponseException(json(['code' => 1, 'msg' => lang('build_view_action_success'), 'data' => []]));
             } else {
                 throw new HttpResponseException(json(['code' => 0, 'msg' =>  lang('build_view_action_error'), 'data' => []]));
@@ -382,12 +398,16 @@ class Form extends Field
                         $hasManyjsHtml = '';
                         foreach ($this->formItem as $k => $f) {
                             if (is_null($f->field)) {
+                                $f->value('');
                                 $f->field($f->name);
                             }
+                            $f->build_view_rand(rand(10000,99999));
                             $f->name("{$form['relationMethod']}[{$f->field}][]");
                             $hasManyjsHtml = $hasManyjsHtml . $f->render();
+
                         }
                         $hasManyjsHtml = '<div class="layui-row">' . $hasManyjsHtml . '<div class="layui-form-item"><div class="layui-input-block"><button type="button" class="layui-btn layui-btn-danger" data-hasMany="hasManyDel">'.lang('build_view_action_remove_btn').'</button></div></div></div>';
+
                         foreach ($this->data[$form['relationMethod']] as $val) {
                             $hasItemHtml = '';
                             $idField = new Field('hidden', 'id', "{$form['relationMethod']}[id][]", $val['id']);
@@ -395,14 +415,18 @@ class Form extends Field
                                 if (is_null($f->field)) {
                                     $f->field($f->name);
                                 }
+
                                 $f->value($val[$f->field]);
+                                $f->build_view_rand(rand(10000,99999));
                                 $f->name("{$form['relationMethod']}[{$f->field}][]");
                                 $hasItemHtml = $hasItemHtml . $f->render();
                             }
-                            $hasItemHtml = '<div class="layui-row">' . $idField->render() . $hasItemHtml . '<div class="layui-form-item"><div class="layui-input-block"><button type="button" class="layui-btn layui-btn-danger" data-hasMany="hasManyDel">移除</button></div></div></div>';
+                            $hasItemHtml = '<div class="layui-row">' . $idField->render() . $hasItemHtml . '<div class="layui-form-item"><div class="layui-input-block"><button type="button" class="layui-btn layui-btn-danger" data-hasMany="hasManyDel">'.lang('build_view_action_remove_btn').'</button></div></div></div>';
                             $hasManyHtml .= $hasItemHtml;
                         }
+
                         $hasManyField = new Field('hasMany', $form['label'], $form['relationMethod'], $hasManyHtml);
+
                         $hasManyField->hasManyjsHtml(urlencode($hasManyjsHtml));
                         $html .= $hasManyField->render();
                         $this->formItem = $formItemArr;

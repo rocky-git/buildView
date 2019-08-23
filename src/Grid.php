@@ -233,10 +233,9 @@ class Grid extends Field
     public function setSort($field = 'sort')
     {
         if (in_array($field, $this->tableFields)) {
-            $this->column($field, '排序')->width(100)->style('background-color: #eee;')->editor();
+            $this->column($field, lang('build_view_grid_sort'))->width(100)->style('background-color: #eee;')->editor();
         }
     }
-
     //过滤
     public function filter($callback)
     {

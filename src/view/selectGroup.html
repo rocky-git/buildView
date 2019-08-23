@@ -4,7 +4,11 @@
         <select name="{$name}" lay-filter="{$name}" lay-verify="{$layVerify}" lay-verType="tips" lay-reqText="{:lang('build_view_please_select')}{$label}" lay-search {$required} {if isset($multiple)}xm-select="{$name}" xm-select-search{/if}>
         <option value="">{:lang('build_view_please_select')}{$label}</option>
         <!--{foreach $options as $key=>$val}-->
-            <option value="{$key}" {eq name="$value" value="$key"}selected{/eq}>{$val}</option>
+             <optgroup label="{$val.text}">
+                 <!--{foreach $val.son as $v}-->
+                <option value="{$v.id}" {eq name="$value" value="$v.id"}selected{/eq}>{$v.text}</option>
+                 <!--{/foreach}-->
+             </optgroup>
             <!--{/foreach}-->
         </select>
         <!--{notempty name="$help"}-->
