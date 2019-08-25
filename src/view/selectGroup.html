@@ -16,26 +16,27 @@
         <!--{/notempty}-->
     </div>
 </div>
-<!--{if isset($load)}-->
 <script type="text/javascript">
-form.on('select({$name})', function(data){
-    $.post("{:url($load[1])}",{q:data.value},function(result,status){
-        var data = result.data;
-        var str = '';
-        for(var x in data){
-            str += '<option value = "' + data[x].id + '">' + data[x].text + '</option>'
-        }
-        $('select[name={$load[0]}]').html(str);
-        form.render('select'); 
+    let i = Math.ceil(Math.random()*10000000)
+    $('[data-name=name_{$build_view_rand}]').attr('lay-filter','build_id_'+i);
+    $('[data-name=name_{$build_view_rand}]').attr('xm-select','build_id_'+i);
+    /*{if isset($load)}*/
+    form.on('select(build_id_'+i+')', function(data){
+        $.post("{:url($load[1])}",{q:data.value},function(result,status){
+            var data = result.data;
+            var str = '';
+            for(var x in data){
+                str += '<option value = "' + data[x].id + '">' + data[x].text + '</option>'
+            }
+            $('select[name={$load[0]}]').html(str);
+            form.render('select');
+        });
     });
-});
-</script>
-<!--{/if}-->
-<!--{if isset($multiple)}-->
-<script type="text/javascript">
+    /*{/if}*/
+    /*{if isset($multiple)}*/
     var formSelects = layui.formSelects;
-    formSelects.render('{$name}',{
+    formSelects.render('build_id_'+i,{
         init:{$value|raw|json_encode},
     });
+    /*{/if}*/
 </script>
-<!--{/if}-->

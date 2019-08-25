@@ -51,6 +51,7 @@
      'build_view_table_confirm_btn' => 'Confirm the choice ',
      'build_view_table_confirm_tip' => 'Data that needs to be manipulated ',
      'build_view_table_delete_tip' => 'Confirm Deletions ?',
+     'build_view_upload_file'=>'Upload Files',
      'build_view_table_delete_all_tip' => 'Are you sure you want to delete the data ?',
  ];
  

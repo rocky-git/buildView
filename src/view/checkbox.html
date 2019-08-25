@@ -2,10 +2,19 @@
     <label class="layui-form-label">{$label}</label>
     <div class="layui-{$layui}">
         {foreach $options as $key=>$val}
-        <input type="checkbox" style="display:none!important;" {$required}name="{$name}[]" title="{$val}" {if in_array($key,$value)}checked{/if} value="{$key}"/>
+        <input type="checkbox" style="display:none!important;" data-name="name_{$build_view_rand}" {$required} name="{$name}[]" title="{$val}" {if in_array($key,$value)}checked{/if} value="{$key}"/>
         {/foreach}
         {notempty name="$help"}
         <div class="help-block">{$help}</div>
         {/notempty}
     </div>
 </div>
+<script>
+    let i = Math.ceil(Math.random()*10000000)
+    $('[data-name=name_{$build_view_rand}]').attr('lay-filter','build_id_'+i);
+    let name = $('[data-name=name_{$build_view_rand}]').attr('name');
+    if(name.indexOf('[]') > -1){
+        name = name.replace('[]','');
+        $('[data-name=name_{$build_view_rand}]').attr('name',name+'['+i+']');
+    }
+</script>

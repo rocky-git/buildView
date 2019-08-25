@@ -51,6 +51,7 @@ return [
     'build_view_table_confirm_btn' => '确认选择',
     'build_view_table_confirm_tip' => '需要操作的数据',
     'build_view_table_delete_tip' => '确认删除？',
+    'build_view_upload_file'=>'上传文件',
     'build_view_table_delete_all_tip' => '确定要删除这些数据吗？',
 ];
  

@@ -4,14 +4,14 @@
         {if isset($required)}<input type="hidden" required>{/if}
         {if is_array($name)}
         <div class="layui-inline">
-            <input  lay-verify="{$layVerify}" readonly lay-verType="tips" lay-reqText="{:lang('build_view_please_select')}{:lang('build_view_please_start')}{$label}" name="{$name[0]}" id="{$name[0]}" value="{$value[0]|default=''}"  placeholder="{:lang('build_view_please_select')}{:lang('build_view_please_start')}{$label}" class="layui-input">
+            <input  lay-verify="{$layVerify}" readonly lay-verType="tips" lay-reqText="{:lang('build_view_please_select')}{:lang('build_view_please_start')}{$label}" data-name="name_{$build_view_rand}_1" name="{$name[0]}" value="{$value[0]|default=''}"  placeholder="{:lang('build_view_please_select')}{:lang('build_view_please_start')}{$label}" class="layui-input">
         </div>
         <div class="layui-inline">-</div>
         <div class="layui-inline">
-            <input  lay-verify="{$layVerify}" readonly lay-verType="tips" lay-reqText="{:lang('build_view_please_select')}{:lang('build_view_please_end')}{$label}" name="{$name[1]}" id="{$name[1]}" value="{$value[1]|default=''}"  placeholder="{:lang('build_view_please_select')}{:lang('build_view_please_end')}{$label}" class="layui-input">
+            <input  lay-verify="{$layVerify}" readonly lay-verType="tips" lay-reqText="{:lang('build_view_please_select')}{:lang('build_view_please_end')}{$label}" data-name="name_{$build_view_rand}_2" name="{$name[1]}" value="{$value[1]|default=''}"  placeholder="{:lang('build_view_please_select')}{:lang('build_view_please_end')}{$label}" class="layui-input">
         </div>
         {else/}
-        <input  lay-verify="{$layVerify}" readonly lay-verType="tips" lay-reqText="{:lang('build_view_please_select')}{$label}" name="{$name}" id="{$name}" value="{$value}"  placeholder="{:lang('build_view_please_select')}{$label}" class="layui-input">
+        <input  lay-verify="{$layVerify}" readonly lay-verType="tips" lay-reqText="{:lang('build_view_please_select')}{$label}" name="{$name}" data-name="name_{$build_view_rand}" value="{$value}"  placeholder="{:lang('build_view_please_select')}{$label}" class="layui-input">
         {/if}
         {notempty name="$help"}
         <div class="help-block">{$help}</div>
@@ -20,33 +20,36 @@
 </div>
 <script>
     layui.use('laydate', function(){
+        let i = Math.ceil(Math.random()*10000000);
         var laydate = layui.laydate;
         //执行一个laydate实例
-        {if is_array($name)}
+        /*{if is_array($name)}*/
+        $('[data-name=name_{$build_view_rand}_1]').attr('id','build_id_1'+i);
         laydate.render({
-            elem: '#{$name[0]}' //指定元素
+            elem: '#'+'build_id_1'+i
             ,type: 'datetime'
-        {if isset($format)}
-    ,format:'{$format}'
-        {/if}
+            /*{if isset($format)}*/
+            ,format:'{$format}'
+            /*{/if}*/
         });
+        $('[data-name=name_{$build_view_rand}_2]').attr('id','build_id_1'+i);
         laydate.render({
-            elem: '#{$name[1]}' //指定元素
+            elem: '#'+'build_id_1'+i
             ,type: 'datetime'
-        {if isset($format)}
-    ,format:'{$format}'
-        {/if}
+            /*{if isset($format)}*/
+            ,format:'{$format}'
+            /*{/if}*/
         });
-        {else/}
-            laydate.render({
-                elem: '#{$name}' //指定元素
-                ,type: 'datetime'
-                ,range: true
-            {if isset($format)}
-        ,format:'{$format}'
-            {/if}
-            });
-            {/if}
-
-            });
+        /*{else/}*/
+        $('[data-name=name_{$build_view_rand}]').attr('id','build_id_'+i);
+        laydate.render({
+            elem: '#'+'build_id_'+i
+            ,type: 'datetime'
+            ,range: true
+            /* {if isset($format)}*/
+            ,format:'{$format}'
+            /*{/if}*/
+        });
+        /*{/if}*/
+    });
 </script>

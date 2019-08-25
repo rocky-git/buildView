@@ -1,8 +1,8 @@
 <div class="layui-form-item">
     <label class="layui-form-label color-green">{$label}</label>
     <div class="layui-input-{$layui}">
-        <input readonly autocomplete="off" type="text" {$required}name="{$name}" value="{$value}"  placeholder="{:lang('build_view_please_input')}{$label}" class="layui-input">
-        <div id="{$name}"></div>
+        <input readonly autocomplete="off" type="text" {$required}name="{$name}" data-name="name_{$build_view_rand}" value="{$value}"  placeholder="{:lang('build_view_please_input')}{$label}" class="layui-input">
+        <div id="silder_{$build_view_rand}"></div>
         {notempty name="$help"}
         <div class="help-block">{$help}</div>
         {/notempty}
@@ -10,15 +10,19 @@
 </div>
 <script>
     layui.use('slider', function(){
+        let i = Math.ceil(Math.random()*10000000);
+        $('[data-name=name_{$build_view_rand}]').attr('data-name','newname_'+i);
+        $(document.getElementById('silder_{$build_view_rand}')).attr('id','build_name_'+i);
+        let input = $('[data-name=newname_'+i+']');
         var slider = layui.slider;
         //渲染
         slider.render({
-            elem: '#{$name}'  //绑定元素
+            elem: '#'+'build_name_'+i
             ,min:{$min|default='1'}
             ,max:{$max|default='100'}
             ,value:'{$value}'
             ,change: function(value){
-                $('input[name={$name}]').val(value);
+                input.val(value);
             }
         });
     });

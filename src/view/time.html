@@ -2,7 +2,7 @@
     <label class="layui-form-label">{$label}</label>
     <div class="layui-input-{$layui}">
         {if isset($required)}<input type="hidden" required>{/if}
-        <input   lay-verify="{$layVerify}" readonly lay-verType="tips" lay-reqText="{:lang('build_view_please_select')}{$label}" name="{$name}" id="{$name}" value="{$value}"  placeholder="{:lang('build_view_please_select')}{$label}" class="layui-input">
+        <input   lay-verify="{$layVerify}" readonly lay-verType="tips" lay-reqText="{:lang('build_view_please_select')}{$label}" name="{$name}" data-name="name_{$build_view_rand}" value="{$value}"  placeholder="{:lang('build_view_please_select')}{$label}" class="layui-input">
         {notempty name="$help"}
         <div class="help-block">{$help}</div>
         {/notempty}
@@ -10,10 +10,12 @@
 </div>
 <script>
     layui.use('laydate', function(){
+        let i = Math.ceil(Math.random()*10000000)
+        $('[data-name=name_{$build_view_rand}]').attr('id','build_id_'+i);
         var laydate = layui.laydate;
         //执行一个laydate实例
         laydate.render({
-            elem: '#{$name}' //指定元素
+            elem: '#'+'build_id_'+i
             ,type: 'time'
         {if isset($format)}
             ,format:'{$format}'

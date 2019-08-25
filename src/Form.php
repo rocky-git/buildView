@@ -401,7 +401,6 @@ class Form extends Field
                                 $f->value('');
                                 $f->field($f->name);
                             }
-                            $f->build_view_rand(rand(10000,99999));
                             $f->name("{$form['relationMethod']}[{$f->field}][]");
                             $hasManyjsHtml = $hasManyjsHtml . $f->render();
 
@@ -417,7 +416,6 @@ class Form extends Field
                                 }
 
                                 $f->value($val[$f->field]);
-                                $f->build_view_rand(rand(10000,99999));
                                 $f->name("{$form['relationMethod']}[{$f->field}][]");
                                 $hasItemHtml = $hasItemHtml . $f->render();
                             }

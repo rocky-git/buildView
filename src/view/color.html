@@ -11,14 +11,14 @@
 </div>
 <script>
     layui.use('colorpicker', function(){
-        let i = Math.ceil(Math.random()*100000)
+        let i = Math.ceil(Math.random()*10000000);
         $('[data-name=name_{$build_view_rand}]').attr('data-name','newname_'+i);
-        $(document.getElementById('color_{$build_view_rand}')).attr('id','newname_'+i)
+        $(document.getElementById('color_{$build_view_rand}')).attr('id','build_name_'+i);
         let input = $('[data-name=newname_'+i+']');
         //表单赋值
         var colorpicker = layui.colorpicker;
         colorpicker.render({
-            elem: '#'+'newname_'+i
+            elem: '#'+'build_name_'+i
             ,color: '{$value}'
             ,done: function(color){
                 input.val(color);
