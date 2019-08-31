@@ -96,6 +96,7 @@
     });
     initChart = function(title,text,series,dateArr,textType){
         chart = echarts.init(document.getElementById('container'));
+        chart.clear();
         chart.resize({
             width: $('#container').width() ,
         });

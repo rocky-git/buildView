@@ -40,6 +40,7 @@
         var table = layui.table;
         table.render({
             elem: '#{$tableId}'
+            ,skin:'line'
             ,url:'{:url(request()->url())}'
             ,autoSort:false
             ,where:{

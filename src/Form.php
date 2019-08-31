@@ -81,9 +81,9 @@ class Form extends Field
             } else {
                 abort(999, '不是有效的模型');
             }
-            $id = Request::get('id', false);
+            $id = Request::get('id', '');
             $this->setOption('title', lang('build_view_add_btn'));
-            if ($id !== false) {
+            if (!empty($id)) {
                 $this->data = $this->model->exists(true)->find($id);
                 if (empty($this->data)) {
                     throw new HttpResponseException(json(['code' => 0, 'msg' => '数据不存在！', 'data' => []]));
@@ -124,7 +124,22 @@ class Form extends Field
                 break;
         }
     }
-
+    /**
+     * 设置md布局
+     * @param $md 默认12
+     */
+    public function md($md=12)
+    {
+        $this->setOption('md', $md);
+    }
+    /**
+     * 设置方框风格的表单集
+     * @param $title 设置标题
+     */
+    public function setThemePane()
+    {
+        $this->setOption('theme', true);
+    }
     /**
      * 设置标题
      * @param $title 设置标题
@@ -194,75 +209,82 @@ class Form extends Field
     {
         if (Request::isPost()) {
             $post = Request::post();
-            if (!is_null($this->beforeSave)) {
-                $beforePost = call_user_func($this->beforeSave, Request::post());
-                if(is_array($beforePost)){
-                    $post = array_merge($post, $beforePost);
+            Db::startTrans();
+            try {
+                if (!is_null($this->beforeSave)) {
+                    $beforePost = call_user_func($this->beforeSave, Request::post());
+                    if (is_array($beforePost)) {
+                        $post = array_merge($post, $beforePost);
+                    }
                 }
-            }
-            if ($this->model instanceof Model) {
-                $this->checkRule($post);
-                $res = $this->model->save($post);
+                if ($this->model instanceof Model) {
+                    $this->checkRule($post);
+                    $res = $this->model->save($post);
 
-                foreach ($this->relationArr as $relation) {
-                    if ($this->model->$relation() instanceof BelongsTo || $this->model->$relation() instanceof HasOne) {
-                        $relationData = $post[$relation];
-                        if (empty($this->data)) {
-                            $this->model->$relation()->save($relationData);
-                        } else {
-                            $this->data->$relation->save($relationData);
-                        }
-                    } elseif ($this->model->$relation() instanceof HasMany) {
-                        if(empty($this->data)){
-                            $pk  = $this->model->getPk();
-                            $this->data = $this->model->find($this->model->$pk);
-                        }
-                        $realtionUpdateIds = $post[$relation]['id'];
-                        $deleteIds = $this->data->$relation->column('id');
-                        if(is_array($realtionUpdateIds)){
-                            $deleteIds = array_diff($deleteIds, $realtionUpdateIds);
-                        }
-                        $relationData = [];
-                        $fields = array_keys($post[$relation]);
-                        foreach ($fields as $field) {
-                            foreach ($post[$relation][$field] as $key => $val) {
-                                $relationData[$key][$field] = $val;
+                    foreach ($this->relationArr as $relation) {
+                        if ($this->model->$relation() instanceof BelongsTo || $this->model->$relation() instanceof HasOne) {
+                            $relationData = $post[$relation];
+                            if (empty($this->data)) {
+                                $this->model->$relation()->save($relationData);
+                            } else {
+                                $this->data->$relation->save($relationData);
                             }
+                        } elseif ($this->model->$relation() instanceof HasMany) {
+                            if (empty($this->data)) {
+                                $pk = $this->model->getPk();
+                                $this->data = $this->model->find($this->model->$pk);
+                            }
+                            $realtionUpdateIds = $post[$relation]['id'];
+                            $deleteIds = $this->data->$relation->column('id');
+                            if (is_array($realtionUpdateIds)) {
+                                $deleteIds = array_diff($deleteIds, $realtionUpdateIds);
+                            }
+                            $relationData = [];
+                            $fields = array_keys($post[$relation]);
+                            foreach ($fields as $field) {
+                                foreach ($post[$relation][$field] as $key => $val) {
+                                    $relationData[$key][$field] = $val;
+                                }
+                            }
+                            if (count($deleteIds) > 0) {
+                                $this->model->$relation()->whereIn('id', $deleteIds)->delete();
+                            }
+                            $this->model->$relation()->saveAll($relationData);
+                        } elseif ($this->model->$relation() instanceof BelongsToMany) {
+                            $relationData = $post[$relation];
+                            if (is_string($relationData)) {
+                                $relationData = explode(',', $relationData);
+                            }
+                            if (empty($this->data)) {
+                                $pk = $this->model->getPk();
+                                $this->data = $this->model->find($this->model->$pk);
+                            }
+                            $this->data->$relation()->detach();
+                            $res = $this->data->$relation()->saveAll($relationData);
                         }
-                        if (count($deleteIds) > 0) {
-                            $this->model->$relation()->whereIn('id', $deleteIds)->delete();
+                    }
+                } else {
+                    //不传入模型的时候默认配置表
+                    foreach ($post as $name => $value) {
+                        if (Db::name($this->configTable)->where('name', $name)->count() > 0) {
+                            $res = Db::name($this->configTable)->where('name', $name)->setField('value', $value);
+                        } else {
+                            $res = Db::name($this->configTable)->insert([
+                                'name' => $name,
+                                'value' => $value
+                            ]);
                         }
-                        $this->model->$relation()->saveAll($relationData);
-                    } elseif ($this->model->$relation() instanceof BelongsToMany) {
-                        $relationData = $post[$relation];
-                        if(is_string($relationData)){
-                            $relationData = explode(',',$relationData);
-                        }
-                        if(empty($this->data)){
-                            $pk  = $this->model->getPk();
-                            $this->data = $this->model->find($this->model->$pk);
-                        }
-                        $this->data->$relation()->detach();
-                        $res = $this->data->$relation()->saveAll($relationData);
                     }
                 }
-            } else {
-                //不传入模型的时候默认配置表
-                foreach ($post as $name => $value) {
-                    if (Db::name($this->configTable)->where('name', $name)->count() > 0) {
-                        $res = Db::name($this->configTable)->where('name', $name)->setField('value', $value);
-                    } else {
-                        $res = Db::name($this->configTable)->insert([
-                            'name' => $name,
-                            'value' => $value
-                        ]);
-                    }
+                Db::commit();
+                if ($res || $this->model == null) {
+                    throw new HttpResponseException(json(['code' => 1, 'msg' => lang('build_view_action_success'), 'data' => []]));
+                } else {
+                    throw new HttpResponseException(json(['code' => 0, 'msg' => lang('build_view_action_error'), 'data' => []]));
                 }
-            }
-            if ($res || $this->model == null) {
-                throw new HttpResponseException(json(['code' => 1, 'msg' => lang('build_view_action_success'), 'data' => []]));
-            } else {
-                throw new HttpResponseException(json(['code' => 0, 'msg' =>  lang('build_view_action_error'), 'data' => []]));
+            } catch (Exception $e) {
+                Db::rollback();
+                throw new HttpResponseException(json(['code' => 0, 'msg' => lang('build_view_action_error'), 'data' => []]));
             }
         }
     }

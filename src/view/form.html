@@ -22,8 +22,8 @@
     }
     input[type="number"]{-moz-appearance:textfield;}
 </style>
-<div class="layui-card-body layui-anim layui-anim-upbit">
-    <form class="layui-form layui-card-body think-box-shadow layui-box" action="{$aciontUrl}" method="post" data-auto="true" autocomplete="off">
+<div class="layui-card-body layui-anim layui-anim-upbit col-md-{$md|default='12'}"">
+    <form class="layui-form layui-card-body think-box-shadow layui-box {if isset($theme)}layui-form-pane{/if}" action="{$aciontUrl}" method="post" data-auto="true" autocomplete="off">
         <div class="layui-card-body">
             {$content|raw}
             <div class="hr-line-dashed"></div>
@@ -35,7 +35,7 @@
     </form>
 </div>
 {/block}
-{$script|raw}
 <script>
+    {$script|raw}
     window.form.render();
 </script>

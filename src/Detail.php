@@ -77,7 +77,7 @@ class Detail extends Field
                 call_user_func($layout['closure'], $this);
                 if ($layout['type'] == 'layout') {
                     $html .= '<div class="layui-col-md' . $layout['md'] . '"><blockquote  class="layui-elem-quote think-box-shadow" style="font-size: 14px;margin-bottom: 0px;font-weight: bold">' . $layout['title'] . '</blockquote>' . $this->parseColumnHtml() . '</div>';
-                }elseif($layout['type'] == 'hasMany'){
+                }elseif($layout['type'] == 'hasMany' || $layout['type'] == 'array'){
                     $html .= '<div class="layui-col-md' . $layout['md'] . '"><blockquote  class="layui-elem-quote think-box-shadow" style="font-size: 14px;margin-bottom: 0px;font-weight: bold">' . $layout['title'] . '</blockquote>' . $this->parsehasManyHtml($layout['relationMethod']) . '</div>';
                 }
             }
@@ -88,6 +88,11 @@ class Detail extends Field
     public function layout($title, $md, \Closure $closure)
     {
         array_push($this->layoutArr, ['type' => 'layout', 'title' => $title, 'md' => $md, 'closure' => $closure]);
+        return $this;
+    }
+    public function hasManyArray($relationMethod,$title, $md,\Closure $closure)
+    {
+        array_push($this->layoutArr, ['type' => 'array', 'title' => $title, 'md' => $md,'relationMethod'=>$relationMethod,  'closure' => $closure]);
         return $this;
     }
     public function hasMany($relationMethod,$title, $md,\Closure $closure)
@@ -128,7 +133,7 @@ class Detail extends Field
             $tr .= '<tr>'.$td.'</tr>';
         }
         $html .= $tr;
-        $html = '<table class="layui-table" style="margin-top:0px ">' . $html . '</table>';
+        $html = '<table class="layui-table" lay-skin="line" style="margin-top:0px ">' . $html . '</table>';
         $this->columns = [];
         return $html;
     }
@@ -143,7 +148,11 @@ class Detail extends Field
         $html = '';
         foreach ($this->columns as $column) {
             $column->setData($this->data);
-            $html .= '<tr><td >' . $column->title . '：' . $column->render() . '</td></tr>';
+            if(empty($column->title)){
+                $html .= '<tr><td >' .  $column->render() . '</td></tr>';
+            }else{
+                $html .= '<tr><td >' . $column->title . '：' . $column->render() . '</td></tr>';
+            }
         }
         $html = '<table class="layui-table" lay-size="lg" style="margin-top:0px ">' . $html . '</table>';
         $this->columns = [];

@@ -2,7 +2,7 @@
     <label class="layui-form-label">{$label}</label>
     <div class="layui-input-{$layui}">
         {if isset($required)}<input type="hidden" required>{/if}
-        <input autocomplete="off" type="number" {$min}{$max}{$readonly}name="{$name}" value="{$value}" lay-verify="{$layVerify}" lay-verType="tips" lay-reqText="{:lang('build_view_please_input')}{$label}" placeholder="{:lang('build_view_please_input')}{$label}" class="layui-input">
+        <input autocomplete="off" type="number" step="0.01" {$min}{$max}{$readonly}name="{$name}" value="{$value}" lay-verify="{$layVerify}" lay-verType="tips" lay-reqText="{:lang('build_view_please_input')}{$label}" placeholder="{:lang('build_view_please_input')}{$label}" class="layui-input">
         {notempty name="$help"}
         <div class="help-block">{$help}</div>
         {/notempty}

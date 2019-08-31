@@ -12,6 +12,11 @@
 <script>
     let i = Math.ceil(Math.random()*10000000)
     $('[data-name=name_{$build_view_rand}]').attr('lay-filter','build_id_'+i);
+    /*{if isset($event)}*/
+    form.on('radio(build_id_'+i+')', function (data) {
+        {$event|raw}
+    });
+    /*{/if}*/
     let name = $('[data-name=name_{$build_view_rand}]').attr('name');
     if(name.indexOf('[]') > -1){
         name = name.replace('[]','');
