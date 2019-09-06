@@ -324,7 +324,7 @@ class Grid extends Field
             throw new HttpResponseException(json(['code' => 0, 'msg' => '操作成功', 'data' => $tableData, 'count' => $this->db->removeOption('page')->removeOption('order')->count()]));
         }
         if (Request::get('export')) {
-            Excel::exprot($this->options['title'], $excelTitle, $excelData);
+            Excel::export($this->options['title'], $excelTitle, $excelData);
         }
         if (!is_null($this->filter)) {
             $this->setOption('filter', $this->filter->render());

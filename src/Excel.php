@@ -13,6 +13,7 @@ namespace buildView;
 use PhpOffice\PhpSpreadsheet\IOFactory;
 use PhpOffice\PhpSpreadsheet\Spreadsheet;
 use think\Collection;
+use think\Db;
 
 class Excel
 {
@@ -27,10 +28,10 @@ class Excel
      * @throws \PhpOffice\PhpSpreadsheet\Exception
      * @throws \PhpOffice\PhpSpreadsheet\Writer\Exception
      */
-    public static function exprot($title, $columnTitle, $data, $callback='')
+    public static function export($title, $columnTitle, $data, $callback = '')
     {
         set_time_limit(0);
-        ini_set ('memory_limit', '-1');
+        ini_set('memory_limit', '-1');
         $letter = array('A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z');
         $PHPExcel = new Spreadsheet();
         $worksheet = $PHPExcel->getActiveSheet();
@@ -73,7 +74,7 @@ class Excel
         }
         $row = count($data) + 1;
         $worksheet->getStyle("A1:{$letter[count($columnTitle)-1]}{$row}")->applyFromArray($styleArray);
-        $filename = $title. date('_YmdHi') . '分.xls';
+        $filename = $title . date('_YmdHi') . '分.xls';
         ob_end_clean();
         header('Content-Type: application/vnd.ms-excel');
         header('Content-Disposition: attachment;filename="' . $filename . '"');
@@ -82,9 +83,53 @@ class Excel
         $writer->save('php://output');
         exit;
     }
+
+    /**
+     * Excel导入数据库
+     * @Author: rocky
+     * 2019/9/6 18:49
+     * @param $filename 文件路径
+     * @param $table 数据库表名
+     * @param $columnFields 字段 ['title','content']
+     * @param int $sheet 第几个工作表 默认第一个
+     * @param int $rowIndex 第几行开始 默认第二行
+     * @param int $cellIndex 第几列开始 默认第一列
+     * @param null $rowCount 多少行 默认全部 如果是数组指定第哪几行 [3,5]
+     * @return bool
+     * @throws \PhpOffice\PhpSpreadsheet\Exception
+     * @throws \PhpOffice\PhpSpreadsheet\Reader\Exception
+     */
+    public static function inport($filename, $table, $columnFields, $sheet = 0, $rowIndex = 2, $cellIndex = 1, $rowCount = null)
+    {
+        $Excel = IOFactory::load($filename);
+        $excel_array = $Excel->getSheet($sheet)->toArray();
+        $data = [];
+        $excel_data = [];
+        if(is_array($rowCount)){
+            $excel_array = array_slice($excel_array, $rowIndex - 1, null);
+            foreach ($rowCount as $key=>$value){
+                array_push($excel_data,$excel_array[$value-1]);
+            }
+            $excel_array = $excel_data;
+        }else{
+            $excel_array = array_slice($excel_array, $rowIndex - 1, $rowCount);
+        }
+        foreach ($excel_array as $key => $value) {
+            $rowData = [];
+            $cell = $cellIndex - 1;
+            foreach ($columnFields as $k => $field) {
+                $rowData[$field] = $value[$cell];
+                $cell++;
+            }
+            array_push($data, $rowData);
+        }
+        Db::name($table)->insertAll($data);
+        return true;
+    }
+
     private static function filterEmoji($str)
     {
-        $str = preg_replace_callback( '/./u',
+        $str = preg_replace_callback('/./u',
             function (array $match) {
                 return strlen($match[0]) >= 4 ? '' : $match[0];
             },
