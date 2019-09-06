@@ -36,53 +36,57 @@
     }
 </style>
 
-        <div class="layui-row">
-            {foreach $headerAnalyze as $val}
-            <div class="layui-col-md{$md}">
-                <div class="layui-card-body">
-                <div class="layui-card layui-card-body">
-                    <div class="layui-card-header">
-                        {$val.text}
-                        <span class="layui-badge layui-bg-blue layuiadmin-badge">{:lang('build_view_echart_day')}</span>
-                    </div>
-                    <div class="layui-card-body layuiadmin-card-list">
-                        <p class="layuiadmin-big-font">{$val.todayCount}</p>
-                        <p>
-                            {:lang('build_view_echart_total')}{$val.text} <span class="layui-text">{$val.count}</span>
-                            <span class="layuiadmin-span-color"><i class="fa fa-bar-chart" style="font-size: 30px; color: green;cursor: pointer" data-open="{:request()->baseUrl()}?{:request()->query()}&chartTable={$val.table}"></i></span>
-                        </p>
-
-                    </div>
-                </div>
-                </div>
-            </div>
-            {/foreach}
-        </div>
-
-<div class="layui-card-body layui-anim layui-anim-upbit">
-    <div class="layui-card-body layui-card think-box-shadow">
+<div class="layui-row">
+    {foreach $headerAnalyze as $val}
+    <div class="layui-col-md{$md}">
         <div class="layui-card-body">
-        {$filter|raw}
+            <div class="layui-card layui-card-body">
+                <div class="layui-card-header">
+                    {$val.text}
+                    <span class="layui-badge layui-bg-blue layuiadmin-badge">{:lang('build_view_echart_day')}</span>
+                </div>
+                <div class="layui-card-body layuiadmin-card-list">
+                    <p class="layuiadmin-big-font">{$val.todayCount}</p>
+                    <p>
+                        {:lang('build_view_echart_total')}{$val.text} <span class="layui-text">{$val.count}</span>
+                        <span class="layuiadmin-span-color"><i class="fa fa-bar-chart" style="font-size: 30px; color: green;cursor: pointer" data-open="{:request()->baseUrl()}?{:request()->query()}&chartTable={$val.table}"></i></span>
+                    </p>
 
-            <div class="layui-form-item layui-inline" id="dateButtonDiv">
-                <button type="button" class="layui-btn layui-btn-sm layui-btn-checked" id="today">{:lang('build_view_echart_today')}</button>
-                <button type="button" class="layui-btn layui-btn-sm layui-btn-primary" id="week">{:lang('build_view_echart_week')}</button>
-                <button type="button" class="layui-btn layui-btn-sm layui-btn-primary" id="month">{:lang('build_view_echart_month')}</button>
-                <button type="button" class="layui-btn layui-btn-sm layui-btn-primary" id="quarter">{:lang('build_view_echart_quarter')}</button>
-                <button type="button" class="layui-btn layui-btn-sm layui-btn-primary" id="year">{:lang('build_view_echart_year')}</button>
-            </div>
-            <div class="layui-form-item layui-inline">
-                <label class="layui-form-label">{:lang('build_view_please_date_range')}</label>
-                <div class="layui-input-inline">
-                    <input name="create_at" id="create_at" value="{$Think.get.create_at}" placeholder="{:lang('build_view_please_select')}{:lang('build_view_please_date')}"
-                           class="layui-input">
                 </div>
             </div>
-
-        <div id="totalArr" class="layui-col-space15 layui-row"></div>
-        <div id="container" style="width:100%;height:390px;display: inline-flex;"></div>
+        </div>
     </div>
-</div>
+    {/foreach}
+    <div id="totalArr" class="layui-col-space15 layui-row">
+    </div>
+
+    <div class="layui-card-body layui-anim layui-anim-upbit">
+        <div class="layui-card-body layui-card think-box-shadow">
+            <div class="layui-card-body">
+                {$filter|raw}
+
+                <div class="layui-form-item layui-inline" id="dateButtonDiv">
+                    <button type="button" class="layui-btn layui-btn-sm layui-btn-checked" id="today">{:lang('build_view_echart_today')}</button>
+                    <button type="button" class="layui-btn layui-btn-sm layui-btn-primary" id="week">{:lang('build_view_echart_week')}</button>
+                    <button type="button" class="layui-btn layui-btn-sm layui-btn-primary" id="month">{:lang('build_view_echart_month')}</button>
+                    <button type="button" class="layui-btn layui-btn-sm layui-btn-primary" id="quarter">{:lang('build_view_echart_quarter')}</button>
+                    <button type="button" class="layui-btn layui-btn-sm layui-btn-primary" id="year">{:lang('build_view_echart_year')}</button>
+                </div>
+                <div class="layui-form-item layui-inline">
+                    <label class="layui-form-label">{:lang('build_view_please_date_range')}</label>
+                    <div class="layui-input-inline">
+                        <input name="create_at" id="create_at" value="{$Think.get.create_at}" placeholder="{:lang('build_view_please_select')}{:lang('build_view_please_date')}"
+                               class="layui-input">
+                    </div>
+                </div>
+
+
+
+
+            </div>
+            <div id="container" style="width:100%;height:390px;display: inline-flex;"></div>
+        </div>
+    </div>
 </div>
 <script>
     var obj = {};
@@ -189,15 +193,54 @@
         $.post("{:request()->url()}",obj, function (data, status) {
             if (data.code == 200) {
                 var res = data.data;
-
+                var size = 4;
+                if(res.totalArr.length >size){
+                    var line = Math.ceil(res.totalArr.length / size);
+                    var md = 3;
+                    var end_md = 12 / (res.totalArr.length % size);
+                }else{
+                    var md = 12 / res.totalArr.length;
+                    if(md < 3){
+                        md =3;
+                    }
+                }
+                var i = 0;
+                var current_line = 1;
                 res.totalArr.forEach(function(item){
-                    $('#totalArr').append('<div class="layui-col-sm6 layui-col-md4">\n' +
-                        '                   <div class="layui-circle circle_bg layui-anim layui-anim-scaleSpring" style="margin: 0 auto">\n' +
-                        '                        <div class="layui-circle circle_box"  >\n' +
-                        '                            <p ><div class="layuiadmin-big-font circle_font" >'+item.count+'</div><div>'+item.text+'</div></p>\n' +
+                    var percent = parseFloat(item.percent);
+                    if (percent > 0) {
+                        var percent_text = '▲';
+                        var percent_color = 'color-red';
+                    }else{
+                        var percent_text = '▼';
+                        var percent_color = 'color-green';
+                    }
+                    var totalhtml = '';
+                    if(item.totalCount!=null){
+                        totalhtml =  '<p>{:lang('build_view_echart_total')}'+item.text+'： '+item.totalCount+'</p>' ;
+                    }
+                    $('#totalArr').append('<div class="layui-col-md'+md+'">\n' +
+                        '                    <div class="layui-card-body">\n' +
+                        '                        <div class="layui-card layui-card-body">\n' +
+                        '                            <div class="layui-card-header">\n' +
+                        '                                '+item.text+'\n' +
+                        '                                <span class="layui-badge layui-bg-blue layuiadmin-badge">'+item.date_text+'</span>\n' +
+                        '                            </div>\n' +
+                        '                            <div class="layui-card-body layuiadmin-card-list">\n' +
+                        '                                <p class="layuiadmin-big-font">'+item.count+'</p>\n' +
+                        '                                <p><span>'+item.compare_text+' </span><span class="layui-text"> '+item.compare+'</span><span class="pull-right"><span class="'+percent_color+'">'+percent_text+'</span><span class="layui-text"> '+item.percent+'</span></span></p>\n' +
+                        '<hr class="layui-bg-gray">\n' +totalhtml+
+                        '                            </div>\n' +
                         '                        </div>\n' +
                         '                    </div>\n' +
                         '                </div>');
+                    i++;
+                    if((i % size) == 0){
+                        current_line++;
+                    }
+                    if(current_line == line){
+                        md = end_md;
+                    }
                 });
                 var textType = [];
                 res.series.forEach(function(item){

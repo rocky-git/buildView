@@ -48,7 +48,6 @@ class Echarts extends Field
 
     public function __construct()
     {
-
         $this->template = 'echarts';
     }
 
@@ -87,6 +86,7 @@ class Echarts extends Field
                 $this->dateField = $this->charts[$this->chartTable]['dateField'];
                 $this->type = $this->charts[$this->chartTable]['type'];
                 if ($filter instanceof \Closure) {
+
                     $this->filter = new Filter($this->db);
                     $this->filter->setRequest('post');
                     call_user_func($filter, $this->filter);
@@ -113,7 +113,7 @@ class Echarts extends Field
         return $this;
     }
 
-    public function setHeader($text, $type, $field, $db_callback = null)
+    public function setHeader($text, $type, $field, $db_callback = null,$dateField='')
     {
         $this->model();
         if ($db_callback instanceof \Closure) {
@@ -122,10 +122,13 @@ class Echarts extends Field
         $where = $this->db->getOptions('where');
 
         $table = $this->db->getTable();
+        if(empty($dateField)){
+            $dateField = $this->dateField;
+        }
         $this->headerAnalyze[] = [
             'table' => $this->db->getTable(),
             'text' => $text,
-            'todayCount' => Db::name($table)->setOption('where', $where)->whereTime($this->dateField, 'd')->$type($field),
+            'todayCount' => Db::name($table)->setOption('where', $where)->whereTime($dateField, 'd')->$type($field),
             'count' => Db::name($table)->setOption('where', $where)->$type($field)
         ];
         $this->setOption('headerAnalyze', $this->headerAnalyze);
@@ -138,20 +141,22 @@ class Echarts extends Field
 
         $this->model();
         if (Request::isPost() && $this->chartTable == $this->db->getTable()) {
-
-            if (end($arguments) instanceof \Closure) {
-                $callback = array_pop($arguments);
-                call_user_func($callback, $this->db);
-            }
-            if (count($arguments) > 1) {
-                $this->text = array_shift($arguments);
-                array_unshift($arguments, $name);
-                call_user_func_array([$this, 'analyze'], $arguments);
-
-            } else {
+            if($name == 'count' && count($arguments) == 2 && end($arguments) instanceof \Closure){
                 $this->text = $arguments[0];
-                $this->analyze($name, '*');
+                $callback = array_pop($arguments);
+                $this->analyze($name, '*',$callback);
+            }else{
+                if (count($arguments) > 1) {
+                    $this->text = array_shift($arguments);
+                    array_unshift($arguments, $name);
+                    call_user_func_array([$this, 'analyze'], $arguments);
+
+                } else {
+                    $this->text = $arguments[0];
+                    $this->analyze($name, '*');
+                }
             }
+
         }
         return $this;
     }
@@ -198,7 +203,7 @@ class Echarts extends Field
      * @param $type 统计类型
      * @param $field 统计字段
      */
-    private function analyze($type, $field)
+    private function analyze($type, $field,$callback ='')
     {
         $post = Request::post();
         $data = [];
@@ -206,32 +211,68 @@ class Echarts extends Field
         $countArr = [];
         $where = $this->db->getOptions('where');
         $table = $this->db->getTable();
+        $totalCount = null;
         switch ($post['datetype']) {
             case 'today':
-                $dates = $this->get_week();
-                $data['dateArr'] = $dates;
-                foreach ($dates as $key => $date) {
-                    $count = Db::name($table)->setOption('where', $where)->whereBetween($this->dateField, ["{$date} 00:00:00", "{$date} 23:59:59"])->$type($field);
-                    array_push($countArr, $count);
-                }
                 $toDay = date('Y-m-d');
+                $data['dateArr']  = [];
+                $j = 0;
+                for ($i = 0; $i < 24; $i++) {
+
+                    if($callback instanceof \Closure){
+                        $db = Db::name($table)->setOption('where', $where)->whereBetween($this->dateField, ["{$toDay} {$i}:00:00", "{$toDay} {$j}:59:59"]);
+                        $res = $callback($db);
+                        if(is_null($res)){
+                            $count = $db->$type($field);
+                        }else{
+                            $count = $res;
+                        }
+                    }else{
+                        $count = Db::name($table)->setOption('where', $where)->whereBetween($this->dateField, ["{$toDay} {$i}:00:00", "{$toDay} {$j}:59:59"])->$type($field);
+                    }
+                    array_push($countArr,$count);
+                    array_push($data['dateArr'],$j);
+                    $j++;
+                }
                 $yesterday = date("Y-m-d",strtotime("-1 day"));
-                $weekCount = Db::name($table)->setOption('where', $where)->whereBetween($this->dateField, ["{$toDay} 00:00:00", "{$toDay} 23:59:59"])->$type($field);
-                $lastWeekCount = Db::name($table)->setOption('where', $where)->whereBetween($this->dateField, ["{$yesterday} 00:00:00", "{$yesterday} 23:59:59"])->$type($field);
+                if($callback instanceof \Closure){
+                    $db = Db::name($table)->setOption('where', $where)->whereBetween($this->dateField, ["{$toDay} 00:00:00", "{$toDay} 23:59:59"]);
+                    $res = $callback($db);
+                    if(is_null($res)){
+                        $weekCount = $db->$type($field);
+                    }else{
+                        $weekCount = $res;
+                    }
+                }else{
+                    $weekCount = Db::name($table)->setOption('where', $where)->whereBetween($this->dateField, ["{$toDay} 00:00:00", "{$toDay} 23:59:59"])->$type($field);
+                }
+                if($callback instanceof \Closure){
+                    $db = Db::name($table)->setOption('where', $where)->whereBetween($this->dateField, ["{$yesterday} 00:00:00", "{$yesterday} 23:59:59"]);
+                    $res = $callback($db);
+                    if(is_null($res)){
+                        $lastWeekCount = $db->$type($field);
+                    }else{
+                        $lastWeekCount = $res;
+                    }
+                    if(is_null($res)){
+                        $db->removeWhereField($this->dateField);
+                        $totalCount = $db->$type($field);
+                    }
+                }else{
+                    $lastWeekCount = Db::name($table)->setOption('where', $where)->whereBetween($this->dateField, ["{$yesterday} 00:00:00", "{$yesterday} 23:59:59"])->$type($field);
+                    $totalCount = Db::name($table)->setOption('where', $where)->$type($field);
+                }
                 $weekCountPercent = $this->computePercent($weekCount, $lastWeekCount);
                 $this->data['totalArr'] = array_merge($this->data['totalArr'], [
                     [
-                        'text' => lang('build_view_echart_today') . $this->text,
+                        'date_text'=>lang('build_view_echart_day'),
+                        'text' => $this->text,
                         'count' => $weekCount,
+                        'compare_text' => lang('build_view_echart_yesterday'),
+                        'compare'=>$lastWeekCount,
+                        'percent'=>$weekCountPercent,
+                        'totalCount'=>$totalCount
                     ],
-                    [
-                        'text' => lang('build_view_echart_yesterday'). $this->text,
-                        'count' => $lastWeekCount,
-                    ],
-                    [
-                        'text' => lang('build_view_echart_compared').lang('build_view_echart_yesterday') . $this->text,
-                        'count' => $weekCountPercent,
-                    ]
                 ]);
 
                 break;
@@ -239,25 +280,59 @@ class Echarts extends Field
                 $dates = $this->get_week();
                 $data['dateArr'] = $dates;
                 foreach ($dates as $key => $date) {
-                    $count = Db::name($table)->setOption('where', $where)->whereBetween($this->dateField, ["{$date} 00:00:00", "{$date} 23:59:59"])->$type($field);
+                    if($callback instanceof \Closure){
+                        $db = Db::name($table)->setOption('where', $where)->whereBetween($this->dateField, ["{$date} 00:00:00", "{$date} 23:59:59"]);
+                        $res = $callback($db);
+                        if(is_null($res)){
+                            $count = $db->$type($field);
+
+                        }else{
+                            $count = $res;
+                        }
+                    }else{
+                        $count = Db::name($table)->setOption('where', $where)->whereBetween($this->dateField, ["{$date} 00:00:00", "{$date} 23:59:59"])->$type($field);
+
+                    }
                     array_push($countArr, $count);
                 }
-                $weekCount = Db::name($table)->setOption('where', $where)->whereTime($this->dateField, 'week')->$type($field);
-                $lastWeekCount = Db::name($table)->setOption('where', $where)->whereTime($this->dateField, 'last week')->$type($field);
+                if($callback instanceof \Closure){
+                    $db = Db::name($table)->setOption('where', $where)->whereTime($this->dateField, 'week');
+                    $res = $callback($db);
+                    if(is_null($res)){
+                        $weekCount = $db->$type($field);
+                    }else{
+                        $weekCount = $res;
+                    }
+                    if(is_null($res)){
+                        $db->removeWhereField($this->dateField);
+                        $totalCount = $db->$type($field);
+                    }
+                }else{
+                    $weekCount = Db::name($table)->setOption('where', $where)->whereTime($this->dateField, 'week')->$type($field);
+                    $totalCount = Db::name($table)->setOption('where', $where)->$type($field);
+                }
+                if($callback instanceof \Closure){
+                    $db = Db::name($table)->setOption('where', $where)->whereTime($this->dateField, 'last week');
+                    $res = $callback($db);
+                    if(is_null($res)){
+                        $lastWeekCount = $db->$type($field);
+                    }else{
+                        $lastWeekCount = $res;
+                    }
+                }else{
+                    $lastWeekCount = Db::name($table)->setOption('where', $where)->whereTime($this->dateField, 'last week')->$type($field);
+                }
                 $weekCountPercent = $this->computePercent($weekCount, $lastWeekCount);
                 $this->data['totalArr'] = array_merge($this->data['totalArr'], [
                     [
-                        'text' => lang('build_view_echart_week') . $this->text,
+                        'date_text'=>lang('build_view_echart_week'),
+                        'text' => $this->text,
                         'count' => $weekCount,
+                        'compare_text' => lang('build_view_echart_lastweek'),
+                        'compare'=>$lastWeekCount,
+                        'percent'=>$weekCountPercent,
+                        'totalCount'=>$totalCount
                     ],
-                    [
-                        'text' => lang('build_view_echart_lastweek') . $this->text,
-                        'count' => $lastWeekCount,
-                    ],
-                    [
-                        'text' => lang('build_view_echart_compared').lang('build_view_echart_lastweek') . $this->text,
-                        'count' => $weekCountPercent,
-                    ]
                 ]);
                 break;
             case 'month':
@@ -267,25 +342,61 @@ class Echarts extends Field
                     $data['dateArr'][$key] = ($key + 1) . lang('build_view_echart_day');
                 }
                 foreach ($dates as $key => $date) {
-                    $count = Db::name($table)->setOption('where', $where)->whereBetween($this->dateField, ["{$date} 00:00:00", "{$date} 23:59:59"])->$type($field);
+                    if($callback instanceof \Closure){
+                        $db = Db::name($table)->setOption('where', $where)->whereBetween($this->dateField, ["{$date} 00:00:00", "{$date} 23:59:59"]);
+                        $res = $callback($db);
+                        if(is_null($res)){
+                            $count = $db->$type($field);
+
+                        }else{
+                            $count = $res;
+                        }
+                    }else{
+                        $count = Db::name($table)->setOption('where', $where)->whereBetween($this->dateField, ["{$date} 00:00:00", "{$date} 23:59:59"])->$type($field);
+
+                    }
                     array_push($countArr, $count);
                 }
-                $weekCount = Db::name($table)->setOption('where', $where)->whereTime($this->dateField, 'month')->$type($field);
-                $lastWeekCount = Db::name($table)->setOption('where', $where)->whereTime($this->dateField, 'last month')->$type($field);
+                if($callback instanceof \Closure){
+                    $db = Db::name($table)->setOption('where', $where)->whereTime($this->dateField, 'month');
+                    $res = $callback($db);
+                    if(is_null($res)){
+                        $weekCount = $db->$type($field);
+                    }else{
+                        $weekCount = $res;
+                    }
+                    if(is_null($res)){
+                        $db->removeWhereField($this->dateField);
+                        $totalCount = $db->$type($field);
+                    }
+                }else{
+                    $weekCount = Db::name($table)->setOption('where', $where)->whereTime($this->dateField, 'month')->$type($field);
+                    $totalCount = Db::name($table)->setOption('where', $where)->$type($field);
+                }
+                if($callback instanceof \Closure){
+                    $db = Db::name($table)->setOption('where', $where)->whereTime($this->dateField, 'last month');
+                    $res = $callback($db);
+                    if(is_null($res)){
+                        $lastWeekCount = $db->$type($field);
+                    }else{
+                        $lastWeekCount = $res;
+                    }
+                }else{
+                    $lastWeekCount = Db::name($table)->setOption('where', $where)->whereTime($this->dateField, 'last month')->$type($field);
+                }
+
                 $weekCountPercent = $this->computePercent($weekCount, $lastWeekCount);
                 $this->data['totalArr'] = array_merge($this->data['totalArr'], [
                     [
-                        'text' => lang('build_view_echart_month'). $this->text,
+                        'date_text'=>lang('build_view_echart_month'),
+                        'text' => $this->text,
                         'count' => $weekCount,
+                        'compare_text' => lang('build_view_echart_lastmonth'),
+                        'compare'=>$lastWeekCount,
+                        'percent'=>$weekCountPercent,
+                        'totalCount'=>$totalCount
                     ],
-                    [
-                        'text' => lang('build_view_echart_lastmonth') . $this->text,
-                        'count' => $lastWeekCount,
-                    ],
-                    [
-                        'text' => lang('build_view_echart_compared').lang('build_view_echart_lastmonth') . $this->text,
-                        'count' => $weekCountPercent,
-                    ]
+
                 ]);
                 break;
             case 'quarter':
@@ -303,63 +414,161 @@ class Echarts extends Field
                     $whereLastDate = [date('Y-07-01'), date('Y-09-30')];
                     $whereDate = [date('Y-10-01'), date('Y-12-31')];
                 }
-                $weekCount = Db::name($table)->setOption('where', $where)->whereTime($this->dateField, $whereDate)->$type($field);
-                $lastWeekCount = Db::name($table)->setOption('where', $where)->whereTime($this->dateField, $whereLastDate)->$type($field);
+                if($callback instanceof \Closure){
+                    $db = Db::name($table)->setOption('where', $where)->whereTime($this->dateField, $whereDate);
+                    $res = $callback($db);
+                    if(is_null($res)){
+                        $weekCount = $db->$type($field);
+                    }else{
+                        $weekCount = $res;
+                    }
+                    if(is_null($res)){
+                        $db->removeWhereField($this->dateField);
+                        $totalCount = $db->$type($field);
+                    }
+                }else{
+                    $weekCount = Db::name($table)->setOption('where', $where)->whereTime($this->dateField, $whereDate)->$type($field);
+                    $totalCount = Db::name($table)->setOption('where', $where)->$type($field);
+                }
+                if($callback instanceof \Closure){
+                    $db = Db::name($table)->setOption('where', $where)->whereTime($this->dateField, $whereLastDate);
+                    $res = $callback($db);
+                    if(is_null($res)){
+                        $lastWeekCount = $db->$type($field);
+                    }else{
+                        $lastWeekCount = $res;
+                    }
+                }else{
+                    $lastWeekCount = Db::name($table)->setOption('where', $where)->whereTime($this->dateField, $whereLastDate)->$type($field);
+                }
+
                 $weekCountPercent = $this->computePercent($weekCount, $lastWeekCount);
                 $this->data['totalArr'] = array_merge($this->data['totalArr'], [
                     [
-                        'text' => lang('build_view_echart_thisquarter') . $this->text,
+                        'date_text'=>lang('build_view_echart_thisquarter'),
+                        'text' => $this->text,
                         'count' => $weekCount,
+                        'compare_text' => lang('build_view_echart_lasquarter'),
+                        'compare'=>$lastWeekCount,
+                        'percent'=>$weekCountPercent,
+                        'totalCount'=>$totalCount
                     ],
-                    [
-                        'text' => lang('build_view_echart_lasquarter') . $this->text,
-                        'count' => $lastWeekCount,
-                    ],
-                    [
-                        'text' => lang('build_view_echart_compared').lang('build_view_echart_lasquarter') . $this->text,
-                        'count' => $weekCountPercent,
-                    ]
+
                 ]);
-                $count = Db::name($table)->setOption('where', $where)->whereTime($this->dateField, [date('Y-01-01'), date('Y-03-31')])->$type($field);
+                if($callback instanceof \Closure){
+                    $db = Db::name($table)->setOption('where', $where)->whereTime($this->dateField, [date('Y-01-01'), date('Y-03-31')]);
+                    $res = $callback($db);
+                    if(is_null($res)){
+                        $count = $db->$type($field);
+
+                    }else{
+                        $count = $res;
+                    }
+                }else{
+                    $count = Db::name($table)->setOption('where', $where)->whereTime($this->dateField, [date('Y-01-01'), date('Y-03-31')])->$type($field);
+
+                }
+
                 $data['dateArr'][] = lang('build_view_echart_the').'1 '.lang('build_view_echart_quarter');
                 array_push($countArr, $count);
-                $count = Db::name($table)->setOption('where', $where)->whereTime($this->dateField, [date('Y-04-01'), date('Y-06-30')])->$type($field);
-
+                if($callback instanceof \Closure){
+                    $db = Db::name($table)->setOption('where', $where)->whereTime($this->dateField,[date('Y-04-01'), date('Y-06-30')]);
+                    $res = $callback($db);
+                    if(is_null($res)){
+                        $count = $db->$type($field);
+                    }else{
+                        $count = $res;
+                    }
+                }else{
+                    $count = Db::name($table)->setOption('where', $where)->whereTime($this->dateField, [date('Y-04-01'), date('Y-06-30')])->$type($field);
+                }
                 $data['dateArr'][] =lang('build_view_echart_the'). '2 '.lang('build_view_echart_quarter');
                 array_push($countArr, $count);
+                if($callback instanceof \Closure){
+                    $db = Db::name($table)->setOption('where', $where)->whereTime($this->dateField,[date('Y-07-01'), date('Y-09-30')]);
+                    $res = $callback($db);
+                    if(is_null($res)){
+                        $count = $db->$type($field);
+                    }else{
+                        $count = $res;
+                    }
+                }else{
+                    $count = Db::name($table)->setOption('where', $where)->whereTime($this->dateField, [date('Y-07-01'), date('Y-09-30')])->$type($field);
+                }
 
-                $count = Db::name($table)->setOption('where', $where)->whereTime($this->dateField, [date('Y-07-01'), date('Y-09-30')])->$type($field);
                 $data['dateArr'][] =lang('build_view_echart_the'). '3 '.lang('build_view_echart_quarter');
                 array_push($countArr, $count);
-
-                $count = Db::name($table)->setOption('where', $where)->whereTime($this->dateField, [date('Y-10-01'), date('Y-12-31')])->$type($field);
+                if($callback instanceof \Closure){
+                    $db = Db::name($table)->setOption('where', $where)->whereTime($this->dateField,[date('Y-10-01'), date('Y-12-31')]);
+                    $res = $callback($db);
+                    if(is_null($res)){
+                        $count = $db->$type($field);
+                    }else{
+                        $count = $res;
+                    }
+                }else{
+                    $count = Db::name($table)->setOption('where', $where)->whereTime($this->dateField, [date('Y-10-01'), date('Y-12-31')])->$type($field);
+                }
                 $data['dateArr'][] =lang('build_view_echart_the'). '4 '.lang('build_view_echart_quarter');
                 array_push($countArr, $count);
                 break;
             case 'year':
-                $weekCount = Db::name($table)->setOption('where', $where)->whereTime($this->dateField, 'year')->$type($field);
-
-                $lastWeekCount = Db::name($table)->setOption('where', $where)->whereTime($this->dateField, 'last year')->$type($field);
+                if($callback instanceof \Closure){
+                    $db = Db::name($table)->setOption('where', $where)->whereTime($this->dateField, 'year');
+                    $res = $callback($db);
+                    if(is_null($res)){
+                        $weekCount = $db->$type($field);
+                    }else{
+                        $weekCount = $res;
+                    }
+                    if(is_null($res)){
+                        $db->removeWhereField($this->dateField);
+                        $totalCount = $db->$type($field);
+                    }
+                }else{
+                    $weekCount = Db::name($table)->setOption('where', $where)->whereTime($this->dateField, 'year')->$type($field);
+                    $totalCount = Db::name($table)->setOption('where', $where)->$type($field);
+                }
+                if($callback instanceof \Closure){
+                    $db = Db::name($table)->setOption('where', $where)->whereTime($this->dateField, 'last year');
+                    $res = $callback($db);
+                    if(is_null($res)){
+                        $lastWeekCount = $db->$type($field);
+                    }else{
+                        $lastWeekCount = $res;
+                    }
+                }else{
+                    $lastWeekCount = Db::name($table)->setOption('where', $where)->whereTime($this->dateField, 'last year')->$type($field);
+                }
 
                 $weekCountPercent = $this->computePercent($weekCount, $lastWeekCount);
                 $this->data['totalArr'] = array_merge($this->data['totalArr'], [
                     [
-                        'text' => lang('build_view_echart_thisyear') . $this->text,
+                        'date_text'=>lang('build_view_echart_year'),
+                        'text' => $this->text,
                         'count' => $weekCount,
+                        'compare_text' => lang('build_view_echart_last_year'),
+                        'compare'=>$lastWeekCount,
+                        'percent'=>$weekCountPercent,
+                        'totalCount'=>$totalCount
                     ],
-                    [
-                        'text' =>lang('build_view_echart_compared'). lang('build_view_echart_last_year') . $this->text,
-                        'count' => $lastWeekCount,
-                    ],
-                    [
-                        'text' => lang('build_view_echart_last_year') . $this->text,
-                        'count' => $weekCountPercent,
-                    ]
+
                 ]);
                 for ($i = 1; $i <= 12; $i++) {
                     $data['dateArr'][] = $i . lang('build_view_echart_months');
                     $todayNum = date("t", strtotime(date('Y-m')));
-                    $count = Db::name($table)->setOption('where', $where)->whereTime($this->dateField, [date("Y-{$i}-01"), date("Y-{$i}-{$todayNum}")])->$type($field);
+                    if($callback instanceof \Closure){
+                        $db =  Db::name($table)->setOption('where', $where)->whereTime($this->dateField, [date("Y-{$i}-01"), date("Y-{$i}-{$todayNum}")]);
+                        $res = $callback($db);
+                        if(is_null($res)){
+                            $count = $db->$type($field);
+                        }else{
+                            $count = $res;
+                        }
+                    }else{
+                        $count = Db::name($table)->setOption('where', $where)->whereTime($this->dateField, [date("Y-{$i}-01"), date("Y-{$i}-{$todayNum}")])->$type($field);
+                    }
+
                     array_push($countArr, $count);
                 }
                 break;
@@ -370,7 +579,18 @@ class Echarts extends Field
                 $endDate = $dates[1];
                 $data['dateArr'] = $this->prDates($startDate, $endDate);
                 foreach ($data['dateArr'] as $key => $date) {
-                    $count = Db::name($table)->setOption('where', $where)->whereBetween($this->dateField, ["{$date} 00:00:00", "{$date} 23:59:59"])->$type($field);
+                    if($callback instanceof \Closure){
+                        $db =  Db::name($table)->setOption('where', $where)->whereBetween($this->dateField, ["{$date} 00:00:00", "{$date} 23:59:59"]);
+                        $res = $callback($db);
+                        if(is_null($res)){
+                            $count = $db->$type($field);
+                        }else{
+                            $count = $res;
+                        }
+                    }else{
+                        $count = Db::name($table)->setOption('where', $where)->whereBetween($this->dateField, ["{$date} 00:00:00", "{$date} 23:59:59"])->$type($field);
+                    }
+
                     array_push($countArr, $count);
                 }
                 break;

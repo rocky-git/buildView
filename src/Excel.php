@@ -29,6 +29,8 @@ class Excel
      */
     public static function exprot($title, $columnTitle, $data, $callback='')
     {
+        set_time_limit(0);
+        ini_set ('memory_limit', '-1');
         $letter = array('A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z');
         $PHPExcel = new Spreadsheet();
         $worksheet = $PHPExcel->getActiveSheet();
@@ -44,7 +46,7 @@ class Excel
                 $val = call_user_func($callback, $val);
             }
             foreach ($columnTitle as $fkey => $fval) {
-                $worksheet->setCellValueByColumnAndRow($i, $key + 2, slef::filterEmoji($val[$fkey]));
+                $worksheet->setCellValueByColumnAndRow($i, $key + 2, self::filterEmoji($val[$fkey]));
                 $i++;
             }
             $i = 1;
@@ -72,6 +74,7 @@ class Excel
         $row = count($data) + 1;
         $worksheet->getStyle("A1:{$letter[count($columnTitle)-1]}{$row}")->applyFromArray($styleArray);
         $filename = $title. date('_YmdHi') . '分.xls';
+        ob_end_clean();
         header('Content-Type: application/vnd.ms-excel');
         header('Content-Disposition: attachment;filename="' . $filename . '"');
         header('Cache-Control: max-age=0');
