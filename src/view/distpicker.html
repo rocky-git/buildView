@@ -1,0 +1,31 @@
+
+
+
+<link href="/vendor/rockys/build-view/src/plugs/city-picker/city-picker.css" rel="stylesheet">
+<script src="/vendor/rockys/build-view/src/plugs/city-picker/city-picker.data.js"></script>
+<script src="/vendor/rockys/build-view/src/plugs/city-picker/city-picker.js"></script>
+<div class="layui-form-item">
+    <label class="layui-form-label">{$label}</label>
+    <div class="layui-input-{$layui}">
+        <input type="text" autocomplete="on" class="layui-input" data-name="name_{$build_view_rand}"  readonly="readonly" data-toggle="city-picker" placeholder="{:lang('build_view_please_select')}{$label}">
+        {$appendHtml|raw}
+        {notempty name="$help"}
+        <div class="help-block">{$help}</div>
+        {/notempty}
+    </div>
+</div>
+<script>
+    let i = Math.ceil(Math.random()*10000000);
+    $('[data-name=name_{$build_view_rand}]').attr('data-name','newname_'+i);
+    $(document.getElementById('color_{$build_view_rand}')).attr('id','build_name_'+i);
+    let input = $('[data-name=newname_'+i+']');
+    input.citypicker({
+        provincename:"{$name[0]|default='province'}",
+        cityname:"{$name[1]|default='city'}",
+        districtname: "{$name[2]|default='area'}",
+        province: "{$value[0]|default=''}",// 默认省份名称
+        city: "{$value[1]|default=''}",// 默认地市名称
+        district: "{$value[2]|default=''}",// 默认区县名称
+        level:"{$level|default='area'}",
+    });
+</script>
