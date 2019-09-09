@@ -42,6 +42,7 @@ use think\model\relation\HasOne;
  * @method Field timeRange($field, $lable) 时间范围框;
  * @method Field time($field, $lable) 时间框;
  * @method Field color($field, $lable) 颜色框;
+ * @method Field distpicker($field, $lable) 省市区;
  */
 class Form extends Field
 {

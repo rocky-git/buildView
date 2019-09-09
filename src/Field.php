@@ -149,6 +149,9 @@ class Field
      */
     public function render()
     {
+        if(is_array($this->options['value'])){
+            $this->options['value'] = array_filter($this->options['value']);
+        }
         if (empty($this->options['value'])  && !is_numeric($this->options['value'])) {
             if (isset($this->options['default'])) {
                 $this->options['value'] = $this->options['default'];
