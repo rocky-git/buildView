@@ -1,4 +1,4 @@
-<div class="layui-form-item">
+<div class="layui-form-item ">
     <label class="layui-form-label">{$label}</label>
     <div class="layui-input-{$layui}">
         {if isset($required)}<input type="hidden" required>{/if}
@@ -32,9 +32,9 @@
                 ,format:'{$format}'
                 /*{/if}*/
             });
-            $('[data-name=name_{$build_view_rand}_2]').attr('id','build_id_1'+i);
+            $('[data-name=name_{$build_view_rand}_2]').attr('id','build_id_2'+i);
             laydate.render({
-                elem: '#'+'build_id_1'+i
+                elem: '#'+'build_id_2'+i
                 ,type: 'date'
                  /*{if isset($format)}*/
                 ,format:'{$format}'
