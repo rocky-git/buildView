@@ -14,7 +14,9 @@
     .layui-table-grid-down {
         display: none;
     }
-
+    .layui-table img {
+        max-width: none;
+    }
 </style>
 {if isset($toolbar)}
 <div class="layui-row">
@@ -23,15 +25,13 @@
 {/if}
 <table class="layui-hide" id="{$tableId}" lay-filter="{$tableId}">
 </table>
-<div class="layui-form-item text-center">
+<!--{eq name="iframeType" value="submit"}-->
+<div class="layui-form-item text-center" >
     <button type="button"  class='layui-btn' id="subbutton">{:lang('build_view_table_confirm_btn')}</button>
 </div>
+<!--{/eq}-->
 <script>
-    if (window.frames.length != parent.frames.length) {
-        $('#subbutton').show();
-    }else{
-        $('#subbutton').hide();
-    }
+
 
     //导出选中行
     layui.use('table', function(){
@@ -115,6 +115,30 @@
                 $.form.load("{:url(request()->url())}", {field: 'delete', id: 'all'}, 'post');
             });
         })
+        //批量操作
+        $('[data-batch=true]').click(function () {
+            var checkStatus = table.checkStatus('{$tableId}')
+                ,data = checkStatus.data,arr = new Array();;
+            for(var i = 0;i<data.length;i++){
+                arr.push(data[i]['id']);
+            }
+            var ids =  arr.join(",");
+            if (ids.length < 1) {
+                return $.msg.tips("{:lang('build_view_please_select')}{:lang('build_view_table_confirm_tip')}");
+            }
+            var rules = $(this).attr('data-value').split(';');
+            let datas = {};
+            for (var i in rules) {
+                datas[rules[i].split('#')[0]] = rules[i].split('#')[1];
+            }
+
+            datas.id = ids;
+            console.log(datas);
+            let url = $(this).data('url');
+            $.msg.confirm('确定要操作这些数据吗？', function () {
+                $.form.load(url, datas, 'post');
+            });
+        })
         //批量删除
         $('#batch_delete').click(function () {
             var checkStatus = table.checkStatus('{$tableId}')
@@ -132,7 +156,11 @@
         })
         //监听行内编辑
         table.on('edit({$tableId})', function(obj){
-            $.form.load("{:url(request()->url())}", {field: obj.field, value: obj.value, id: obj.data.id}, 'post');
+
+            let post = {};
+            post['id'] = obj.data.id;
+            post[obj.field] = obj.value;
+            $.form.load("{:url(request()->url())}", post, 'post');
         });
         //导出当前页
         $('#excelPage').click(function(){

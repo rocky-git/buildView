@@ -1,15 +1,20 @@
-<link rel="stylesheet" href="/vendor/rockys/build-view/src/plugs/layui/css/layui.css">
-<script src="/vendor/rockys/build-view/src/plugs/layui/layui.all.js"></script>
+<link rel="stylesheet" href="/static/plugs/layui/css/layui.css">
+<link rel="stylesheet" href="/static/theme/css/console.css?at={:date('md')}">
+<script src="/static/plugs/layui/layui.all.js"></script>
+<script src="/static/plugs/require/require.js"></script>
+<script src="/static/admin.js"></script>
+
 <!--{block name="header"}-->
 <!--{notempty name='title'}-->
-<!--{neq name="Think.get.open_type" value="modal"}-->
-<div class="layui-card-header box-thak-sh think-box-shadow">
+<!--{eq name="Think.get.open_type" value="open"}-->
+<div class="layui-card layui-bg-gray">
+    <div class="layui-card-header notselect">
     <span class="layui-icon layui-icon-next font-s10 color-desc margin-right-5"></span>{$title|default=''}
     <!--{if $Think.get.back eq 1}-->
     <button style="position:absolute;right:5px;top: 5px" class="layui-btn layui-btn-sm layui-bg-black"
             href="javascript:;" onclick="history.back();"><i class="layui-icon">&#xe65a;</i>{:lang('build_view_back_btn')}
     </button>
-    </span>
+
     <!--{/if}-->
     <div class="pull-right">
         <!--{if !isset($hideAddButton)}-->
@@ -57,19 +62,17 @@
         <!--{/if}-->
     </div>
 </div>
-<!--{/neq}-->
+</div>
+<!--{/eq}-->
 <!--{/notempty}-->
 <!--{/block}-->
-{block name='content'}
-<div class="layui-card-body layui-anim layui-anim-upbit">
-    <div class="layui-card-body layui-card think-box-shadow">
-        <div class="layui-card-body">
-            <div class="">
+<!--{block name='content'}-->
+<div class="layui-card-body layui-anim layui-anim-upbit ">
+    <div class="layui-card-body think-box-shadow">
                 {$filter|raw}
                 {$table|raw}
-            </div>
-        </div>
     </div>
 </div>
+
 <!--{/block}-->
 

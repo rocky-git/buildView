@@ -149,6 +149,7 @@ class Field
      */
     public function render()
     {
+
         if(is_array($this->options['value'])){
             $this->options['value'] = array_filter($this->options['value']);
         }
@@ -182,6 +183,7 @@ class Field
             $this->options['layVerify'] = implode('|', $layuiVerifyArr);
         }
         $this->setOption('build_view_rand',mt_rand(1000000,9999999));
-        return View::display($content, $this->options);
+        return View::display($content, $this->options,['strip_space'=>false]);
     }
+
 }

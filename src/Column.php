@@ -233,12 +233,10 @@ class Column
     }
 
     //图片显示
-    public function image($radius = '', $width = 80, $height = 80)
+    public function image($radius = 0, $width = 80, $height = 80)
     {
-        if (!empty($radius)) {
-            $radius = "style='border-radius: {$radius}%'";
-        }
-        $this->htmlAttr[] = "<img src='_VALUE_' data-tips-image='' height='{$height}' width='{$width}' {$radius}>";
+
+        $this->htmlAttr[] = "<img src='_VALUE_' data-tips-image='' style='width: {$width}px;height: {$height}px;border-radius: {$radius}%'>";
     }
     public function rate($length){
         $this->htmlAttr[] = <<<EOF

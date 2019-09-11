@@ -64,7 +64,8 @@ class Detail extends Field
     public function view()
     {
         if (Request::isPost()) {
-            $res = $this->model->where($this->model->getPk(), Request::post('id'))->setField(Request::post('field'), Request::post('value'));
+            $updateData = Request::except('id','post');
+            $res = $this->model->where($this->model->getPk(), Request::post('id'))->update($updateData);
             if ($res) {
                 throw new HttpResponseException(json(['code' => 1, 'msg' => lang('build_view_action_success'), 'data' => []]));
             } else {

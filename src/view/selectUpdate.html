@@ -29,7 +29,10 @@
         }else{
             removeByValue(values,val.value)
         }
-        $.post('{:url(request()->url())}',{id:'{$id}',field:'{$name}',value:values.join(',')},function(res){
+        let post = {};
+        post['id'] = '{$id}';
+        post['{$name}'] = values.join(',');
+        $.post('{:url(request()->url())}',post,function(res){
             if(res.code !=1){
                 $.msg.tips(res.msg);
             }
@@ -39,7 +42,10 @@
 {else}
 <script type="text/javascript">
     form.on('select({$domId})', function(data){
-        $.post('{:url(request()->url())}',{id:'{$id}',field:'{$name}',value:data.value},function(res){
+        let post = {};
+        post['id'] = '{$id}';
+        post['{$name}'] = data.value;
+        $.post('{:url(request()->url())}',post,function(res){
             if(res.code !=1){
                 $.msg.tips(res.msg);
             }

@@ -57,6 +57,7 @@ class Grid extends Field
 
         $this->template = 'grid';
         $this->setOption('title', lang('build_view_grid_list'));
+
         $this->column($model->getPk(), 'id')->hide();
         $this->table = new Field('table', '', '', '');
         $this->table->setOption('tableId', 'table_content' . time());
@@ -96,7 +97,8 @@ class Grid extends Field
                     }
                     break;
                 default:
-                    $res = $this->model->whereIn($this->model->getPk(), Request::post('id'))->setField($action, Request::post('value'));
+                    $updateData = Request::except('id','post');
+                    $res = $this->model->whereIn($this->model->getPk(), Request::post('id'))->update($updateData);
                     if ($res) {
                         throw new HttpResponseException(json(['code' => 1, 'msg' =>  lang('build_view_action_success'), 'data' => []]));
                     } else {
@@ -164,11 +166,13 @@ class Grid extends Field
      * 设置iframe中提交的参数
      * @Author: rocky
      * 2019/7/31 17:04
+     * @param $type 提交模式
      * @param $url 提交地址
      * @param $val 附加参数
      */
-    public function setIframeSubmit($url,$val){
+    public function setIframe($type='submit',$url='',$val=''){
         $this->template = 'iframe';
+        $this->table->iframeType($type);
         $this->table->iframeUrl($url);
         $this->table->iframeValue($val);
     }

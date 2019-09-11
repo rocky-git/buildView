@@ -17,7 +17,10 @@
             value = "{$swithcStates['off']['value']|default='-1'}";
         }
         $('input[name={$domId}]').val(value);
-        $.post('{:url(request()->url())}',{id:'{$id}',field:'{$name}',value:$('input[name={$domId}]').val()},function(res){
+        let post = {};
+        post['id'] = '{$id}';
+        post['{$name}'] = $('input[name={$domId}]').val();
+        $.post('{:url(request()->url())}',post,function(res){
             if(res.code !=1){
                 $.msg.tips(res.msg);
             }

@@ -1,13 +1,14 @@
 <!--{block name="header"}-->
 <!--{notempty name='title'}-->
 <!--{neq name="Think.get.open_type" value="modal"}-->
-<div class="layui-card-header box-thak-sh think-box-shadow">
+<div class="layui-card layui-bg-gray">
+<div class="layui-card-header notselect">
     <span class="layui-icon layui-icon-next font-s10 color-desc margin-right-5"></span>{$title|default=''}
     <!--{if $Think.get.back eq 1}-->
     <button style="position:absolute;right:5px;top: 5px" class="layui-btn layui-btn-sm layui-bg-black"
             href="javascript:;" onclick="history.back();"><i class="layui-icon">&#xe65a;</i>{:lang('build_view_back_btn')}
     </button>
-    </span>
+
     <!--{/if}-->
     <div class="pull-right">
         <!--{if !isset($hideAddButton)}-->
@@ -64,17 +65,17 @@
         </script>
     </div>
 </div>
+</div>
 <!--{/neq}-->
 <!--{/notempty}-->
 <!--{/block}-->
-{block name='content'}
-<div class="layui-card-body layui-anim layui-anim-upbit">
-    <div class="layui-card-body layui-card think-box-shadow">
-        <div class="layui-card-body">
+<!--{block name='content'}-->
+    <div class="layui-card-body layui-anim layui-anim-upbit ">
+        <div class="layui-card-body think-box-shadow">
                 {$filter|raw}
                 {$table|raw}
         </div>
     </div>
-</div>
 <!--{/block}-->
+
 
