@@ -39,7 +39,6 @@ class Grid extends Field
     protected $tableTitles = [];
     protected $actionColumn = null;
     protected $toolsArr = [];
-
     /**
      * Form constructor.
      * @param 模型
