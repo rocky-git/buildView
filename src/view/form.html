@@ -24,8 +24,8 @@
     }
     input[type="number"]{-moz-appearance:textfield;}
 </style>
-<div class="layui-card-body layui-anim layui-anim-upbit col-md-{$md|default='12'}"">
-    <form class="layui-form layui-card-body think-box-shadow layui-box {if isset($theme)}layui-form-pane{/if}" action="{$aciontUrl}" method="post" data-auto="true" autocomplete="off">
+<div class="layui-card-body layui-anim layui-anim-upbit col-md-{$md|default='12'}">
+    <form class="layui-form layui-card-body think-box-shadow layui-box {if isset($theme)}layui-form-pane{/if}" action="{$aciontUrl}" method="post" autocomplete="off">
         <div class="layui-card-body">
             {$content|raw}
             <div class="hr-line-dashed"></div>
@@ -41,4 +41,29 @@
 <script>
     {$script|raw}
     window.form.render();
+    form.on('submit(*)', function(data){
+
+        var validate = true;
+        var form = data.form;
+        if (typeof CKEDITOR === 'object' && typeof CKEDITOR.instances === 'object') {
+            for (var instance in CKEDITOR.instances) {
+                CKEDITOR.instances[instance].updateElement();
+            }
+        }
+        $(form).find('input').map(function(){
+            if(!this.checkValidity() && validate){
+                validate = false;
+            }
+        });
+
+        if(validate){
+            var method = form.getAttribute('method') || 'POST';
+            var tips = form.getAttribute('data-tips') || undefined;
+            var url = form.getAttribute('action') || window.location.href;
+            var callback = undefined;
+            var time = form.getAttribute('data-time') || undefined;
+            $.form.load(url,$(form).serialize(), method, callback, true, tips, time);
+            return false;
+        }
+    });
 </script>
