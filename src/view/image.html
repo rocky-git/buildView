@@ -1,19 +1,89 @@
+<style>
+    .uploadimages {
+        width: 5pc;
+        height: 5pc;
+        cursor: pointer;
+        display: inline-block;
+        background: url(/vendor/build-view/theme/img/image.png) no-repeat;
+        background-size: 100% 100%;
+    }
+</style>
 <div class="layui-form-item layui-form-text">
     <label class="layui-form-label">{$label}</label>
     <div class="layui-input-{$layui}">
         {if isset($required)}<input type="hidden" required>{/if}
-        <input type="hidden" name="{$name}" lay-verify="{$layVerify}" lay-verType="tips" data-name="name_{$build_view_rand}" lay-reqText="{:lang('build_view_please_select')}{$label}" value="{$value}" data-width="{$width|default=''}" data-height="{$height|default=''}">
+        <input type="hidden" name="{$name}" lay-verify="{$layVerify}" data-uptype="{$uptype|default='local'}" lay-verType="tips" data-name="name_{$build_view_rand}" lay-reqText="{:lang('build_view_please_select')}{$label}" value="{$value}" data-width="{$size[0]|default=''}" data-height="{$size[1]|default=''}">
         {notempty name="$help"}
         <div class="help-block">{$help}</div>
         {/notempty}
     </div>
 </div>
 <script>
+    $.fn.uploadFile = function (callback) {
+        if (this.attr('data-inited')) return false;
+        var that = this, mode = $(this).attr('data-file') || 'one';
+        this.attr('data-inited', true).attr('data-multiple', (mode !== 'btn' && mode !== 'one') ? 1 : 0);
+        require(['/vendor/build-view/plugs/plupload/build.js'], function (apply) {
+            apply(that, null, callback);
+        })
+    };
+    /*! 上传单个图片 */
+    $.fn.uploadOneImages = function () {
+        var name = $(this).attr('name') || 'image', type = $(this).data('type') || 'png,jpg,gif',width = $(this).data('width') || '',height = $(this).data('height') || '',uptype = $(this).data('uptype');
+        var $tpl = $('<a data-file="btn" class="uploadimages"></a>').attr('data-field', name).attr('data-type', type).attr('data-width', width).attr('data-height', height).attr('data-uptype', uptype).attr('data-safe','{if !isset($baseUrl)}true{/if}');
+        $(this).attr('name', name).after($tpl.data('input', this)).on('change', function () {
+            if (this.value) $tpl.css('backgroundImage', 'url(' + this.value + ')');
+        }).trigger('change');
+    };
+
+    /*! 上传多个图片 */
+    $.fn.uploadMultipleImages = function () {
+        var type = $(this).data('type') || 'png,jpg,gif', name = $(this).attr('name') || 'umt-image',width = $(this).data('width') || '',height = $(this).data('height') || '',uptype = $(this).data('uptype');
+        var $tpl = $('<a class="uploadimages"></a>').attr('data-file', 'mul').attr('data-field', name).attr('data-type', type).attr('data-width', width).attr('data-height', height).attr('data-uptype', uptype).attr('data-safe','{if !isset($baseUrl)}true{/if}');
+        $(this).attr('name', name).after($tpl.data('input', this)).on('change', function () {
+            var input = this;
+            this.setImageData = function () {
+                input.value = input.getImageData().join('|');
+            };
+            this.getImageData = function () {
+                var values = [];
+                $(input).prevAll('.uploadimages').map(function () {
+                    values.push($(this).attr('data-tips-image'));
+                });
+                return values.reverse(), values;
+            };
+            var urls = this.getImageData(), srcs = this.value.split('|');
+            for (var i in srcs) if (srcs[i]) urls.push(srcs[i]);
+            $(this).prevAll('.uploadimages').remove();
+            this.value = urls.join('|');
+            for (var i in urls) {
+                var tpl = '<div class="uploadimages uploadimagemtl"><a class="layui-icon margin-right-5">&#xe602;</a><a class="layui-icon margin-right-5">&#x1006;</a><a class="layui-icon margin-right-5">&#xe603;</a></div>';
+                var $tpl = $(tpl).attr('data-tips-image', urls[i]).css('backgroundImage', 'url(' + urls[i] + ')').on('click', 'a', function (e) {
+                    e.stopPropagation();
+                    var $cur = $(this).parent();
+                    switch ($(this).index()) {
+                        case 1:// remove
+                            return $.msg.confirm('确定要移除这张图片吗？', function (index) {
+                                $cur.remove(), input.setImageData(), $.msg.close(index);
+                            });
+                        case 0: // right
+                            var lenght = $cur.siblings('div.uploadimagemtl').length;
+                            if ($cur.index() !== lenght) $cur.next().after($cur);
+                            return input.setImageData();
+                        case 2: // left
+                            if ($cur.index() !== 0) $cur.prev().before($cur);
+                            return input.setImageData();
+                    }
+                });
+                $(this).before($tpl);
+            }
+        }).trigger('change');
+    };
     let i = Math.ceil(Math.random()*10000000);
     $('[data-name=name_{$build_view_rand}]').attr('id','build_id_'+i);
     /*{if isset($multiple)}*/
-    $('#build_id_'+i).uploadMultipleImage();
+    $('#build_id_'+i).uploadMultipleImages();
     /*{else/}*/
-    $('#build_id_'+i).uploadOneImage();
+    $('#build_id_'+i).uploadOneImages();
     /*{/if}*/
 </script>

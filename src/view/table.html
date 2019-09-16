@@ -41,7 +41,7 @@
         table.render({
             elem: '#{$tableId}'
             ,skin:'line'
-            ,url:'{:url(request()->url())}'
+            ,url:"{:request()->url()}"
             ,autoSort:false
             ,where:{
                 table:true
@@ -95,7 +95,7 @@
                 }
             } else if(obj.event === 'del'){
                 layer.confirm("{:lang('build_view_table_delete_tip')}", function(index){
-                    $.form.load('{:url(request()->url())}', {field: 'delete', value: data.id, id: data.id}, 'post');
+                    $.form.load("{:request()->url()}", {field: 'delete', value: data.id, id: data.id}, 'post');
                     layer.close(index);
                 });
             } else if(obj.event === 'edit'){
@@ -112,7 +112,7 @@
         // 全部删除
         $('#batch_delete_all').click(function () {
             $.msg.confirm("{:lang('build_view_table_delete_all_tip')}", function () {
-                $.form.load("{:url(request()->url())}", {field: 'delete', id: 'all'}, 'post');
+                $.form.load("{:request()->url()}", {field: 'delete', id: 'all'}, 'post');
             });
         })
         //批量操作
@@ -151,7 +151,7 @@
                 return $.msg.tips("{:lang('build_view_please_select')}{:lang('build_view_table_confirm_tip')}");
             }
             $.msg.confirm('确定要删除这些数据吗？', function () {
-                $.form.load("{:url(request()->url())}", {field: 'delete', value: data.id, id: ids}, 'post');
+                $.form.load("{:request()->url()}", {field: 'delete', value: data.id, id: ids}, 'post');
             });
         })
         //监听行内编辑
@@ -160,7 +160,7 @@
             let post = {};
             post['id'] = obj.data.id;
             post[obj.field] = obj.value;
-            $.form.load("{:url(request()->url())}", post, 'post');
+            $.form.load("{:request()->url()}", post, 'post');
         });
         //导出当前页
         $('#excelPage').click(function(){

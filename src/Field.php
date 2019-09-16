@@ -22,9 +22,11 @@ use think\facade\View;
  * @method $this min() 最小值
  * @method $this max() 最大值
  * @method $this swithcStates() switch参数设置
- * @method $this uploadType() 文件上传类型
  * @method $this help() 提示文本
  * @method $this format() 时间格式
+ * @method Field uptype($type) 上传存储类型;
+ * @method Field baseUrl($bool) 上传带域名前缀;
+ * @method Field uploadType($extension) 允许上传文件的后缀;
  */
 class Field
 {

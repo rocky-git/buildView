@@ -337,8 +337,7 @@ class Grid extends Field
         $this->table->setOption('toolbar', implode('', $this->toolsArr));
         $this->table->name(json_encode($this->tableTitles));
         $this->setOption('table', $this->table->render());
-        $builder = new Builder();
-        return $builder->render($this->render());
+        return $this->render();
     }
 
     private function issetField($data, $field)

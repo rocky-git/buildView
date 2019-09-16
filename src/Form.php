@@ -305,8 +305,7 @@ class Form extends Field
 
         $this->dataSave();
         $this->setOption('content', $html);
-        $builder = new Builder();
-        return $builder->render($this->render());
+        return $this->render();
     }
 
     //添加formitem

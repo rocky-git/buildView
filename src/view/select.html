@@ -1,3 +1,6 @@
+{if isset($multiple)}
+<link href="/vendor/build-view/plugs/formSelect/formSelects-v4.css" rel="stylesheet">
+{/if}
 <div class="layui-form-item layui-form-text">
     <label class="layui-form-label">{$label}</label>
     <div class="layui-input-{$layui}">
@@ -36,9 +39,14 @@
     });
     /*{/if}*/
     /*{if isset($multiple)}*/
-    var formSelects = layui.formSelects;
-    formSelects.render('build_id_'+i,{
-        init:{$value|raw|json_encode},
+    layui.extend({
+        formSelects:'/vendor/build-view/plugs/formSelect/formSelects-v4',
+    });
+    layui.use([ 'formSelects'], function(){
+        let formSelects = layui.formSelects;
+        formSelects.render('build_id_'+i,{
+            init:{$value|raw|json_encode},
+        });
     });
     /*{/if}*/
 </script>
