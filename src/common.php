@@ -60,6 +60,12 @@ if (!is_dir($path)) {
    $plug = new \buildView\Plugs();
    return $plug->plupload();
 });
+//定义获取七牛云Token
+\think\facade\Route::any('buildview/qiniuToken',function(){
+    $plug = new \buildView\Plugs();
+    return $plug->qiniuToken();
+});
+
 //语言
 $lang = 'zh-cn';
 \think\facade\Lang::load(__DIR__ . '/lang/' . $lang . '.php');
