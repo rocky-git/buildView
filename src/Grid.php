@@ -123,14 +123,16 @@ class Grid extends Field
         foreach ($methods as $method){
             if($method->class == $className){
                 $name = $method->name;
-                if($this->model->$name() instanceof HasMany){
-                    array_push($relation,$name);
-                }elseif($this->model->$name() instanceof BelongsToMany){
-                    array_push($manyRelations,$name);
+                $p = new \ReflectionMethod($method->class ,$name);
+                if($p->getNumberOfParameters() == 0){
+                    if($this->model->$name() instanceof HasMany){
+                        array_push($relation,$name);
+                    }elseif($this->model->$name() instanceof BelongsToMany){
+                        array_push($manyRelations,$name);
+                    }
                 }
             }
         }
-
         if(count($relation) > 0 || count($manyRelations) > 0){
             if($deleteIds == 0){
                 $deleteIds =  $this->model->column('id');
