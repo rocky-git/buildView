@@ -17,6 +17,25 @@ use think\Db;
 
 class Excel
 {
+    private static function getLetter($i)
+    {
+
+        $letter = array('A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z');
+        if ($i > count($letter) - 1) {
+            if($i > 51){
+                $num = ceil($i / 25);
+            }else{
+                $num = round($i / 25);
+            }
+            $j = $i % 26;
+
+            $str = $letter[$num-1].$letter[$j];
+
+            return $str;
+        } else {
+            return $letter[$i];
+        }
+    }
     /**
      * 导出excel表格
      * @Author: rocky
@@ -32,7 +51,6 @@ class Excel
     {
         set_time_limit(0);
         ini_set('memory_limit', '-1');
-        $letter = array('A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z');
         $PHPExcel = new Spreadsheet();
         $worksheet = $PHPExcel->getActiveSheet();
         $worksheet->setTitle($title);
@@ -69,11 +87,12 @@ class Excel
                 }
             }
             $width = ceil(mb_strlen($str) * 3);
-            $worksheet->getColumnDimension($letter[$i])->setWidth($width);
+            $worksheet->getColumnDimension(self::getLetter($i))->setWidth($width);
             $i++;
         }
         $row = count($data) + 1;
-        $worksheet->getStyle("A1:{$letter[count($columnTitle)-1]}{$row}")->applyFromArray($styleArray);
+        $letter = self::getLetter(count($columnTitle)-1);
+        $worksheet->getStyle("A1:{$letter}{$row}")->applyFromArray($styleArray);
         $filename = $title . date('_YmdHi') . '分.xls';
         ob_end_clean();
         header('Content-Type: application/vnd.ms-excel');
