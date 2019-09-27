@@ -24,14 +24,14 @@
     }
     input[type="number"]{-moz-appearance:textfield;}
 </style>
-<div class="layui-card-body layui-anim layui-anim-upbit col-md-{$md|default='12'}">
-    <form class="layui-form layui-card-body think-box-shadow layui-box {if isset($theme)}layui-form-pane{/if}" action="{$aciontUrl}" method="post" autocomplete="off">
+<div class="layui-card-body layui-anim layui-anim-upbit layui-col-md{$md|default='12'}">
+    <form class="layui-form think-box-shadow layui-box {if isset($theme)}layui-form-pane{/if}" action="{$aciontUrl}" method="post" autocomplete="off">
         <div class="layui-card-body">
             {$content|raw}
             <div class="hr-line-dashed"></div>
             <div class="layui-form-item text-center">
                 {$hiddenId|raw}
-                <button class="layui-btn" lay-submit type='submit' lay-filter="*">{:lang('build_view_form_save')}</button>
+                <button class="layui-btn" lay-submit type='submit' lay-filter="*">{$submitText|default=lang('build_view_form_save')}</button>
             </div>
         </div>
     </form>

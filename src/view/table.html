@@ -7,9 +7,6 @@
     }
     .layui-table-cell {
         height: auto;
-
-
-
     }
     .layui-table-grid-down {
         display: none;
@@ -67,7 +64,13 @@
                         layer.tips(text, that);
                     }
                 });
-
+                var tableElem = this.elem.next('.layui-table-view');
+                layui.each(tableElem.find('table td select'), function (index, item) {
+                    var elem = $(item);
+                    $('.layui-table-body').css('overflow', 'visible');
+                    $('.layui-table-box').css('overflow', 'visible');
+                    elem.parents('div.layui-table-cell').css('overflow', 'visible');
+                });
             }
         });
         //监听排序

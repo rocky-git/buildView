@@ -6,7 +6,7 @@
         <!--{foreach $options as $key=>$val}-->
              <optgroup label="{$val.text}">
                  <!--{foreach $val.son as $v}-->
-                <option value="{$v.id}" {eq name="$value" value="$v.id"}selected{/eq}>{$v.text}</option>
+                 <option value="{$v.id}" {notempty name="$value"}{eq name="$value" value="$v.id"}selected{/eq}{/notempty}>{$v.text}</option>
                  <!--{/foreach}-->
              </optgroup>
             <!--{/foreach}-->

@@ -140,10 +140,10 @@ define(['plupload', 'Base64', 'md5'], function (plupload) {
                         },
                         data: ctx.join(","),
                         success: function (ret) {
+                            var field = $element.data('field') || 'file';
                             if (typeof UploadedHandler === 'function') {
-                                UploadedHandler(ret.filename, ret.url);
+                                UploadedHandler(ret.filename, ret.url,field);
                             } else {
-                                var field = $element.data('field') || 'file';
                                 $('[name="' + field + '"]').val(ret.url).trigger('change');
                             }
                         }, fail: function () {
@@ -159,10 +159,10 @@ define(['plupload', 'Base64', 'md5'], function (plupload) {
                         return false;
                     }
                     if (ret.uploaded) {
+                        var field = $element.data('field') || 'file';
                         if (typeof UploadedHandler === 'function') {
-                            UploadedHandler(ret.filename, ret.url);
+                            UploadedHandler(ret.filename, ret.url,field);
                         } else {
-                            var field = $element.data('field') || 'file';
                             $('[name="' + field + '"]').val(ret.url).trigger('change');
                         }
                     } else {

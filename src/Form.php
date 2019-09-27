@@ -58,6 +58,8 @@ class Form extends Field
     protected $tabCount = 0;
     //保存前回调
     protected $beforeSave = null;
+    //保存后回调
+    protected $afterSave = null;
     //创建验证规则
     protected $createRules = [
         'rule' => [],
@@ -264,6 +266,9 @@ class Form extends Field
                             $res = $this->data->$relation()->saveAll($relationData);
                         }
                     }
+                    if (!is_null($this->afterSave)) {
+                        call_user_func_array($this->afterSave, [Request::post(),$this->model]);
+                    }
                 } else {
                     //不传入模型的时候默认配置表
                     foreach ($post as $name => $value) {
@@ -277,6 +282,7 @@ class Form extends Field
                         }
                     }
                 }
+               
                 Db::commit();
                 if ($res || $this->model == null) {
                     throw new HttpResponseException(json(['code' => 1, 'msg' => lang('build_view_action_success'), 'data' => []]));
@@ -289,7 +295,13 @@ class Form extends Field
             }
         }
     }
-
+    /**
+     * 设置提交按钮文字
+     * @return string
+     */
+    public function setSubmitText($text){
+        $this->setOption('submitText',$text);
+    }
     /**
      * 输出视图
      * @return string
@@ -304,7 +316,11 @@ class Form extends Field
         $html = $this->parseFormItem($html, $hasManyHtml);
 
         $this->dataSave();
+        if(isset($this->options['theme'])){
+            $html = str_replace('layui-form-label','layui-form-label color-green',$html);
+        }
         $this->setOption('content', $html);
+
         return $this->render();
     }
 
@@ -481,7 +497,11 @@ class Form extends Field
         }
         return $html;
     }
-
+    //保存后回调
+    public function saved(\Closure $closure)
+    {
+        $this->afterSave = $closure;
+    }
     //保存前回调
     public function saving(\Closure $closure)
     {

@@ -75,7 +75,7 @@
                 <div class="layui-form-item layui-inline">
                     <label class="layui-form-label">{:lang('build_view_please_date_range')}</label>
                     <div class="layui-input-inline">
-                        <input name="create_at" id="create_at" value="{$Think.get.create_at}" placeholder="{:lang('build_view_please_select')}{:lang('build_view_please_date')}"
+                        <input name="create_at" id="create_at" readonly value="{$Think.get.create_at}" placeholder="{:lang('build_view_please_select')}{:lang('build_view_please_date')}"
                                class="layui-input">
                     </div>
                 </div>
@@ -99,51 +99,55 @@
         postChart($('#create_at').val());
     });
     initChart = function(title,text,series,dateArr,textType){
-        chart = echarts.init(document.getElementById('container'));
-        chart.clear();
-        chart.resize({
-            width: $('#container').width() ,
-        });
-        window.onresize = chart.resize;
-        chart.setOption({
-            title: {
-                text: title
-            },
-            tooltip: {trigger: 'axis'},
-            grid: {top: '10%', left: '3%', right: '8%', bottom: '3%', containLabel: true},
-            xAxis: [{
-                type: 'category',
-                scale: false,
-                boundaryGap: false,
-                axisLabel: {
-                    color: '#2f9de2',
+        require(['echarts'],function(echarts){
+            chart = echarts.init(document.getElementById('container'));
+            chart.clear();
+            chart.resize({
+                width: $('#container').width() ,
+            });
+            window.onresize = chart.resize;
+            chart.setOption({
+                title: {
+                    text: title
                 },
-                data: dateArr
-            }],
-            yAxis: [{
-                type: 'value',
-                scale: true,
+                tooltip: {trigger: 'axis'},
+                grid: {top: '10%', left: '3%', right: '8%', bottom: '3%', containLabel: true},
+                xAxis: [{
+                    type: 'category',
+                    scale: false,
+                    boundaryGap: false,
+                    axisLabel: {
+                        color: '#2f9de2',
+                    },
+                    data: dateArr
+                }],
+                yAxis: [{
+                    type: 'value',
+                    scale: true,
 
-                axisLabel: {
-                    color: '#2f9de2',
-                    formatter: "{value}"
-                },
-                splitLine: {
-                    lineStyle: {
-                        type: 'dashed',
-                        color: '#cccccc'
+                    axisLabel: {
+                        color: '#2f9de2',
+                        formatter: "{value}"
+                    },
+                    splitLine: {
+                        lineStyle: {
+                            type: 'dashed',
+                            color: '#cccccc'
+                        }
                     }
-                }
-            }],
-            legend: {data: textType},
-            series: series
-        });
+                }],
+                legend: {data: textType},
+                series: series
+            });
+        })
+
     }
     postChart();
     window.form.render();
     window.laydate.render({range: true, elem: '#create_at',done:function(value){
             if(value != ''){
                 $('#dateButtonDiv').find('button').addClass('layui-btn-primary').removeClass('layui-btn-checked');
+                type='range';
                 postChart(value)
             }
         }});

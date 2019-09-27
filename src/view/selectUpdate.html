@@ -1,16 +1,44 @@
+
 <div class="layui-form layui-box layui-inline text-left">
-    <select name="{$domId}"  lay-filter="{$domId}" lay-search  {if isset($multiple)}xm-select="{$domId}" xm-select-skin="normal" xm-select-direction="up" xm-select-search{/if}>
+    <select name="{$domId}" lay-filter="{$domId}" lay-search  {if isset($multiple)}xm-select="{$domId}" xm-select-skin="normal" xm-select-direction="up" xm-select-search{/if}>
+    <option value="">{:lang('build_view_please_select')}{$label}</option>
     {foreach $options as $key=>$val}
-    <option value="{$key}" {eq name="$value" value="$key"}selected{/eq}>{$val}</option>
+    <option value="{$key}" {notempty name="$value"}{eq name="$value" value="$key"}selected{/eq}{/notempty}>{$val}</option>
     {/foreach}
     </select>
 </div>
 {if isset($multiple)}
+<link href="/vendor/build-view/plugs/formSelect/formSelects-v4.css" rel="stylesheet">
 <script type="text/javascript">
-    var formSelects = layui.formSelects;
-    formSelects.render('{$domId}',{
-        init:{$value|raw|json_encode},
+    layui.extend({
+        formSelects:'/vendor/build-view/plugs/formSelect/formSelects-v4',
     });
+    layui.use(['formSelects'], function(){
+        let formSelects = layui.formSelects;
+        formSelects.render('{$domId}',{
+            init:{$value|raw|json_encode},
+    });
+        formSelects.on('{$domId}',function(id, vals, val, isAdd, isDisabled){
+            var values = [];
+            vals.forEach(function(item){
+                values.push(item.value)
+            });
+            if(isAdd){
+                values.push(val.value)
+            }else{
+                removeByValue(values,val.value)
+            }
+            let post = {};
+            post['id'] = '{$id}';
+            post['{$name}'] = values.join(',');
+            $.post('{:url(request()->url())}',post,function(res){
+                if(res.code !=1){
+                    $.msg.tips(res.msg);
+                }
+            })
+        });
+    });
+
     function removeByValue(arr, val) {
         for(var i=0; i<arr.length; i++) {
             if(arr[i] == val) {
@@ -19,25 +47,7 @@
             }
         }
     }
-    formSelects.on('{$domId}',function(id, vals, val, isAdd, isDisabled){
-        var values = [];
-        vals.forEach(function(item){
-            values.push(item.value)
-        });
-        if(isAdd){
-            values.push(val.value)
-        }else{
-            removeByValue(values,val.value)
-        }
-        let post = {};
-        post['id'] = '{$id}';
-        post['{$name}'] = values.join(',');
-        $.post('{:url(request()->url())}',post,function(res){
-            if(res.code !=1){
-                $.msg.tips(res.msg);
-            }
-        })
-    });
+
 </script>
 {else}
 <script type="text/javascript">

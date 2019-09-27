@@ -19,9 +19,9 @@ $uptype = 'local';
 {/php}
 <div class="layui-form-item layui-form-text">
     <label class="layui-form-label">{$label}</label>
-    <div class="layui-input-{$layui}">
+    <div class="layui-input-{$layui}" style="padding: 5px">
         {if isset($required)}<input type="hidden" required>{/if}
-        <input type="hidden" name="{$name}" lay-verify="{$layVerify}" data-uptype="{$uptype}" lay-verType="tips" data-name="name_{$build_view_rand}" lay-reqText="{:lang('build_view_please_select')}{$label}" value="{$value}" data-width="{$size[0]|default=''}" data-height="{$size[1]|default=''}">
+        <input type="hidden" name="{$name}" lay-verify="{$layVerify}" data-uptype="{$uptype}" lay-verType="tips" data-name="name_{$build_view_rand}" lay-reqText="{:lang('build_view_please_select')}{$label}" data-url="{$value}" value="{$value}" data-width="{$size[0]|default=''}" data-height="{$size[1]|default=''}">
         {notempty name="$help"}
         <div class="help-block">{$help}</div>
         {/notempty}
@@ -29,17 +29,21 @@ $uptype = 'local';
 </div>
 <script>
     $.fn.uploadFile = function (callback) {
-        if (this.attr('data-inited')) return false;
+
         var that = this, mode = $(this).attr('data-file') || 'one';
         this.attr('data-inited', true).attr('data-multiple', (mode !== 'btn' && mode !== 'one') ? 1 : 0);
+
         require(['/vendor/build-view/plugs/plupload/build.js'], function (apply) {
-            apply(that, null, function(filename,url){
-                $('[name="{$name}"]').attr('data-url',url);
+            apply(that, null, function(filename,url,field){
+
+                var input = $(that).prev('input');
+                input.attr('data-url',url);
                 /*{if !isset($baseUrl) && $uptype == 'local'}*/
-                $('[name="{$name}"]').val(filename).trigger('change');
+                input.val(filename).trigger('change');
                 /*{else/}*/
-                $('[name="{$name}"]').val(url).trigger('change');
+                input.val(url).trigger('change');
                 /*{/if}*/
+                if (input.attr('data-url')) input.next().css('backgroundImage', 'url(' + input.attr('data-url') + ')');
             });
         })
     };
@@ -48,8 +52,9 @@ $uptype = 'local';
         var name = $(this).attr('name') || 'image', type = $(this).data('type') || 'png,jpg,gif',width = $(this).data('width') || '',height = $(this).data('height') || '',uptype = $(this).data('uptype');
         var $tpl = $('<a data-file="btn" class="uploadimages"></a>').attr('data-field', name).attr('data-type', type).attr('data-width', width).attr('data-height', height).attr('data-uptype', uptype);
         $(this).attr('name', name).after($tpl.data('input', this)).on('change', function () {
-            if ($(this).data('url')) $tpl.css('backgroundImage', 'url(' + $(this).data('url') + ')');
+            if ($(this).attr('data-url')) $tpl.css('backgroundImage', 'url(' + $(this).attr('data-url') + ')');
         }).trigger('change');
+
     };
 
     /*! 上传多个图片 */

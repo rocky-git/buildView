@@ -13,6 +13,7 @@ use think\facade\View;
 /**
  * Class Field
  * @package app\common\tools\formview
+ * @method $this readonly() 只读
  * @method $this required() 非空
  * @method $this default() 默认值
  * @method $this layui() 布局
@@ -161,7 +162,7 @@ class Field
             }
         }
         foreach ($this->options as $key => $option) {
-            if (in_array($key, ['min', 'max', 'readonly'])) {
+            if (in_array($key, ['min', 'max', 'readonly','disabled'])) {
                 $this->options[$key] = "{$key}='{$option}' ";
             }
         }

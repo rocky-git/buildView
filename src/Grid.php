@@ -10,6 +10,7 @@ namespace buildView;
 
 
 use Faker\Provider\File;
+use think\Db;
 use think\exception\HttpResponseException;
 use think\facade\Request;
 use think\Model;
@@ -39,6 +40,7 @@ class Grid extends Field
     protected $tableTitles = [];
     protected $actionColumn = null;
     protected $toolsArr = [];
+    protected $beforeDel = null;
 
     /**
      * Form constructor.
@@ -48,7 +50,7 @@ class Grid extends Field
     {
         if ($model instanceof Model) {
             $this->model = $model;
-            $this->db = $this->model->db();
+            $this->db = clone $this->model;
 
             $this->tableFields = $this->model->getTableFields();
         } else {
@@ -63,47 +65,69 @@ class Grid extends Field
         $this->table->setOption('tableId', 'table_content' . time());
         $this->setSort();
         $this->actionColumn = new Actions('actions_tools', lang('build_view_grid_action'));
-        $this->dataSave();
+      
+
     }
+
     public function actions(\Closure $closure)
     {
         $this->actionColumn->setClosure($closure);
     }
-    //数据保存
+
+    //删除前回调
+    public function deling(\Closure $closure)
+    {
+        $this->beforeDel = $closure;
+    }
+
+    //数据操作
     private function dataSave()
     {
         if (Request::isPost()) {
+
             $action = Request::post('field');
-            switch ($action) {
-                case 'delete':
-                    $deleteIds = Request::post('id');
-                    if (in_array('is_deleted', $this->tableFields)) {
-                        if($deleteIds == 'all'){
-                            $res = $this->model->where('1=1')->setField('is_deleted', 1);
-                        }else{
-                            $res = $this->model->whereIn($this->model->getPk(), $deleteIds)->setField('is_deleted', 1);
+            Db::startTrans();
+            try {
+                switch ($action) {
+                    case 'delete':
+                        $deleteIds = Request::post('id');
+                        if (!is_null($this->beforeDel)) {
+                            call_user_func($this->beforeDel, $deleteIds);
                         }
-                    } else {
-                        if($deleteIds == 'all'){
-                            $res =  $this->deleteHasManyData(0);
-                        }else{
-                            $res = $this->deleteHasManyData($deleteIds);
+
+                        if (in_array('is_deleted', $this->tableFields)) {
+                            if($deleteIds == 'all'){
+                                $res = $this->model->where('1=1')->setField('is_deleted', 1);
+                            }else{
+                                $res = $this->model->whereIn($this->model->getPk(), $deleteIds)->setField('is_deleted', 1);
+                            }
+                        } else {
+                            if($deleteIds == 'all'){
+                                $res =  $this->deleteHasManyData(0);
+                            }else{
+                                $res = $this->deleteHasManyData($deleteIds);
+                            }
                         }
-                    }
-                    if ($res) {
-                        throw new HttpResponseException(json(['code' => 1, 'msg' => lang('build_view_action_del_success'), 'data' => []]));
-                    } else {
-                        throw new HttpResponseException(json(['code' => 0, 'msg' => lang('build_view_action_error'), 'data' => []]));
-                    }
-                    break;
-                default:
-                    $updateData = Request::except('id','post');
-                    $res = $this->model->whereIn($this->model->getPk(), Request::post('id'))->update($updateData);
-                    if ($res) {
-                        throw new HttpResponseException(json(['code' => 1, 'msg' =>  lang('build_view_action_success'), 'data' => []]));
-                    } else {
-                        throw new HttpResponseException(json(['code' => 0, 'msg' =>  lang('build_view_action_error'), 'data' => []]));
-                    }
+                        Db::commit();
+                        if ($res) {
+                            throw new HttpResponseException(json(['code' => 1, 'msg' => lang('build_view_action_del_success'), 'data' => []]));
+                        } else {
+                            throw new HttpResponseException(json(['code' => 0, 'msg' => lang('build_view_action_error'), 'data' => []]));
+                        }
+                        break;
+                    default:
+                        $updateData = Request::except('id','post');
+                        $res = $this->model->whereIn($this->model->getPk(), Request::post('id'))->update($updateData);
+                        Db::commit();
+                        if ($res) {
+                            throw new HttpResponseException(json(['code' => 1, 'msg' =>  lang('build_view_action_success'), 'data' => []]));
+                        } else {
+                            throw new HttpResponseException(json(['code' => 0, 'msg' =>  lang('build_view_action_error'), 'data' => []]));
+                        }
+                }
+            } catch (Exception $e) {
+                Db::rollback();
+                throw new HttpResponseException(json(['code' => 0, 'msg' => lang('build_view_action_error'), 'data' => []]));
             }
         }
     }
@@ -114,56 +138,58 @@ class Grid extends Field
      * 2019/8/20 13:56
      * @throws \ReflectionException
      */
-    private function deleteHasManyData($deleteIds){
+    private function deleteHasManyData($deleteIds)
+    {
         $reflection = new \ReflectionClass($this->model);
         $methods = $reflection->getMethods(\ReflectionMethod::IS_PUBLIC);
         $className = $reflection->getName();
-        $manyRelations =[];
+        $manyRelations = [];
         $relation = [];
-        foreach ($methods as $method){
-            if($method->class == $className){
+        foreach ($methods as $method) {
+            if ($method->class == $className) {
                 $name = $method->name;
-                $p = new \ReflectionMethod($method->class ,$name);
-                if($p->getNumberOfParameters() == 0){
-                    if($this->model->$name() instanceof HasMany){
-                        array_push($relation,$name);
-                    }elseif($this->model->$name() instanceof BelongsToMany){
-                        array_push($manyRelations,$name);
+                $p = new \ReflectionMethod($method->class, $name);
+                if ($p->getNumberOfParameters() == 0) {
+                    if ($this->model->$name() instanceof HasMany) {
+                        array_push($relation, $name);
+                    } elseif ($this->model->$name() instanceof BelongsToMany) {
+                        array_push($manyRelations, $name);
                     }
                 }
             }
         }
-        if(count($relation) > 0 || count($manyRelations) > 0){
-            if($deleteIds == 0){
-                $deleteIds =  $this->model->column('id');
-                foreach ($deleteIds as $deleteId){
-                    $db = $this->model->get($deleteId,$relation);
+        if (count($relation) > 0 || count($manyRelations) > 0) {
+            if ($deleteIds == 0) {
+                $deleteIds = $this->model->column('id');
+                foreach ($deleteIds as $deleteId) {
+                    $db = $this->model->get($deleteId, $relation);
                     $res = $db->together($relation)->delete();
-                    foreach ($manyRelations as $manyRelation){
+                    foreach ($manyRelations as $manyRelation) {
                         $db->$manyRelation()->detach();
                     }
                 }
-            }else{
-                $deleteIds = explode(',',$deleteIds);
-                foreach ($deleteIds as $deleteId){
-                    if(!empty($deleteId)){
-                        $db = $this->model->get($deleteId,$relation);
+            } else {
+                $deleteIds = explode(',', $deleteIds);
+                foreach ($deleteIds as $deleteId) {
+                    if (!empty($deleteId)) {
+                        $db = $this->model->get($deleteId, $relation);
                         $res = $db->together($relation)->delete();
-                        foreach ($manyRelations as $manyRelation){
+                        foreach ($manyRelations as $manyRelation) {
                             $db->$manyRelation()->detach();
                         }
                     }
                 }
             }
-        }else{
-            if($deleteIds == 0){
+        } else {
+            if ($deleteIds == 0) {
                 $res = $this->model->where('1=1')->delete();
-            }else{
-                $res = $this->model->whereIn($this->model->getPk(),$deleteIds)->delete();
+            } else {
+                $res = $this->model->whereIn($this->model->getPk(), $deleteIds)->delete();
             }
         }
         return $res;
     }
+
     /**
      * 设置iframe中提交的参数
      * @Author: rocky
@@ -172,15 +198,19 @@ class Grid extends Field
      * @param $url 提交地址
      * @param $val 附加参数
      */
-    public function setIframe($type='submit',$url='',$val=''){
+    public function setIframe($type = 'submit', $url = '', $val = '')
+    {
         $this->template = 'iframe';
         $this->table->iframeType($type);
         $this->table->iframeUrl($url);
         $this->table->iframeValue($val);
     }
-    public function getTable(){
+
+    public function getTable()
+    {
         return $this->table;
     }
+
     //获取当前模型
     public function model()
     {
@@ -239,9 +269,10 @@ class Grid extends Field
     public function setSort($field = 'sort')
     {
         if (in_array($field, $this->tableFields)) {
-            $this->column($field, lang('build_view_grid_sort'))->width(100)->style('background-color: #eee;')->editor();
+            $this->column($field, lang('build_view_grid_sort'))->width(80)->style('background-color: #eee;')->editor();
         }
     }
+
     //过滤
     public function filter($callback)
     {
@@ -261,11 +292,12 @@ class Grid extends Field
 
     public function view()
     {
+        $this->dataSave();
         if (in_array('is_deleted', $this->tableFields)) {
             $this->db->where('is_deleted', 0);
         }
-        if(Request::get('table_sort')){
-            $this->db->order(Request::get('field'),Request::get('order'));
+        if (Request::get('table_sort')) {
+            $this->db->removeOption('order')->order(Request::get('field'), Request::get('order'));
         }
         if (Request::get('export')) {
             switch (Request::get('export_type')) {
@@ -279,7 +311,7 @@ class Grid extends Field
                     $this->data = $this->model->whereIn('id', Request::get('ids'))->select();
                     break;
             }
-        }else{
+        } else {
             if ($this->isPage) {
                 $this->data = $this->db->page(Request::get('page'), Request::get('limit'))->select();
             } else {
@@ -308,7 +340,7 @@ class Grid extends Field
                     $excelTitle[$column->field] = $column->title;
                     $excelTr[$column->field] = $column->value;
                 }
-                if(!is_array($column->value)){
+                if (!is_array($column->value)) {
                     $totalRowData[$column->field] += $column->value;
                 }
             }
@@ -318,7 +350,7 @@ class Grid extends Field
         $totalRow = false;
         foreach ($this->columns as $key => $column) {
             if ($column->totalRow) {
-                $column->cols['totalRowText'] = '<span class="layui-badge">合计：'.number_format($totalRowData[$column->field],2).'</span>';
+                $column->cols['totalRowText'] = '<span class="layui-badge">合计：' . number_format($totalRowData[$column->field], 2) . '</span>';
                 if (!$totalRow) {
                     $this->table->totalRow(true);
                     $totalRow = true;
@@ -330,6 +362,9 @@ class Grid extends Field
             throw new HttpResponseException(json(['code' => 0, 'msg' => '操作成功', 'data' => $tableData, 'count' => $this->db->removeOption('page')->removeOption('order')->count()]));
         }
         if (Request::get('export')) {
+            if (empty($excelData)) {
+                die('<script>alert("导出数据不能为空");history.back()</script>');
+            }
             Excel::export($this->options['title'], $excelTitle, $excelData);
         }
         if (!is_null($this->filter)) {
@@ -355,7 +390,24 @@ class Grid extends Field
         }
         return false;
     }
-
+    //头像昵称列
+    public function userInfo($headimg='headimg',$nickname='nickname',$label='会员信息'){
+        array_push($this->realtionMethodArr, $headimg);
+        $headimg = implode('.', $this->realtionMethodArr);
+        array_pop($this->realtionMethodArr);
+        array_push($this->realtionMethodArr, $nickname);
+        $nickname = implode('.', $this->realtionMethodArr);
+        $this->realtionMethodArr = [];
+        return $this->column($headimg, $label)->display(function ($val,$data,$html) use ($nickname){
+            return $html .'<br>'. $this->array_get($nickname,$data);
+        })->image(50);
+    }
+    private function array_get($name,$data){
+        foreach (explode('.',$name) as $segment){
+            $data = $data[$segment];
+        }
+        return $data;
+    }
     public function __call($name, $arguments)
     {
         array_push($this->realtionMethodArr, $name);
@@ -368,7 +420,6 @@ class Grid extends Field
         return $this;
     }
 
-  
 
     /**
      * 设置列
@@ -394,5 +445,5 @@ class Grid extends Field
         }
         return $this;
     }
-    
+
 }

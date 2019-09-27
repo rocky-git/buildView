@@ -2,23 +2,23 @@
 <!--{notempty name='title'}-->
 <!--{neq name="Think.get.open_type" value="modal"}-->
 <div class="layui-card layui-bg-gray">
-<div class="layui-card-header notselect">
-    <span class="layui-icon layui-icon-next font-s10 color-desc margin-right-5"></span>{$title|default=''}
-    <!--{if $Think.get.back eq 1}-->
-    <button style="position:absolute;right:5px;top: 5px" class="layui-btn layui-btn-sm layui-bg-black"
-            href="javascript:;" onclick="history.back();"><i class="layui-icon">&#xe65a;</i>{:lang('build_view_back_btn')}
-    </button>
-
-    <!--{/if}-->
-    <div class="pull-right">
-        <!--{if !isset($hideAddButton)}-->
-        <button data-{$formOpen|default="open" }='{:url("form")}?back=1' type="button" data-title="{:lang('build_view_add_btn')}"
-                class='layui-btn layui-btn-sm layui-btn-primary'><i class="layui-icon layui-icon-add-1"></i>{:lang('build_view_add_btn')}
+    <div class="layui-card-header notselect">
+        <span class="layui-icon layui-icon-next font-s10 color-desc margin-right-5"></span>{$title|default=''}
+        <!--{if $Think.get.back eq 1}-->
+        <button style="position:absolute;right:5px;top: 5px" class="layui-btn layui-btn-sm layui-bg-black"
+                href="javascript:;" onclick="history.back();"><i class="layui-icon">&#xe65a;</i>{:lang('build_view_back_btn')}
         </button>
-        <!--{/if}-->
-        <!--{if !isset($hideDeletesButton)}-->
 
-        <span class="layui-nav layui-bg-red layui-btn layui-btn-sm layui-inline" style="z-index:1">
+        <!--{/if}-->
+        <div class="pull-right">
+            <!--{if !isset($hideAddButton)}-->
+            <button data-{$formOpen|default="open" }='{:url("form")}?back=1' type="button" data-title="{:lang('build_view_add_btn')}"
+                    class='layui-btn layui-btn-sm layui-btn-primary'><i class="layui-icon layui-icon-add-1"></i>{:lang('build_view_add_btn')}
+            </button>
+            <!--{/if}-->
+            <!--{if !isset($hideDeletesButton)}-->
+
+            <span class="layui-nav layui-bg-red layui-btn layui-btn-sm layui-inline" style="z-index:1">
              <li class="layui-nav-item ">
                  <a href="javascript:;" class='layui-btn layui-btn-sm layui-btn-danger' style="color: #ffffff"><i
                          class="layui-icon layui-icon-delete"></i>{:lang('build_view_batch_del_btn')}</a>
@@ -28,9 +28,9 @@
             </dl>
              </li>
         </span>
-        <!--{/if}-->
-        <!--{if !isset($hideExportButton)}-->
-        <span class="layui-nav layui-bg-blue layui-btn layui-btn-sm layui-inline" style="z-index:1">
+            <!--{/if}-->
+            <!--{if !isset($hideExportButton)}-->
+            <span class="layui-nav layui-bg-blue layui-btn layui-btn-sm layui-inline" style="z-index:1">
              <li class="layui-nav-item ">
                  <a href="javascript:;" class='layui-btn layui-btn-sm layui-btn-normal' style="color: #ffffff"><i
                          class="layui-icon layui-icon-export"></i>{:lang('build_view_export_btn')}</a>
@@ -42,29 +42,29 @@
             </dl>
              </li>
         </span>
-        <!--{/if}-->
-        <style>
-            .layui-nav-child dd{
-                height: 30px;
-                line-height: 30px;
-            }
-            .layui-nav-chil dd a:hover{
-                font-weight: bold;;
-                color: #000000;
-            }
-        </style>
-        <script>
-            layui.use('element', function () {
-                var element = layui.element; //导航的hover效果、二级菜单等功能，需要依赖element模块
-                element.render('nav');
-                $('.layui-nav').css('padding', 0);
-                $('.layui-nav-item a').css('padding-left', 10);
-                $('.layui-nav-item a').css('padding-right', 30);
-                $('.layui-nav-child').css('top', 30);
-            });
-        </script>
+            <!--{/if}-->
+            <style>
+                .pull-right .layui-nav-child dd{
+                    height: 30px;
+                    line-height: 30px;
+                }
+                .pull-right .layui-nav-chil dd a:hover{
+                    font-weight: bold;;
+                    color: #000000;
+                }
+            </style>
+            <script>
+                layui.use('element', function () {
+                    var element = layui.element; //导航的hover效果、二级菜单等功能，需要依赖element模块
+                    element.render('nav');
+                    $('.pull-right .layui-nav').css('padding', 0);
+                    $('.pull-right .layui-nav-item a').css('padding-left', 10);
+                    $('.pull-right .layui-nav-item a').css('padding-right', 30);
+                    $('.pull-right .layui-nav-child').css('top', 30);
+                });
+            </script>
+        </div>
     </div>
-</div>
 </div>
 <!--{/neq}-->
 <!--{/notempty}-->

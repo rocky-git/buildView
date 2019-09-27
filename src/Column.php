@@ -184,6 +184,28 @@ class Column
         $this->color = $color;
     }
     /**
+     * 设置单元格所占行数
+     * @Author: rocky
+     * 2019/7/25 16:50
+     * @param $value 行数
+     */
+    public function rowspan($value)
+    {
+        $this->cols['rowspan'] = $value;
+        return $this;
+    }
+    /**
+     * 设置单元格所占列数
+     * @Author: rocky
+     * 2019/7/25 16:50
+     * @param $value 列数
+     */
+    public function colspan($value)
+    {
+        $this->cols['colspan'] = $value;
+        return $this;
+    }
+    /**
      * 设置样式
      * @Author: rocky
      * 2019/7/25 16:50
@@ -206,7 +228,17 @@ class Column
         $this->cols['width'] = $val;
         return $this;
     }
-
+    /**
+     * 设置最小宽度
+     * @Author: rocky
+     * 2019/7/25 16:50
+     * @param $value 宽度
+     */
+    public function minWidth($val)
+    {
+        $this->cols['minWidth'] = $val;
+        return $this;
+    }
     //switchs开关更新
     public function switchs($state = [])
     {

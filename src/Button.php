@@ -12,7 +12,7 @@ class Button extends Field
 {
     protected $html = '';
     protected $class = '';
-    public function __construct($text,$color='',$size='',$icon = 'layui-icon-edit',$radius = false)
+    public function __construct($text,$color='',$size='sm',$icon = '',$radius = false)
     {
         $this->template = 'button';
         if(!empty($icon)){
