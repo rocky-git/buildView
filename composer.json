@@ -1,7 +1,7 @@
 {
   "name": "rockys/build-view",
   "description": "ThinkPhP 基于layui构建视图增删改查",
-  "type": "think-build-view",
+  "type": "library",
   "keywords": [
     "build-view",
     "buildiew",
