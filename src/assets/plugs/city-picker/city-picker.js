@@ -323,7 +323,6 @@ layui.define(['jquery'], function (exports) {
                     var item = $(this).data('item'),
                         type = $(this).data('count');
                     if (item) {
-                        console.log(item);
                         text += ($(this).hasClass('province') ? '' : '/') + '<span class="select-item" data-count="' +
                             type + '" data-code="' + item.code + '">' + item.address + '</span><input type="hidden" name="' + type + '" value="' + item.address + '"  />';
                     }

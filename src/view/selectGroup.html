@@ -6,7 +6,7 @@
         <!--{foreach $options as $key=>$val}-->
              <optgroup label="{$val.text}">
                  <!--{foreach $val.son as $v}-->
-                 <option value="{$v.id}" {notempty name="$value"}{eq name="$value" value="$v.id"}selected{/eq}{/notempty}>{$v.text}</option>
+                 <option value="{$v.id}" {if !empty($value) || $value =='0'}{eq name="$value" value="$v.id"}selected{/eq}{/if}>{$v.text}</option>
                  <!--{/foreach}-->
              </optgroup>
             <!--{/foreach}-->
@@ -17,7 +17,8 @@
     </div>
 </div>
 <script type="text/javascript">
-    let i = Math.ceil(Math.random()*10000000)
+
+    let i = Math.ceil(Math.random()*10000000);
     $('[data-name=name_{$build_view_rand}]').attr('lay-filter','build_id_'+i);
     $('[data-name=name_{$build_view_rand}]').attr('xm-select','build_id_'+i);
     /*{if isset($load)}*/

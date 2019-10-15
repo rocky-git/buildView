@@ -16,6 +16,11 @@ $uptype = sysconf('storage_type');
 $uptype = 'local';
 }
 }
+if(isset($multiple)){
+    if(is_array($value)){
+        $value = implode('|',$value);
+    }
+}
 {/php}
 <div class="layui-form-item layui-form-text">
     <label class="layui-form-label">{$label}</label>
@@ -28,9 +33,9 @@ $uptype = 'local';
     </div>
 </div>
 <script>
-    $.fn.uploadFile = function (callback) {
+    $.fn.uploadFiles = function (callback) {
 
-        var that = this, mode = $(this).attr('data-file') || 'one';
+        var that = this, mode = $(this).attr('data-files') || 'one';
         this.attr('data-inited', true).attr('data-multiple', (mode !== 'btn' && mode !== 'one') ? 1 : 0);
 
         require(['/vendor/build-view/plugs/plupload/build.js'], function (apply) {
@@ -50,7 +55,10 @@ $uptype = 'local';
     /*! 上传单个图片 */
     $.fn.uploadOneImages = function () {
         var name = $(this).attr('name') || 'image', type = $(this).data('type') || 'png,jpg,gif',width = $(this).data('width') || '',height = $(this).data('height') || '',uptype = $(this).data('uptype');
-        var $tpl = $('<a data-file="btn" class="uploadimages"></a>').attr('data-field', name).attr('data-type', type).attr('data-width', width).attr('data-height', height).attr('data-uptype', uptype);
+        var $tpl = $('<a data-files="btn" class="uploadimages"></a>').attr('data-field', name).attr('data-type', type).attr('data-width', width).attr('data-height', height).attr('data-uptype', uptype);
+        $tpl.uploadFiles(function (url) {
+            $($tpl.data('input')).val(url).trigger('change');
+        });
         $(this).attr('name', name).after($tpl.data('input', this)).on('change', function () {
             if ($(this).attr('data-url')) $tpl.css('backgroundImage', 'url(' + $(this).attr('data-url') + ')');
         }).trigger('change');
@@ -61,6 +69,7 @@ $uptype = 'local';
     $.fn.uploadMultipleImages = function () {
         var type = $(this).data('type') || 'png,jpg,gif', name = $(this).attr('name') || 'umt-image',width = $(this).data('width') || '',height = $(this).data('height') || '',uptype = $(this).data('uptype');
         var $tpl = $('<a class="uploadimages"></a>').attr('data-file', 'mul').attr('data-field', name).attr('data-type', type).attr('data-width', width).attr('data-height', height).attr('data-uptype', uptype);
+
         $(this).attr('name', name).after($tpl.data('input', this)).on('change', function () {
             var input = this;
             this.setImageData = function () {

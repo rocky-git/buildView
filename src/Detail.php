@@ -64,6 +64,7 @@ class Detail extends Field
     public function view()
     {
         if (Request::isPost()) {
+            $this->model->setQuery(null);
             $updateData = Request::except('id','post');
             $res = $this->model->where($this->model->getPk(), Request::post('id'))->update($updateData);
             if ($res) {

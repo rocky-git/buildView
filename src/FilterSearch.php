@@ -54,9 +54,7 @@ class FilterSearch
             $this->model = $model;
             $this->db = $this->model->db();
         }elseif($model instanceof Query){
-
             $this->db = $model;
-
             $this->model = $model->getModel();
         } else {
             $this->db = Db::name($model);

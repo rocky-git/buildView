@@ -1,3 +1,8 @@
+{php}
+foreach($name as &$vo){
+$vo = str_replace('.','_',$vo);
+}
+{/php}
 <link href="/vendor/build-view/plugs/city-picker/city-picker.css" rel="stylesheet">
 <script src="/vendor/build-view/plugs/city-picker/city-picker.data.js"></script>
 <script src="/vendor/build-view/plugs/city-picker/city-picker.js"></script>
@@ -20,9 +25,10 @@
         provincename:"{$name[0]|default='province'}",
         cityname:"{$name[1]|default='city'}",
         districtname: "{$name[2]|default='area'}",
-        province: "{$value[0]|default=''}",// 默认省份名称
-        city: "{$value[1]|default=''}",// 默认地市名称
-        district: "{$value[2]|default=''}",// 默认区县名称
+        "{$name[0]|default='province'}": "{$value[0]|default=''}",// 默认省份名称
+        "{$name[1]|default='city'}": "{$value[1]|default=''}",// 默认地市名称
+        "{$name[2]|default='area'}": "{$value[2]|default=''}",// 默认区县名称
         level:"{$level|default='area'}",
     });
+
 </script>

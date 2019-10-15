@@ -41,6 +41,7 @@ class Grid extends Field
     protected $actionColumn = null;
     protected $toolsArr = [];
     protected $beforeDel = null;
+    protected $sortField = 'sort';
 
     /**
      * Form constructor.
@@ -50,8 +51,7 @@ class Grid extends Field
     {
         if ($model instanceof Model) {
             $this->model = $model;
-            $this->db = clone $this->model;
-
+            $this->db = $model->db();
             $this->tableFields = $this->model->getTableFields();
         } else {
             abort(999, '不是有效的模型');
@@ -65,7 +65,7 @@ class Grid extends Field
         $this->table->setOption('tableId', 'table_content' . time());
         $this->setSort();
         $this->actionColumn = new Actions('actions_tools', lang('build_view_grid_action'));
-      
+
 
     }
 
@@ -84,11 +84,29 @@ class Grid extends Field
     private function dataSave()
     {
         if (Request::isPost()) {
-
+            $this->model->setQuery(null);
             $action = Request::post('field');
             Db::startTrans();
             try {
                 switch ($action) {
+                    case 'buldview_sort':
+                        $ids = Request::post('ids');
+                        $values = Request::post('values');
+                        $sortData = [];
+                        foreach ($ids as $key => $id) {
+                            $sortData[] = [
+                                $this->model->getPk() => $id,
+                                $this->sortField => $values[$key]
+                            ];
+                        }
+                        $res = $this->model->saveAll($sortData);
+                        Db::commit();
+                        if ($res) {
+                            throw new HttpResponseException(json(['code' => 1, 'msg' => lang('build_view_action_success'), 'data' => []]));
+                        } else {
+                            throw new HttpResponseException(json(['code' => 0, 'msg' => lang('build_view_action_error'), 'data' => []]));
+                        }
+                        break;
                     case 'delete':
                         $deleteIds = Request::post('id');
                         if (!is_null($this->beforeDel)) {
@@ -96,15 +114,15 @@ class Grid extends Field
                         }
 
                         if (in_array('is_deleted', $this->tableFields)) {
-                            if($deleteIds == 'all'){
+                            if ($deleteIds == 'all') {
                                 $res = $this->model->where('1=1')->setField('is_deleted', 1);
-                            }else{
+                            } else {
                                 $res = $this->model->whereIn($this->model->getPk(), $deleteIds)->setField('is_deleted', 1);
                             }
                         } else {
-                            if($deleteIds == 'all'){
-                                $res =  $this->deleteHasManyData(0);
-                            }else{
+                            if ($deleteIds == 'all') {
+                                $res = $this->deleteHasManyData(0);
+                            } else {
                                 $res = $this->deleteHasManyData($deleteIds);
                             }
                         }
@@ -116,13 +134,13 @@ class Grid extends Field
                         }
                         break;
                     default:
-                        $updateData = Request::except('id','post');
+                        $updateData = Request::except('id', 'post');
                         $res = $this->model->whereIn($this->model->getPk(), Request::post('id'))->update($updateData);
                         Db::commit();
                         if ($res) {
-                            throw new HttpResponseException(json(['code' => 1, 'msg' =>  lang('build_view_action_success'), 'data' => []]));
+                            throw new HttpResponseException(json(['code' => 1, 'msg' => lang('build_view_action_success'), 'data' => []]));
                         } else {
-                            throw new HttpResponseException(json(['code' => 0, 'msg' =>  lang('build_view_action_error'), 'data' => []]));
+                            throw new HttpResponseException(json(['code' => 0, 'msg' => lang('build_view_action_error'), 'data' => []]));
                         }
                 }
             } catch (Exception $e) {
@@ -215,7 +233,7 @@ class Grid extends Field
     public function model()
     {
 
-        return $this->db->getModel();
+        return $this->db;
     }
 
     //设置from打开窗口方式
@@ -268,8 +286,14 @@ class Grid extends Field
     //开启排序
     public function setSort($field = 'sort')
     {
+        $this->sortField = $field;
         if (in_array($field, $this->tableFields)) {
-            $this->column($field, lang('build_view_grid_sort'))->width(80)->style('background-color: #eee;')->editor();
+            $this->column($field, "<button id='sortButton' class='layui-btn layui-btn-xs layui-btn-normal'style='width:46px' title='" . lang('build_view_grid_sort') . "' type='button'>" . lang('build_view_grid_sort') . "</button")
+                ->width(80)
+                ->style('')
+                ->display(function ($val, $data) {
+                    return "<input type='text' data-table-sort='true' value='{$val}' data-id='{$data["id"]}' class='layui-input text-center' style='padding-left:0px;' onkeyup=\"value=value.replace(/[^\d]/g,'')\" onblur=\"value=value.replace(/[^\d]/g,'')\">";
+                });
         }
     }
 
@@ -277,11 +301,10 @@ class Grid extends Field
     public function filter($callback)
     {
         if ($callback instanceof \Closure) {
-            $this->filter = new Filter($this->db->getModel());
+            $this->model->setQuery($this->db);
+            $this->filter = new Filter($this->db);
             call_user_func($callback, $this->filter);
-            $this->db = $this->filter->db();
         }
-
     }
 
     //隐藏多选
@@ -306,6 +329,7 @@ class Grid extends Field
                     break;
                 case 'page':
                     $this->data = $this->db->page(Request::get('page'), Request::get('limit'))->select();
+
                     break;
                 case 'select':
                     $this->data = $this->model->whereIn('id', Request::get('ids'))->select();
@@ -337,8 +361,14 @@ class Grid extends Field
                 $column->setData($val);
                 $tableData[$index][$column->field] = $column->render();
                 if ($column->field != 'actions_tools' && $column->field != 'id' && $this->issetField($val, $column->field)) {
-                    $excelTitle[$column->field] = $column->title;
-                    $excelTr[$column->field] = $column->value;
+                    if (!$column->excelClose) {
+                        $excelTitle[$column->field] = $column->title;
+                        if (empty($column->excelData)) {
+                            $excelTr[$column->field] = $column->value;
+                        } else {
+                            $excelTr[$column->field] = $column->excelData;
+                        }
+                    }
                 }
                 if (!is_array($column->value)) {
                     $totalRowData[$column->field] += $column->value;
@@ -390,24 +420,29 @@ class Grid extends Field
         }
         return false;
     }
+
     //头像昵称列
-    public function userInfo($headimg='headimg',$nickname='nickname',$label='会员信息'){
+    public function userInfo($headimg = 'headimg', $nickname = 'nickname', $label = '会员信息')
+    {
         array_push($this->realtionMethodArr, $headimg);
         $headimg = implode('.', $this->realtionMethodArr);
         array_pop($this->realtionMethodArr);
         array_push($this->realtionMethodArr, $nickname);
         $nickname = implode('.', $this->realtionMethodArr);
         $this->realtionMethodArr = [];
-        return $this->column($headimg, $label)->display(function ($val,$data,$html) use ($nickname){
-            return $html .'<br>'. $this->array_get($nickname,$data);
+        return $this->column($headimg, $label)->display(function ($val, $data, $html) use ($nickname) {
+            return $html . '<br>' . $this->array_get($nickname, $data);
         })->image(50);
     }
-    private function array_get($name,$data){
-        foreach (explode('.',$name) as $segment){
+
+    private function array_get($name, $data)
+    {
+        foreach (explode('.', $name) as $segment) {
             $data = $data[$segment];
         }
         return $data;
     }
+
     public function __call($name, $arguments)
     {
         array_push($this->realtionMethodArr, $name);

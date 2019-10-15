@@ -215,7 +215,7 @@ class Form extends Field
             Db::startTrans();
             try {
                 if (!is_null($this->beforeSave)) {
-                    $beforePost = call_user_func($this->beforeSave, Request::post());
+                    $beforePost = call_user_func($this->beforeSave, Request::post(),$this->data);
                     if (is_array($beforePost)) {
                         $post = array_merge($post, $beforePost);
                     }
@@ -223,7 +223,7 @@ class Form extends Field
                 if ($this->model instanceof Model) {
                     $this->checkRule($post);
                     $res = $this->model->save($post);
-
+                
                     foreach ($this->relationArr as $relation) {
                         if ($this->model->$relation() instanceof BelongsTo || $this->model->$relation() instanceof HasOne) {
                             $relationData = $post[$relation];
@@ -257,13 +257,17 @@ class Form extends Field
                             $relationData = $post[$relation];
                             if (is_string($relationData)) {
                                 $relationData = explode(',', $relationData);
+                                $relationData = array_filter($relationData);
                             }
                             if (empty($this->data)) {
                                 $pk = $this->model->getPk();
                                 $this->data = $this->model->find($this->model->$pk);
                             }
+
                             $this->data->$relation()->detach();
-                            $res = $this->data->$relation()->saveAll($relationData);
+                            if(count($relationData) > 0){
+                                $res = $this->data->$relation()->saveAll($relationData);
+                            }
                         }
                     }
                     if (!is_null($this->afterSave)) {
@@ -330,8 +334,11 @@ class Form extends Field
         if ($this->model instanceof Model) {
             if (is_array($field)) {
                 foreach ($field as $value) {
-                    $val[] = $this->getData($value);
+                    list($tmp_val,$tmp_rawVal) = $this->getData($value);
+                    $val[] = $tmp_val;
+                    $rawVal[] = $tmp_rawVal;
                 }
+               
             } else {
                 if($template == 'checkbox' || $template == 'select'){
                     if(method_exists($this->model,$field)){
@@ -346,14 +353,15 @@ class Form extends Field
                             }
                         }
                     } else{
-                        $val = $this->getData($field);
+                        list($val,$rawVal) = $this->getData($field);
                     }
                 }else{
-                    $val = $this->getData($field);
+                    list($val,$rawVal) = $this->getData($field);
                 }
             }
         } else {
             $val = Db::name($this->configTable)->where('name', $field)->value('value');
+            $rawVal = '';
         }
         $names = explode('.', $field);
         if (count($names) > 1) {
@@ -367,7 +375,10 @@ class Form extends Field
             }
             $field = "{$relationMethod}[{$names[1]}]";
         }
-        $item = new Field($template, $lable, $field, $val);
+        $item = new Field($template, $lable, $field, $val,$rawVal);
+        if($template == 'image'){
+            $item->getData(true);
+        }
         $item->setBuildForm($this);
         array_push($this->formItem, $item);
         return $item;
@@ -411,14 +422,21 @@ class Form extends Field
     {
         $fields = explode('.', $field);
         $val = $this->data;
+        $rawVal = $this->data;
         foreach ($fields as $f) {
             if (isset($val[$f])) {
+                if(is_object($val)){
+                    $rawVal = $val->getData($f);
+                }else{
+                    $rawVal = $val[$f];
+                }
                 $val = $val[$f];
             } else {
                 $val = '';
             }
         }
-        return $val;
+
+        return [$val,$rawVal];
     }
 
     //解析formhtml

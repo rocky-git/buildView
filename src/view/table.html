@@ -24,6 +24,7 @@
 </table>
 <!--{eq name="iframeType" value="submit"}-->
 <div class="layui-form-item text-center" >
+
     <button type="button"  class='layui-btn' id="subbutton">{:lang('build_view_table_confirm_btn')}</button>
 </div>
 <!--{/eq}-->
@@ -102,8 +103,6 @@
                     layer.close(index);
                 });
             } else if(obj.event === 'edit'){
-
-
                 var url = '{:url("form")}?id='+data.id+'&back=1';
                 if('{$formOpen|default="open"}' == 'open'){
                     $.form.href(url, this);
@@ -111,6 +110,15 @@
                     return $.form.modal(url, 'open_type=modal', $(this).attr('data-title') || "{:lang('build_view_grid_edit')}");
                 }
             }
+        });
+        $('#sortButton').click(function(){
+            let ids = [];
+            let values = [];
+            $('[data-table-sort]').each(function(index,item){
+                ids.push($(item).data('id'));
+                values.push( $(item).val());
+            });
+            $.form.load("{:request()->url()}", {ids:ids,values:values,field:'buldview_sort'}, 'post');
         });
         // 全部删除
         $('#batch_delete_all').click(function () {
@@ -159,7 +167,6 @@
         })
         //监听行内编辑
         table.on('edit({$tableId})', function(obj){
-
             let post = {};
             post['id'] = obj.data.id;
             post[obj.field] = obj.value;
@@ -203,8 +210,8 @@
             if (ids.length < 1) {
                 return $.msg.tips("{:lang('build_view_please_select')}{:lang('build_view_table_confirm_tip')}");
             }
-            $.post("{$iframeUrl}",{select_ids:ids,value:'{$iframeValue}'},function(data,status){
-                if(data.code == 200){
+            $.post("{$iframeUrl}",{select_ids:ids,value:'{$iframeValue}',_method:'PUT'},function(data,status){
+                if(data.code == 1){
                     $.msg.success("{:lang('build_view_action_success')}", 1, function(){
                         top.$.form.reload();
                         parent.layer.close(parent.layer.getFrameIndex(window.name));
