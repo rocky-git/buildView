@@ -21,9 +21,11 @@ class Column
     //列宽度
     protected $width = '';
     public $columnHtml = '';
+    public $excelData = '';
     public $field;
     public $title;
     protected $closure = null;
+    protected $excelClosure = null;
     protected $using = [];
     protected $fromFeild = null;
     protected $defaultValue = '--';
@@ -113,6 +115,9 @@ class Column
         if (!is_null($this->closure)) {
             $this->columnHtml = call_user_func_array($this->closure, [$this->value, $this->data,$this->columnHtml ]);
         }
+        if (!is_null($this->excelClosure)) {
+            $this->excelData = call_user_func_array($this->excelClosure, [$this->value, $this->data,$this->columnHtml ]);
+        }
         if(empty($this->columnHtml)){
 
             if(!is_numeric($this->columnHtml)){
@@ -123,7 +128,22 @@ class Column
             $this->columnHtml = '<span class="color-'.$this->color.'">'.$this->columnHtml.'</span>';
         }
     }
+    //自定义显示格式
+    public function setExcelData(\Closure $closure)
+    {
+        $this->excelClosure = $closure;
+        return $this;
+    }
 
+    /**
+     * 关闭excel 导出
+     * @Author: rocky
+     * 2019/10/9 16:54
+     */
+    public function excelClose(){
+        $this->excelClose = true;
+        return $this;
+    }
     /**
      * 开启合计
      * @Author: rocky

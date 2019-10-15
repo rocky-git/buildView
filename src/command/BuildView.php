@@ -101,9 +101,18 @@ class BuildView extends Make
     {
 
         if($input->hasOption('model')){
+
             $model = $input->getOption('model');
+            $names = explode('/',$model);
+            $names = array_filter($names);
+            if(isset($names[1])){
+                $model = $names[1];
+                $classname_model = $this->getClassNames($names[0],'model\\'.$names[1]);
+            }else{
+                $classname_model = $this->getClassNames('common','model\\'.$model);
+            }
+           
             $this->getTableInfo($model);
-            $classname_model = $this->getClassNames('common','model\\'.$model);
             $pathname = $this->getPathName($classname_model);
             if (is_file($pathname)) {
                 $output->writeln('<error>' . $classname_model . ' already exists!</error>');
@@ -121,7 +130,13 @@ class BuildView extends Make
             }
         }
         $name = trim($input->getArgument('name'));
-        $classname = $this->getClassNames('admin','controller\\'.$name);
+        $names = explode('/',$name);
+        $names = array_filter($names);
+        if(isset($names[1])){
+            $classname = $this->getClassNames($names[0],'controller\\'.$names[1]);
+        }else{
+            $classname = $this->getClassNames('admin','controller\\'.$name);
+        }
         $pathname = $this->getPathName($classname);
         if (is_file($pathname)) {
             $output->writeln('<error>' . $classname . ' already exists!</error>');

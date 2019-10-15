@@ -52,12 +52,14 @@ class Button extends Field
      * @param $id 更新主键条件
      * @param array $updateData 更新数据
      * @param string $url
+     * @param $confirm 操作提示
      */
-    public function save($id,$updateData,$url=''){
+    public function save($id,$updateData,$url='',$confirm=''){
         if(empty($url)){
             $url = request()->url();
         }
         $str = $this->ruleValue($updateData);
+        $this->confirm($confirm);
         $this->value("data-value='id#{$id};{$str}'");
         $this->tager("data-action='{$url}'");
     }
@@ -78,12 +80,14 @@ class Button extends Field
      * @param $id 更新主键条件
      * @param array $updateData 更新数据
      * @param string $url
+     * @param string $confirm 操作提示
      */
-    public function saveAll($updateData,$url=''){
+    public function saveAll($updateData,$url='',$confirm=''){
         if(empty($url)){
             $url = request()->url();
         }
         $str = $this->ruleValue($updateData);
+        $this->confirm($confirm);
         $this->id("data-batch='true'");
         $this->value("data-value='{$str}'");
         $this->tager("data-url='{$url}'");
