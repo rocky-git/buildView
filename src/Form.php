@@ -433,6 +433,7 @@ class Form extends Field
                 $val = $val[$f];
             } else {
                 $val = '';
+				$rawVal = '';
             }
         }
 
