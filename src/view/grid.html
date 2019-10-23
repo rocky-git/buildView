@@ -4,12 +4,7 @@
 <div class="layui-card layui-bg-gray">
     <div class="layui-card-header notselect">
         <span class="layui-icon layui-icon-next font-s10 color-desc margin-right-5"></span>{$title|default=''}
-        <!--{if $Think.get.back eq 1}-->
-        <button style="position:absolute;right:5px;top: 5px" class="layui-btn layui-btn-sm layui-bg-black"
-                href="javascript:;" onclick="history.back();"><i class="layui-icon">&#xe65a;</i>{:lang('build_view_back_btn')}
-        </button>
 
-        <!--{/if}-->
         <div class="pull-right">
             <!--{if !isset($hideAddButton)}-->
             <button data-{$formOpen|default="open" }='{:url("form")}?back=1' type="button" data-title="{:lang('build_view_add_btn')}"
@@ -27,7 +22,7 @@
                 <dd lay-unselect><a id="batch_delete_all">{:lang('build_view_del_all_btn')}</a></dd>
             </dl>
              </li>
-        </span>
+             </span>
             <!--{/if}-->
             <!--{if !isset($hideExportButton)}-->
             <span class="layui-nav layui-bg-blue layui-btn layui-btn-sm layui-inline" style="z-index:1">
@@ -41,7 +36,11 @@
 
             </dl>
              </li>
-        </span>
+             </span>
+            <!--{/if}-->
+            <!--{if $Think.get.back eq 1}-->
+            <button  class="layui-btn layui-btn-sm layui-bg-black" href="javascript:;" onclick="history.back();"><i class="layui-icon">&#xe65a;</i>{:lang('build_view_back_btn')}
+            </button>
             <!--{/if}-->
             <style>
                 .pull-right .layui-nav-child dd{
