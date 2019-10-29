@@ -72,6 +72,9 @@
                     $('.layui-table-box').css('overflow', 'visible');
                     elem.parents('div.layui-table-cell').css('overflow', 'visible');
                 });
+                $('[data-table-sort]').change(function(){
+                    $.post("{:request()->url()}",{id:$(this).data('id'),value:$(this).val(),field:'buldview_sort'});
+                });
             }
         });
         //监听排序
@@ -111,14 +114,9 @@
                 }
             }
         });
+        //刷新
         $('#sortButton').click(function(){
-            let ids = [];
-            let values = [];
-            $('[data-table-sort]').each(function(index,item){
-                ids.push($(item).data('id'));
-                values.push( $(item).val());
-            });
-            $.form.load("{:request()->url()}", {ids:ids,values:values,field:'buldview_sort'}, 'post');
+           $.form.reload();
         });
         // 全部删除
         $('#batch_delete_all').click(function () {

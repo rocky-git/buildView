@@ -4,7 +4,7 @@
 <div class="layui-form-item">
     <label class="layui-form-label">{$label}</label>
     <div class="layui-input-{$layui}">
-        <select name="{$name}" lay-filter="{$name}" lay-verify="{$layVerify}" lay-verType="tips" data-name="name_{$build_view_rand}" lay-reqText="{:lang('build_view_please_select')}{$label}" lay-search {$required} {if isset($multiple)}xm-select="{$name}" xm-select-search{/if}>
+        <select name="{$name}" lay-filter="{$name}" lay-verify="{$layVerify}" lay-verType="tips" data-name="name_{$build_view_rand}" lay-reqText="{:lang('build_view_please_select')}{$label}" lay-search {$required} {if isset($multiple)}xm-select="{$name}" xm-select-search-type="dl" xm-select-search{/if}>
         <option value="">{:lang('build_view_please_select')}{$label}</option>
         <!--{foreach $options as $key=>$val}-->
         <option value="{$key}" {if !empty($value) || $value =='0'}{eq name="$value" value="$key"}selected{/eq}{/if}>{$val}</option>
@@ -20,7 +20,7 @@
 
     let i = Math.ceil(Math.random()*10000000);
     $('[data-name=name_{$build_view_rand}]').attr('lay-filter','build_id_'+i);
-    $('[data-name=name_{$build_view_rand}]').attr('xm-select','build_id_'+i);
+
     /*{if isset($event)}*/
     form.on('select(build_id_'+i+')', function (data) {
         {$event|raw}
@@ -40,6 +40,7 @@
     });
     /*{/if}*/
     /*{if isset($multiple)}*/
+    $('[data-name=name_{$build_view_rand}]').attr('xm-select','build_id_'+i);
     layui.extend({
         formSelects:'/vendor/build-view/plugs/formSelect/formSelects-v4',
     });

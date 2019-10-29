@@ -17,9 +17,9 @@ $uptype = 'local';
 }
 }
 if(isset($multiple)){
-    if(is_array($value)){
-        $value = implode('|',$value);
-    }
+if(is_array($value)){
+$value = implode('|',$value);
+}
 }
 {/php}
 <div class="layui-form-item layui-form-text">
@@ -48,7 +48,9 @@ if(isset($multiple)){
                 /*{else/}*/
                 input.val(url).trigger('change');
                 /*{/if}*/
+                /*{if !isset($multiple)}*/
                 if (input.attr('data-url')) input.next().css('backgroundImage', 'url(' + input.attr('data-url') + ')');
+                /*{/if}*/
             });
         })
     };
@@ -68,8 +70,10 @@ if(isset($multiple)){
     /*! 上传多个图片 */
     $.fn.uploadMultipleImages = function () {
         var type = $(this).data('type') || 'png,jpg,gif', name = $(this).attr('name') || 'umt-image',width = $(this).data('width') || '',height = $(this).data('height') || '',uptype = $(this).data('uptype');
-        var $tpl = $('<a class="uploadimages"></a>').attr('data-file', 'mul').attr('data-field', name).attr('data-type', type).attr('data-width', width).attr('data-height', height).attr('data-uptype', uptype);
-
+        var $tpl = $('<a class="uploadimages"></a>').attr('data-files', 'mul').attr('data-field', name).attr('data-type', type).attr('data-width', width).attr('data-height', height).attr('data-uptype', uptype);
+        $tpl.uploadFiles(function (url) {
+            $($tpl.data('input')).val(url).trigger('change');
+        });
         $(this).attr('name', name).after($tpl.data('input', this)).on('change', function () {
             var input = this;
             this.setImageData = function () {

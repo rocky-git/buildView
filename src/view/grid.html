@@ -22,7 +22,7 @@
                 <dd lay-unselect><a id="batch_delete_all">{:lang('build_view_del_all_btn')}</a></dd>
             </dl>
              </li>
-             </span>
+        </span>
             <!--{/if}-->
             <!--{if !isset($hideExportButton)}-->
             <span class="layui-nav layui-bg-blue layui-btn layui-btn-sm layui-inline" style="z-index:1">
@@ -39,7 +39,8 @@
              </span>
             <!--{/if}-->
             <!--{if $Think.get.back eq 1}-->
-            <button  class="layui-btn layui-btn-sm layui-bg-black" href="javascript:;" onclick="history.back();"><i class="layui-icon">&#xe65a;</i>{:lang('build_view_back_btn')}
+            <button  class="layui-btn layui-btn-sm layui-bg-black"
+                     href="javascript:;" onclick="history.back();"><i class="layui-icon">&#xe65a;</i>{:lang('build_view_back_btn')}
             </button>
             <!--{/if}-->
             <style>

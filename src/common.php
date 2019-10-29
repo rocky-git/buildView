@@ -22,16 +22,19 @@ function recurse_copy($src, $dst)
                 //如果是，递归调用本函数，继续读取
                 recurse_copy($src . '/' . $file, $dst . '/' . $file);
             } else {
+
                 if (!is_dir($dst)) {
                     $dirArr = explode('/', $dst);
                     $strDir = '';
                     foreach ($dirArr as $toDir){
                         $strDir .= $toDir .'/';
                         if(!is_dir($strDir)){
+
                             mkdir($strDir,0777);
                         }
                     }
                 }
+
                 //否则复制文件到目标文件夹
                 $res = copy($src . '/' . $file, $dst . '/' . $file);
             }
@@ -50,8 +53,10 @@ error_reporting(E_ERROR | E_PARSE);
 //发布静态资源
 $path = dirname($_SERVER['SCRIPT_FILENAME']);
 $path .= DIRECTORY_SEPARATOR . 'vendor' . DIRECTORY_SEPARATOR . 'build-view';
+
 if (!is_dir($path)) {
     $assets = __DIR__ . DIRECTORY_SEPARATOR . 'assets';
+
     recurse_copy($assets, $path);
 }
 

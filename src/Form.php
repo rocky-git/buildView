@@ -361,7 +361,7 @@ class Form extends Field
             }
         } else {
             $val = Db::name($this->configTable)->where('name', $field)->value('value');
-            $rawVal = '';
+            $rawVal = $val;
         }
         $names = explode('.', $field);
         if (count($names) > 1) {
@@ -386,7 +386,6 @@ class Form extends Field
 
     public function __call($name, $arguments)
     {
-
         return $this->formItem($name, $arguments[0], $arguments[1]);
     }
 
@@ -433,10 +432,9 @@ class Form extends Field
                 $val = $val[$f];
             } else {
                 $val = '';
-				$rawVal = '';
+                $rawVal = '';
             }
         }
-
         return [$val,$rawVal];
     }
 
