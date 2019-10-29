@@ -191,7 +191,7 @@ class Echarts extends Field
             if (!is_null($this->filter)) {
                 $this->setOption('filter', $this->filter->render());
             }
-            $md = 12 / count($this->headerAnalyze);
+            $md = round(12 / count($this->headerAnalyze));
             $this->setOption('md', $md);
             return $this->render();
         }

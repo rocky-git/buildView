@@ -142,7 +142,7 @@ class Excel
             }
             array_push($data, $rowData);
         }
-        Db::name($table)->insertAll($data);
+        Db::name($table)->limit(100)->insertAll($data);
         return true;
     }
 

@@ -2,8 +2,9 @@
     <label class="layui-form-label">{$label}</label>
     <div class="layui-input-{$layui}">
         {if isset($required)}<input type="hidden" required>{/if}
-        <input   lay-verify="{$layVerify}" readonly lay-verType="tips" lay-reqText="{:lang('build_view_please_select')}{$label}" name="{$name}" data-name="name_{$build_view_rand}" value="{$value}"  placeholder="{:lang('build_view_please_select')}{$label}" class="layui-input">
+        <input {volist name="attr" id="vo"}{$vo}{/volist} lay-verify="{$layVerify}" readonly lay-verType="tips" lay-reqText="{:lang('build_view_please_select')}{$label}" name="{$name}" data-name="name_{$build_view_rand}" value="{$value}"  placeholder="{:lang('build_view_please_select')}{$label}" class="layui-input">
         {notempty name="$help"}
+        {$appendHtml|raw}
         <div class="help-block">{$help}</div>
         {/notempty}
     </div>

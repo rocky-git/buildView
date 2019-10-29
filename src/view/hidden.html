@@ -1,1 +1,5 @@
-<input type="hidden" {$required}name="{$name}" value="{$value}"  placeholder="{:lang('build_view_please_input')}{$label}" class="layui-input">
+<input type="hidden" {volist name="attr" id="vo"}{$vo}{/volist} {$required}name="{$name}" value="{$value}"  placeholder="{:lang('build_view_please_input')}{$label}" class="layui-input">
+{$appendHtml|raw}
+{notempty name="$help"}
+<div class="help-block">{$help}</div>
+{/notempty}

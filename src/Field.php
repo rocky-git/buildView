@@ -14,6 +14,9 @@ use think\facade\View;
  * Class Field
  * @package app\common\tools\formview
  * @method $this readonly() 只读
+ * @method $this disabled() 禁用
+ * @method $this attr($array) 设置属性
+ * @method $this appendHtml($html) 追加html
  * @method $this getData($bool) 获取原始数据
  * @method $this required() 非空
  * @method $this default() 默认值
@@ -47,7 +50,6 @@ class Field
         $this->setOption('value', $value);
         $this->setOption('rawValue', $rawValue);
         $this->setOption('layui', 'block');
-
     }
 
     public function setBuildForm($form)

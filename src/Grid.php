@@ -90,16 +90,9 @@ class Grid extends Field
             try {
                 switch ($action) {
                     case 'buldview_sort':
-                        $ids = Request::post('ids');
-                        $values = Request::post('values');
-                        $sortData = [];
-                        foreach ($ids as $key => $id) {
-                            $sortData[] = [
-                                $this->model->getPk() => $id,
-                                $this->sortField => $values[$key]
-                            ];
-                        }
-                        $res = $this->model->saveAll($sortData);
+                        $id = Request::post('id');
+                        $value = Request::post('value');
+                        $res = $this->model->where($this->model->getPk(),$id)->setField($this->sortField,$value);
                         Db::commit();
                         if ($res) {
                             throw new HttpResponseException(json(['code' => 1, 'msg' => lang('build_view_action_success'), 'data' => []]));
@@ -389,7 +382,7 @@ class Grid extends Field
             $this->tableTitles[] = $column->cols;
         }
         if (Request::get('table')) {
-            throw new HttpResponseException(json(['code' => 0, 'msg' => '操作成功', 'data' => $tableData, 'count' => $this->db->removeOption('page')->removeOption('order')->count()]));
+            throw new HttpResponseException(json(['code' => 0, 'msg' => '操作成功', 'data' => $tableData, 'count' => $this->model->removeOption('page')->removeOption('order')->count()]));
         }
         if (Request::get('export')) {
             if (empty($excelData)) {

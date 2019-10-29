@@ -38,7 +38,7 @@ return [
     'build_view_form_save' => '保存数据',
     'build_view_grid_list' => '列表',
     'build_view_grid_action' => '操作',
-    'build_view_grid_sort' => '排 序',
+    'build_view_grid_sort' => '刷 新',
     'build_view_grid_switch_on' => '打开',
     'build_view_grid_switch_off' => '关闭',
     'build_view_grid_edit' => '编辑',
