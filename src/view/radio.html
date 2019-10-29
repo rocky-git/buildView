@@ -2,8 +2,9 @@
     <label class="layui-form-label">{$label}</label>
     <div class="layui-input-{$layui}">
         {foreach $options as $key=>$val}
-        <input type="radio" style="display:none!important;" {$required} name="{$name}" data-name="name_{$build_view_rand}"  title="{$val}" {eq name="$key" value="$value"}checked{/eq} value="{$key}"/>
+        <input {volist name="attr" id="vo"}{$vo}{/volist} type="radio" style="display:none!important;" {$required} name="{$name}" data-name="name_{$build_view_rand}"  title="{$val}" {eq name="$key" value="$value"}checked{/eq} value="{$key}"/>
         {/foreach}
+        {$appendHtml|raw}
         {notempty name="$help"}
         <div class="help-block">{$help}</div>
         {/notempty}

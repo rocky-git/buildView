@@ -1,7 +1,7 @@
 <div class="layui-form-item">
     <label class="layui-form-label">{$label}</label>
     <div class="layui-input-{$layui}">
-        <select name="{$name}" lay-filter="{$name}" lay-verify="{$layVerify}" lay-verType="tips" lay-reqText="{:lang('build_view_please_select')}{$label}" lay-search {$required} {if isset($multiple)}xm-select="{$name}" xm-select-search{/if}>
+        <select {volist name="attr" id="vo"}{$vo}{/volist} name="{$name}" lay-filter="{$name}" lay-verify="{$layVerify}" lay-verType="tips" lay-reqText="{:lang('build_view_please_select')}{$label}" lay-search {$required} {if isset($multiple)}xm-select="{$name}" xm-select-search{/if}>
         <option value="">{:lang('build_view_please_select')}{$label}</option>
         <!--{foreach $options as $key=>$val}-->
              <optgroup label="{$val.text}">
@@ -11,6 +11,7 @@
              </optgroup>
             <!--{/foreach}-->
         </select>
+        <!--{$appendHtml|raw}-->
         <!--{notempty name="$help"}-->
         <div class="help-block">{$help}</div>
         <!--{/notempty}-->

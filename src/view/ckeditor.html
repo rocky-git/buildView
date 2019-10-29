@@ -1,11 +1,13 @@
 <div class="layui-form-item layui-form-text">
     <label class="layui-form-label">{$label}</label>
     <div class="layui-input-{$layui}">
+
         {notempty name="$help"}
         <div class="help-block">{$help}</div>
         {/notempty}
         {if isset($required)}<input type="hidden" required>{/if}
-        <textarea name="{$name}" placeholder="{:lang('build_view_please_input')}{$label}" data-name="name_{$build_view_rand}" lay-verify="{$layVerify}" lay-verType="tips" lay-reqText="{:lang('build_view_please_input')}{$label}" class="layui-textarea">{$value}</textarea>
+        <textarea name="{$name}" {volist name="attr" id="vo"}{$vo}{/volist} placeholder="{:lang('build_view_please_input')}{$label}" data-name="name_{$build_view_rand}" lay-verify="{$layVerify}" lay-verType="tips" lay-reqText="{:lang('build_view_please_input')}{$label}" class="layui-textarea">{$value}</textarea>
+        {$appendHtml|raw}
     </div>
 </div>
 <script>

@@ -1,8 +1,9 @@
 <div class="layui-form-item layui-form-text">
     <label class="layui-form-label">{$label}</label>
     <div class="layui-input-{$layui}">
-        <input type="checkbox" style="display:none!important;" lay-filter="switch-{$name}"  data-name="name_{$build_view_rand}" {$required} {eq name="$value" value="$swithcStates['on']['value']|default='1'"}checked{/eq} lay-text="{$swithcStates['on']['text']|default=lang('build_view_grid_switch_on')}|{$swithcStates['off']['text']|default=lang('build_view_grid_switch_off')}" lay-skin="switch">
+        <input {volist name="attr" id="vo"}{$vo}{/volist} type="checkbox" style="display:none!important;" lay-filter="switch-{$name}"  data-name="name_{$build_view_rand}" {$required} {eq name="$value" value="$swithcStates['on']['value']|default='1'"}checked{/eq} lay-text="{$swithcStates['on']['text']|default=lang('build_view_grid_switch_on')}|{$swithcStates['off']['text']|default=lang('build_view_grid_switch_off')}" lay-skin="switch">
         <input name="{$name}" type="hidden" data-name="input_{$build_view_rand}" value="{$value}">
+        {$appendHtml|raw}
         {notempty name="$help"}
         <div class="help-block">{$help}</div>
         {/notempty}

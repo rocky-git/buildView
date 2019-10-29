@@ -26,7 +26,8 @@ $value = implode('|',$value);
     <label class="layui-form-label">{$label}</label>
     <div class="layui-input-{$layui}" style="padding: 5px">
         {if isset($required)}<input type="hidden" required>{/if}
-        <input type="hidden" name="{$name}" lay-verify="{$layVerify}" data-uptype="{$uptype}" lay-verType="tips" data-name="name_{$build_view_rand}" lay-reqText="{:lang('build_view_please_select')}{$label}" data-url="{$value}" value="{$value}" data-width="{$size[0]|default=''}" data-height="{$size[1]|default=''}">
+        <input {volist name="attr" id="vo"}{$vo}{/volist} type="hidden" name="{$name}" lay-verify="{$layVerify}" data-uptype="{$uptype}" lay-verType="tips" data-name="name_{$build_view_rand}" lay-reqText="{:lang('build_view_please_select')}{$label}" data-url="{$value}" value="{$value}" data-width="{$size[0]|default=''}" data-height="{$size[1]|default=''}">
+        {$appendHtml|raw}
         {notempty name="$help"}
         <div class="help-block">{$help}</div>
         {/notempty}
