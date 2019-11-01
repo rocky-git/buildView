@@ -10,7 +10,7 @@
         <option value="{$key}" {if !empty($value) || $value =='0'}{eq name="$value" value="$key"}selected{/eq}{/if}>{$val}</option>
             <!--{/foreach}-->
         </select>
-        <!--{$appendHtml|raw}-->
+        {$appendHtml|raw}
         <!--{notempty name="$help"}-->
         <div class="help-block">{$help}</div>
         <!--{/notempty}-->

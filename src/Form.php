@@ -360,8 +360,16 @@ class Form extends Field
                 }
             }
         } else {
-            $val = Db::name($this->configTable)->where('name', $field)->value('value');
-            $rawVal = $val;
+            if (is_array($field)) {
+                foreach ($field as $value) {
+                    $temp_val = Db::name($this->configTable)->where('name', $value)->value('value');
+                    $val[] = $temp_val;
+                    $rawVal[] = $temp_val;
+                }
+            } else {
+                $val = Db::name($this->configTable)->where('name', $field)->value('value');
+                $rawVal = $val;
+            }
         }
         $names = explode('.', $field);
         if (count($names) > 1) {

@@ -79,7 +79,18 @@
         });
         //监听排序
         table.on('sort({$tableId})', function(obj){
-            console.log(obj);
+            let sortSqlArr = {};
+            {php}
+            $ths = json_decode($name,true);
+            foreach($ths as $th){
+                if(isset($th['sortSql'])){
+                    echo "sortSqlArr['".$th['field']."'] = '".urlencode($th['sortSql'])."';";
+                }
+            }
+            {/php}
+                if(sortSqlArr[obj.field]){
+                    obj.field = sortSqlArr[obj.field];
+                }
             table.reload('{$tableId}',{
                 initSort: obj //记录初始排序，如果不设的话，将无法标记表头的排序状态。
                 ,where: { //请求参数（注意：这里面的参数可任意定义，并非下面固定的格式）

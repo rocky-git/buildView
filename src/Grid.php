@@ -313,7 +313,9 @@ class Grid extends Field
             $this->db->where('is_deleted', 0);
         }
         if (Request::get('table_sort')) {
-            $this->db->removeOption('order')->order(Request::get('field'), Request::get('order'));
+            $field = urldecode(Request::get('field'));
+            $order = Request::get('order');
+            $this->db->removeOption('order')->orderRaw("{$field} {$order}");
         }
         if (Request::get('export')) {
             switch (Request::get('export_type')) {

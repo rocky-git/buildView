@@ -183,8 +183,11 @@ class Column
      * @Author: rocky
      * 2019/7/25 16:50
      */
-    public function sort()
+    public function sort($sort =true)
     {
+        if(is_string($sort)){
+            $this->cols['sortSql'] = $sort;
+        }
         $this->cols['sort'] = true;
         return $this;
     }
