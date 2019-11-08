@@ -1,0 +1,11 @@
+<div class="layui-form-item layui-form-text">
+    <label class="layui-form-label">{$label}</label>
+    <div class="layui-input-{$layui}">
+        <span class="layui-form-mid" {volist name="attr" id="vo"}{$vo}{/volist}>{$value}</span>
+        {$appendHtml|raw}
+        {notempty name="$help"}
+        <div class="help-block">{$help}</div>
+        {/notempty}
+    </div>
+
+</div>

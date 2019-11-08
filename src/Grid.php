@@ -228,7 +228,15 @@ class Grid extends Field
 
         return $this->db;
     }
-
+    /**
+     * 设置分页每页限制
+     * @Author: rocky
+     * 2019/11/6 14:01
+     * @param $limit
+     */
+    public function setPageLimit($limit){
+        $this->table->setOption('pageLimit',$limit);
+    }
     //设置from打开窗口方式
     public function setFromOpen($type = 'modal')
     {
@@ -384,7 +392,7 @@ class Grid extends Field
             $this->tableTitles[] = $column->cols;
         }
         if (Request::get('table')) {
-            throw new HttpResponseException(json(['code' => 0, 'msg' => '操作成功', 'data' => $tableData, 'count' => $this->model->removeOption('page')->removeOption('order')->count()]));
+            throw new HttpResponseException(json(['code' => 0, 'msg' => '操作成功', 'data' => $tableData, 'count' => $this->db->removeOption('page')->removeOption('order')->count()]));
         }
         if (Request::get('export')) {
             if (empty($excelData)) {
