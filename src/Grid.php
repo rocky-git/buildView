@@ -38,6 +38,7 @@ class Grid extends Field
     protected $hideAction = false;
     protected $hideColumnSelect = false;
     protected $tableTitles = [];
+    protected $tableColRow = 1;
     protected $actionColumn = null;
     protected $toolsArr = [];
     protected $beforeDel = null;
@@ -69,6 +70,33 @@ class Grid extends Field
 
     }
 
+    /**
+     * 设置表头行数
+     * @Author: rocky
+     * 2019/11/9 11:39
+     * @param $row 行数
+     */
+    public function setTableColRow($row){
+        $this->tableColRow = $row;
+    }
+    /**
+     * 设置表格样式
+     * @Author: rocky
+     * 2019/11/9 11:31
+     * @param string $skin 样式
+     */
+    public function setTableSkin($skin = 'row '){
+        $this->table->setOption('tableSkin',$skin);
+    }
+    /**
+     * 设置分页每页限制
+     * @Author: rocky
+     * 2019/11/6 14:01
+     * @param $limit
+     */
+    public function setPageLimit($limit){
+        $this->table->setOption('pageLimit',$limit);
+    }
     public function actions(\Closure $closure)
     {
         $this->actionColumn->setClosure($closure);
@@ -228,15 +256,7 @@ class Grid extends Field
 
         return $this->db;
     }
-    /**
-     * 设置分页每页限制
-     * @Author: rocky
-     * 2019/11/6 14:01
-     * @param $limit
-     */
-    public function setPageLimit($limit){
-        $this->table->setOption('pageLimit',$limit);
-    }
+
     //设置from打开窗口方式
     public function setFromOpen($type = 'modal')
     {
@@ -294,7 +314,7 @@ class Grid extends Field
                 ->style('')
                 ->display(function ($val, $data) {
                     return "<input type='text' data-table-sort='true' value='{$val}' data-id='{$data["id"]}' class='layui-input text-center' style='padding-left:0px;' onkeyup=\"value=value.replace(/[^\d]/g,'')\" onblur=\"value=value.replace(/[^\d]/g,'')\">";
-                });
+                })->setColsRow($this->tableColRow);
         }
     }
 
@@ -323,7 +343,7 @@ class Grid extends Field
         if (Request::get('table_sort')) {
             $field = urldecode(Request::get('field'));
             $order = Request::get('order');
-            $this->db->removeOption('order')->orderRaw("{$field} {$order}");
+            $sql = $this->db->removeOption('order')->orderRaw("{$field} {$order}");
         }
         if (Request::get('export')) {
             switch (Request::get('export_type')) {
@@ -351,7 +371,7 @@ class Grid extends Field
         $excelData = [];
         //是否隐藏多选
         if (!$this->hideColumnSelect) {
-            $this->tableTitles [] = ['type' => 'checkbox'];
+            $this->tableTitles[0][] = ['type' => 'checkbox','rowspan'=>$this->tableColRow];
         }
         //是否隐藏操作列
         if (!$this->hideAction) {
@@ -363,7 +383,7 @@ class Grid extends Field
             foreach ($this->columns as $column) {
                 $column->setData($val);
                 $tableData[$index][$column->field] = $column->render();
-                if ($column->field != 'actions_tools' && $column->field != 'id' && $this->issetField($val, $column->field)) {
+                if (($column->field != 'actions_tools' && $column->field != 'id' && $this->issetField($val, $column->field)) || $column->excelData) {
                     if (!$column->excelClose) {
                         $excelTitle[$column->field] = $column->title;
                         if (empty($column->excelData)) {
@@ -389,7 +409,11 @@ class Grid extends Field
                     $totalRow = true;
                 }
             }
-            $this->tableTitles[] = $column->cols;
+
+            $this->tableTitles[$column->colsRow][] = $column->cols;
+
+            $this->tableTitles = array_values($this->tableTitles);
+            //halt(json_encode($this->tableTitles));
         }
         if (Request::get('table')) {
             throw new HttpResponseException(json(['code' => 0, 'msg' => '操作成功', 'data' => $tableData, 'count' => $this->db->removeOption('page')->removeOption('order')->count()]));
@@ -405,6 +429,7 @@ class Grid extends Field
         }
 
         $this->table->setOption('toolbar', implode('', $this->toolsArr));
+       
         $this->table->name(json_encode($this->tableTitles));
         $this->setOption('table', $this->table->render());
         return $this->render();
@@ -470,6 +495,7 @@ class Grid extends Field
     public function column($field, $label)
     {
         $column = new Column($field, $label);
+
         array_push($this->columns, $column);
         return $column;
     }

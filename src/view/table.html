@@ -38,7 +38,7 @@
         var table = layui.table;
         table.render({
             elem: '#{$tableId}'
-            ,skin:'line'
+            ,skin:'{$tableSkin|default="line"}'
             ,url:"{:request()->url()}"
             ,autoSort:false
             ,where:{
@@ -54,7 +54,7 @@
             }
             {/if}
             ,cellMinWidth: 80 //全局定义常规单元格的最小宽度，layui 2.2.1 新增
-            ,cols: [{$name|raw}]
+            ,cols: {$name|raw}
             ,done:function(res,curr,count){
                 excel_limit = res.data.length;
                 excel_page = curr;
@@ -82,15 +82,15 @@
             let sortSqlArr = {};
             {php}
             $ths = json_decode($name,true);
-            foreach($ths as $th){
+            foreach($ths[0] as $th){
                 if(isset($th['sortSql'])){
                     echo "sortSqlArr['".$th['field']."'] = '".urlencode($th['sortSql'])."';";
                 }
             }
             {/php}
-                if(sortSqlArr[obj.field]){
-                    obj.field = sortSqlArr[obj.field];
-                }
+             if(sortSqlArr[obj.field]){
+                 obj.field = sortSqlArr[obj.field];
+             }
             table.reload('{$tableId}',{
                 initSort: obj //记录初始排序，如果不设的话，将无法标记表头的排序状态。
                 ,where: { //请求参数（注意：这里面的参数可任意定义，并非下面固定的格式）

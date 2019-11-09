@@ -30,6 +30,7 @@ class Column
     protected $fromFeild = null;
     protected $defaultValue = '--';
     public $totalRow = false;
+    public $colsRow = 0;
     private $color = null;
     protected $layui_bg = [
         'layui-bg-cyan',
@@ -52,18 +53,26 @@ class Column
 
     }
 
-    public function defaultValue($val){
+    /**
+     * 设置默认值
+     * @Author: rocky
+     * 2019/11/9 11:07
+     * @param $val 默认值
+     */
+    public function defaultValue($val)
+    {
         $this->defaultValue = $val;
     }
+
     //设置数据
     public function setData($data)
     {
         $this->data = $data;
         $fields = explode('.', $this->field);
         foreach ($fields as $f) {
-            if(isset($data[$f])){
+            if (isset($data[$f])) {
                 $data = $data[$f];
-            }else{
+            } else {
                 $data = '';
             }
 
@@ -85,20 +94,20 @@ class Column
                         $val = preg_replace("/class='(.*)'/", "class='layui-badge {$bgColor}'", $val);
                     }
                 }
-                if(is_array($this->value)){
-                    foreach ($this->value as $value){
-                        if(!empty($value) || is_numeric($value) ){
+                if (is_array($this->value)) {
+                    foreach ($this->value as $value) {
+                        if (!empty($value) || is_numeric($value)) {
                             $this->columnHtml .= str_replace('_VALUE_', $value, $val);
                         }
                     }
 
-                    if(!empty($this->value) || is_numeric($this->value) ){
-                        $this->columnHtml = '<span class="layui-col-space10">'.$this->columnHtml.'</span>';
+                    if (!empty($this->value) || is_numeric($this->value)) {
+                        $this->columnHtml = '<span class="layui-col-space10">' . $this->columnHtml . '</span>';
                     }
-                }else{
+                } else {
 
-                    if(!empty($this->value) || is_numeric($this->value) ){
-                        $val = str_replace('_RAND_', rand(100000,999999), $val);
+                    if (!empty($this->value) || is_numeric($this->value)) {
+                        $val = str_replace('_RAND_', rand(100000, 999999), $val);
                         $this->columnHtml = str_replace('_VALUE_', $this->value, $val);
                     }
                 }
@@ -113,21 +122,34 @@ class Column
             $this->columnHtml = $this->fromFeild->render();
         }
         if (!is_null($this->closure)) {
-            $this->columnHtml = call_user_func_array($this->closure, [$this->value, $this->data,$this->columnHtml ]);
+            $this->columnHtml = call_user_func_array($this->closure, [$this->value, $this->data, $this->columnHtml]);
         }
         if (!is_null($this->excelClosure)) {
-            $this->excelData = call_user_func_array($this->excelClosure, [$this->value, $this->data,$this->columnHtml ]);
+            $this->excelData = call_user_func_array($this->excelClosure, [$this->value, $this->data, $this->columnHtml]);
         }
-        if(empty($this->columnHtml)){
+        if (empty($this->columnHtml)) {
 
-            if(!is_numeric($this->columnHtml)){
+            if (!is_numeric($this->columnHtml)) {
                 $this->columnHtml = $this->defaultValue;
             }
         }
-        if(!is_null($this->color)){
-            $this->columnHtml = '<span class="color-'.$this->color.'">'.$this->columnHtml.'</span>';
+        if (!is_null($this->color)) {
+            $this->columnHtml = '<span class="color-' . $this->color . '">' . $this->columnHtml . '</span>';
         }
     }
+
+    /**
+     * 设置表头行数，用于多级表头
+     * @Author: rocky
+     * 2019/11/9 11:08
+     * @param $row 行数
+     */
+    public function setColsRow($row)
+    {
+        $this->colsRow = $row - 1;
+        return $this;
+    }
+
     //自定义显示格式
     public function setExcelData(\Closure $closure)
     {
@@ -140,10 +162,12 @@ class Column
      * @Author: rocky
      * 2019/10/9 16:54
      */
-    public function excelClose(){
+    public function excelClose()
+    {
         $this->excelClose = true;
         return $this;
     }
+
     /**
      * 开启合计
      * @Author: rocky
@@ -155,6 +179,7 @@ class Column
         $this->totalRow = true;
         return $this;
     }
+
     /**
      * 开启编辑
      * @Author: rocky
@@ -166,6 +191,7 @@ class Column
         $this->cols['hide'] = true;
         return $this;
     }
+
     /**
      * 开启编辑
      * @Author: rocky
@@ -183,9 +209,9 @@ class Column
      * @Author: rocky
      * 2019/7/25 16:50
      */
-    public function sort($sort =true)
+    public function sort($sort = true)
     {
-        if(is_string($sort)){
+        if (is_string($sort)) {
             $this->cols['sortSql'] = $sort;
         }
         $this->cols['sort'] = true;
@@ -203,9 +229,12 @@ class Column
         $this->cols['align'] = $value;
         return $this;
     }
-    public function color($color){
+
+    public function color($color)
+    {
         $this->color = $color;
     }
+
     /**
      * 设置单元格所占行数
      * @Author: rocky
@@ -217,6 +246,7 @@ class Column
         $this->cols['rowspan'] = $value;
         return $this;
     }
+
     /**
      * 设置单元格所占列数
      * @Author: rocky
@@ -228,6 +258,7 @@ class Column
         $this->cols['colspan'] = $value;
         return $this;
     }
+
     /**
      * 设置样式
      * @Author: rocky
@@ -251,6 +282,7 @@ class Column
         $this->cols['width'] = $val;
         return $this;
     }
+
     /**
      * 设置最小宽度
      * @Author: rocky
@@ -262,6 +294,7 @@ class Column
         $this->cols['minWidth'] = $val;
         return $this;
     }
+
     //switchs开关更新
     public function switchs($state = [])
     {
@@ -293,7 +326,9 @@ class Column
 
         $this->htmlAttr[] = "<img src='_VALUE_' data-tips-image='' style='width: {$width}px;height: {$height}px;border-radius: {$radius}%'>";
     }
-    public function rate($length){
+
+    public function rate($length)
+    {
         $this->htmlAttr[] = <<<EOF
 <div data-rate='_RAND_'></div><script>
   layui.rate.render({
@@ -305,6 +340,7 @@ class Column
   </script>
 EOF;
     }
+
     //徽章显示
     public function badge($options = 'blue')
     {

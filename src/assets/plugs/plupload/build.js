@@ -23,7 +23,7 @@ define(['plupload', 'Base64', 'md5'], function (plupload) {
             },
             drop_element: $element.get(0),
             browse_button: $element.get(0),
-            url: '/buildview/upload',
+            url: 'buildview/upload',
             chunk_size: 0,
             runtimes: 'html5,flash,silverlight,html4',
             file_data_name: $element.attr('data-name') || 'file',

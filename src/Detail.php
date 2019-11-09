@@ -176,7 +176,7 @@ class Detail extends Field
     public function model()
     {
         $this->queryFind = true;
-        return $this->db->getModel();
+        return $this->db;
     }
 
     /**

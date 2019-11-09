@@ -19,6 +19,7 @@ class Actions
     //列宽度
     protected $width = '';
     public $columnHtml = '';
+    public $colsRow = 0;
     public $field;
     public $title;
     protected $closure = null;
@@ -58,7 +59,39 @@ class Actions
     {
         $this->hideDelButton = true;
     }
-
+    /**
+     * 设置单元格所占行数
+     * @Author: rocky
+     * 2019/7/25 16:50
+     * @param $value 行数
+     */
+    public function rowspan($value)
+    {
+        $this->cols['rowspan'] = $value;
+        return $this;
+    }
+    /**
+     * 设置表头行数，用于多级表头
+     * @Author: rocky
+     * 2019/11/9 11:08
+     * @param $row 行数
+     */
+    public function setColsRow($row)
+    {
+        $this->colsRow = $row - 1;
+        return $this;
+    }
+    /**
+     * 设置单元格所占列数
+     * @Author: rocky
+     * 2019/7/25 16:50
+     * @param $value 列数
+     */
+    public function colspan($value)
+    {
+        $this->cols['colspan'] = $value;
+        return $this;
+    }
     //设置数据
     public function setData($data)
     {
