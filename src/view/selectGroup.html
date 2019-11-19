@@ -1,25 +1,35 @@
+{if isset($multiple)}
+<link href="/vendor/build-view/plugs/formSelect/formSelects-v4.css" rel="stylesheet">
+{/if}
 <div class="layui-form-item">
     <label class="layui-form-label">{$label}</label>
     <div class="layui-input-{$layui}">
-        <select {volist name="attr" id="vo"}{$vo}{/volist} name="{$name}" lay-filter="{$name}" lay-verify="{$layVerify}" lay-verType="tips" lay-reqText="{:lang('build_view_please_select')}{$label}" lay-search {$required} {if isset($multiple)} xm-select="{$name}" xm-select-search{/if}>
+        <select name="{$name}" lay-filter="{$name}" lay-verify="{$layVerify}" lay-verType="tips" data-name="name_{$build_view_rand}" lay-reqText="{:lang('build_view_please_select')}{$label}" lay-search {$required} {if isset($multiple)}xm-select="{$name}" xm-select-search-type="dl" xm-select-search{/if}>
         <option value="">{:lang('build_view_please_select')}{$label}</option>
         <!--{foreach $options as $key=>$val}-->
-             <optgroup label="{$val.text}">
-                 <!--{foreach $val.son as $v}-->
-                 <option value="{$v.id}" {if !empty($value) || $value =='0'}{eq name="$value" value="$v.id"}selected{/eq}{/if}>{$v.text}</option>
-                 <!--{/foreach}-->
-             </optgroup>
+        <optgroup label="{$val.text}">
+            <!--{foreach $val.son as $v}-->
+            <option value="{$v.id}" {if !empty($value) || $value =='0'}{eq name="$value" value="$v.id"}selected{/eq}{/if}>{$v.text}</option>
             <!--{/foreach}-->
+        </optgroup>
+        <!--{/foreach}-->
         </select>
-        {$appendHtml|raw}
         <!--{notempty name="$help"}-->
         <div class="help-block">{$help}</div>
         <!--{/notempty}-->
     </div>
 </div>
+
 <script type="text/javascript">
+
     let i = Math.ceil(Math.random()*10000000);
     $('[data-name=name_{$build_view_rand}]').attr('lay-filter','build_id_'+i);
+
+    /*{if isset($event)}*/
+    form.on('select(build_id_'+i+')', function (data) {
+        {$event|raw}
+    });
+    /*{/if}*/
     /*{if isset($load)}*/
     form.on('select(build_id_'+i+')', function(data){
         $.post("{:url($load[1])}",{q:data.value},function(result,status){
