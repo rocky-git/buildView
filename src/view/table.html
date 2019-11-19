@@ -36,6 +36,10 @@
         var excel_limit =0;
         var excel_page=0;
         var table = layui.table;
+        var page = 1;
+        if(localStorage.getItem('build_view_url') == '{:md5(request()->url())}'){
+            page = localStorage.getItem('{:md5(request()->url())}')
+        }
         table.render({
             elem: '#{$tableId}'
             ,skin:'{$tableSkin|default="line"}'
@@ -50,6 +54,7 @@
              {if !isset($hidePage)}
             ,page: {
                 limit:{$pageLimit|default='20'}
+                ,curr: page
                 ,limits:[10, 20, 30, 40, 50, 60, 70, 80, 90, 100, 110, 120, 130, 140, 150, 160, 170, 180, 190, 200]
             }
             {/if}
@@ -58,6 +63,8 @@
             ,done:function(res,curr,count){
                 excel_limit = res.data.length;
                 excel_page = curr;
+                localStorage.setItem('build_view_url','{:md5(request()->url())}');
+                localStorage.setItem('{:md5(request()->url())}',curr);
                 $(".layui-table-cell").mouseover(function() {
                     if(this.offsetWidth<this.scrollWidth){
                         var that = this;
