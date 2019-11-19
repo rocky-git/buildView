@@ -56,6 +56,7 @@ class Form extends Field
     protected $tabField = null;
     protected $tabNum = 0;
     protected $tabCount = 0;
+    protected $tableFields = [];
     //保存前回调
     protected $beforeSave = null;
     //保存后回调
@@ -81,6 +82,7 @@ class Form extends Field
         if (!empty($model)) {
             if ($model instanceof Model) {
                 $this->model = $model;
+                $this->tableFields = $this->model->getTableFields();
             } else {
                 abort(999, '不是有效的模型');
             }
@@ -231,9 +233,9 @@ class Form extends Field
                 if ($this->model instanceof Model) {
                     $this->checkRule($post);
                     $res = $this->model->save($post);
-
                     foreach ($this->relationArr as $relation) {
                         if ($this->model->$relation() instanceof BelongsTo || $this->model->$relation() instanceof HasOne) {
+
                             $relationData = $post[$relation];
                             if (empty($this->data)) {
                                 $this->model->$relation()->save($relationData);
@@ -444,7 +446,11 @@ class Form extends Field
         foreach ($fields as $f) {
             if (isset($val[$f])) {
                 if (is_object($val)) {
-                    $rawVal = $val->getData($f);
+                    if(in_array($f,$this->tableFields)){
+                        $rawVal = $val->getData($f);
+                    }else{
+                        $rawVal = '';
+                    }
                 } else {
                     $rawVal = $val[$f];
                 }
@@ -464,12 +470,15 @@ class Form extends Field
             if ($form instanceof Field) {
                 $html .= $form->render();
             } else {
+
                 if ($form['type'] == 'hasMany') {
                     $formItemArr = array_slice($this->formItem, $key);
                     $this->formItem = [];
                     call_user_func($form['closure'], $this);
                     if (method_exists($this->model, $form['relationMethod'])) {
+
                         $hasManyjsHtml = '';
+
                         foreach ($this->formItem as $k => $f) {
                             if (is_null($f->field)) {
                                 $f->value('');
@@ -479,11 +488,14 @@ class Form extends Field
                             $hasManyjsHtml = $hasManyjsHtml . $f->render();
 
                         }
+
                         $hasManyjsHtml = '<div class="layui-row">' . $hasManyjsHtml . '<div class="layui-form-item"><div class="layui-input-block"><button type="button" class="layui-btn layui-btn-danger" data-hasMany="hasManyDel">' . lang('build_view_action_remove_btn') . '</button></div></div></div>';
 
                         foreach ($this->data[$form['relationMethod']] as $val) {
+
                             $hasItemHtml = '';
                             $idField = new Field('hidden', 'id', "{$form['relationMethod']}[id][]", $val['id']);
+
                             foreach ($this->formItem as $k => $f) {
                                 if (is_null($f->field)) {
                                     $f->field($f->name);
@@ -495,10 +507,10 @@ class Form extends Field
                             }
                             $hasItemHtml = '<div class="layui-row">' . $idField->render() . $hasItemHtml . '<div class="layui-form-item"><div class="layui-input-block"><button type="button" class="layui-btn layui-btn-danger" data-hasMany="hasManyDel">' . lang('build_view_action_remove_btn') . '</button></div></div></div>';
                             $hasManyHtml .= $hasItemHtml;
+
                         }
-
                         $hasManyField = new Field('hasMany', $form['label'], $form['relationMethod'], $hasManyHtml);
-
+                        $hasManyHtml = '';
                         $hasManyField->hasManyjsHtml(urlencode($hasManyjsHtml));
                         $html .= $hasManyField->render();
                         $this->formItem = $formItemArr;
