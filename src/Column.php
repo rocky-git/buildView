@@ -320,6 +320,50 @@ class Column
         return $this->html;
     }
 
+    /**
+     * 视频显示
+     * @Author: rocky
+     * 2019/11/19 10:56
+     * @param int $width 宽度
+     * @param int $height 高度
+     * @param $autoplay 自动播放
+     * @param bool $control 控制
+     */
+    public function video($width=500,$height=300,$autoplay=false,$control=true){
+        if($control){
+            $control = 'controls';
+        }else{
+            $control = '';
+        }
+        if($autoplay){
+            $autoplay = 'autoplay';
+        }else{
+            $autoplay = '';
+        }
+        $this->htmlAttr[] = "<video src='_VALUE_' width='{$width}' height='{$height}' {$control} {$autoplay}></video><script> $('audio,video').mediaelementplayer(/* Options */);</script>";
+    }
+    /**
+     * 音频显示
+     * @Author: rocky
+     * 2019/11/19 10:56
+     * @param int $width 宽度
+     * @param int $height 高度
+     * @param $autoplay 自动播放
+     * @param bool $control 控制
+     */
+    public function audio($width=300,$height=40,$autoplay=false,$control=true){
+        if($control){
+            $control = 'controls';
+        }else{
+            $control = '';
+        }
+        if($autoplay){
+            $autoplay = 'autoplay';
+        }else{
+            $autoplay = '';
+        }
+        $this->htmlAttr[] = "<audio src='_VALUE_' width='{$width}' height='{$height}' {$control} {$autoplay}></audio><script> $('audio,video').mediaelementplayer(/* Options */);</script>";
+    }
     //图片显示
     public function image($radius = 0, $width = 80, $height = 80)
     {
