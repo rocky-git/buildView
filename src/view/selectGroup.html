@@ -1,7 +1,7 @@
 <div class="layui-form-item">
     <label class="layui-form-label">{$label}</label>
     <div class="layui-input-{$layui}">
-        <select {volist name="attr" id="vo"}{$vo}{/volist} name="{$name}" lay-filter="{$name}" lay-verify="{$layVerify}" lay-verType="tips" lay-reqText="{:lang('build_view_please_select')}{$label}" lay-search {$required} {if isset($multiple)}xm-select="{$name}" xm-select-search{/if}>
+        <select {volist name="attr" id="vo"}{$vo}{/volist} name="{$name}" lay-filter="{$name}" lay-verify="{$layVerify}" lay-verType="tips" lay-reqText="{:lang('build_view_please_select')}{$label}" lay-search {$required} {if isset($multiple)} xm-select="{$name}" xm-select-search{/if}>
         <option value="">{:lang('build_view_please_select')}{$label}</option>
         <!--{foreach $options as $key=>$val}-->
              <optgroup label="{$val.text}">
@@ -18,10 +18,8 @@
     </div>
 </div>
 <script type="text/javascript">
-
     let i = Math.ceil(Math.random()*10000000);
     $('[data-name=name_{$build_view_rand}]').attr('lay-filter','build_id_'+i);
-    $('[data-name=name_{$build_view_rand}]').attr('xm-select','build_id_'+i);
     /*{if isset($load)}*/
     form.on('select(build_id_'+i+')', function(data){
         $.post("{:url($load[1])}",{q:data.value},function(result,status){
@@ -36,9 +34,15 @@
     });
     /*{/if}*/
     /*{if isset($multiple)}*/
-    var formSelects = layui.formSelects;
-    formSelects.render('build_id_'+i,{
-        init:{$value|raw|json_encode},
+    $('[data-name=name_{$build_view_rand}]').attr('xm-select','build_id_'+i);
+    layui.extend({
+        formSelects:'/vendor/build-view/plugs/formSelect/formSelects-v4',
+    });
+    layui.use([ 'formSelects'], function(){
+        let formSelects = layui.formSelects;
+        formSelects.render('build_id_'+i,{
+            init:{$value|raw|json_encode},
+    });
     });
     /*{/if}*/
 </script>
