@@ -63,7 +63,9 @@ class Column
     {
         $this->defaultValue = $val;
     }
-
+    public function getClosure(){
+        return $this->closure;
+    }
     //设置数据
     public function setData($data)
     {

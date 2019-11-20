@@ -394,7 +394,15 @@ class Grid extends Field
                     }
                 }
                 if (!is_array($column->value)) {
-                    $totalRowData[$column->field] += $column->value;
+                    if ($column->totalRow) {
+                        if(is_null($column->getClosure())){
+                            $totalRowData[$column->field] += $column->value;
+                        }else{
+                            $totalRowData[$column->field] += $tableData[$index][$column->field];
+                        }
+                    }
+
+
                 }
             }
             array_push($excelData, $excelTr);
@@ -403,7 +411,7 @@ class Grid extends Field
         $totalRow = false;
         foreach ($this->columns as $key => $column) {
             if ($column->totalRow) {
-                $column->cols['totalRowText'] = '<span class="layui-badge">合计：' . number_format($totalRowData[$column->field], 2) . '</span>';
+                $column->cols['totalRowText'] = '<span class="layui-badge">合计：' . $totalRowData[$column->field] . '</span>';
                 if (!$totalRow) {
                     $this->table->totalRow(true);
                     $totalRow = true;
