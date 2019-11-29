@@ -24,6 +24,9 @@ class Actions
     public $title;
     protected $closure = null;
     protected $detailButton = '';
+    protected $detailText = '';
+    protected $editText = '';
+    protected $delText = '';
     protected $editButton = '';
     protected $delButton = '';
     protected $hideDetailButton = false;
@@ -31,30 +34,57 @@ class Actions
     protected $hideDelButton = false;
     protected $prependArr =[];
     protected $appendArr = [];
+
     public $cols = [
         'align' => 'center'
     ];
     public function __construct($field, $title)
     {
-        $this->detailButton = '<a class="layui-btn layui-btn-primary layui-btn-sm" lay-event="detail" ><i class="layui-icon layui-icon-about"></i>'.lang('build_view_grid_detail').'</a>';
-        $this->delButton = '<a class="layui-btn layui-btn-danger layui-btn-sm" lay-event="del"><i class="layui-icon layui-icon-delete"></i>'.lang('build_view_grid_del').'</a>';
-        $this->editButton = '<a class="layui-btn layui-btn-sm" lay-event="edit"><i class="layui-icon layui-icon-edit"></i>'.lang('build_view_grid_edit').'</a>';
         $this->field = $field;
         $this->title = $title;
         $this->cols['field'] = $this->field;
         $this->cols['title'] = $title;
     }
+    /**
+     * 设置删除按钮文字
+     * @Author: rocky
+     * 2019/11/28 15:06
+     * @param $text 文字
+     */
+    public function setDelText($text){
+        $this->delText = $text;
+    }
+    /**
+     * 设置详情按钮文字
+     * @Author: rocky
+     * 2019/11/28 15:06
+     * @param $text 文字
+     */
+    public function setDetailText($text){
+        $this->detailText = $text;
+    }
+    /**
+     * 设置编辑按钮文字
+     * @Author: rocky
+     * 2019/11/28 15:06
+     * @param $text 文字
+     */
+    public function setEditText($text){
 
+        $this->editText = $text;
+
+    }
+    //隐藏详情按钮
     public function hideDetail()
     {
         $this->hideDetailButton = true;
     }
-
+    //隐藏编辑按钮
     public function hideEdit()
     {
         $this->hideEditButton = true;
     }
-
+    //隐藏删除按钮
     public function hideDel()
     {
         $this->hideDelButton = true;
@@ -151,7 +181,12 @@ class Actions
         if (!is_null($this->closure)) {
             call_user_func_array($this->closure, [$this, $this->data]);
         }
-
+        $this->detailText = $this->detailText ? $this->detailText : lang('build_view_grid_detail');
+        $this->delText = $this->delText ? $this->delText : lang('build_view_grid_del');
+        $this->editText = $this->editText ? $this->editText : lang('build_view_grid_edit');
+        $this->detailButton = '<a class="layui-btn layui-btn-primary layui-btn-sm" lay-event="detail" ><i class="layui-icon layui-icon-about"></i>'.$this->detailText.'</a>';
+        $this->delButton = '<a class="layui-btn layui-btn-danger layui-btn-sm" lay-event="del"><i class="layui-icon layui-icon-delete"></i>'.$this->delText.'</a>';
+        $this->editButton = '<a class="layui-btn layui-btn-sm" lay-event="edit"><i class="layui-icon layui-icon-edit"></i>'.$this->editText.'</a>';
         if (!$this->hideDetailButton) {
             $width+=100;
             $this->columnHtml .= $this->detailButton;

@@ -83,29 +83,37 @@ class Column
         $this->value = $data;
 
         if (!empty($this->using)) {
-            $bgColor = $this->layui_bg[$this->value];
-            $this->value = $this->using[$this->value];
-            $this->columnHtml = $this->value;
+            if (is_array($this->value)) {
+                foreach ($this->value as &$v){
+                    $v = $this->using[$v];
+                }
+            }else{
+                $bgColor = $this->layui_bg[$this->value];
+                $this->value = $this->using[$this->value];
+                $this->columnHtml = $this->value;
+            }
         }
         if (empty($this->htmlAttr)) {
             $this->columnHtml = $this->value;
         } else {
             foreach ($this->htmlAttr as $val) {
+
                 if (!empty($this->using)) {
                     if (strstr($val, 'badge')) {
+
                         $val = preg_replace("/class='(.*)'/", "class='layui-badge {$bgColor}'", $val);
                     }
                 }
                 if (is_array($this->value)) {
+
                     foreach ($this->value as $value) {
+
                         if (!empty($value) || is_numeric($value)) {
-                            $this->columnHtml .= str_replace('_VALUE_', $value, $val);
+                            $this->columnHtml .= str_replace('_VALUE_', $value, $val).'&nbsp;';
                         }
                     }
 
-                    if (!empty($this->value) || is_numeric($this->value)) {
-                        $this->columnHtml = '<span class="layui-col-space10">' . $this->columnHtml . '</span>';
-                    }
+
                 } else {
 
                     if (!empty($this->value) || is_numeric($this->value)) {

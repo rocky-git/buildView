@@ -116,6 +116,7 @@ $value = implode('|',$value);
     };
     let i = Math.ceil(Math.random()*10000000);
     $('[data-name=name_{$build_view_rand}]').attr('id','build_id_'+i);
+	$('[data-name=name_{$build_view_rand}]').attr('data-name','build_id_'+i);
     /*{if isset($multiple)}*/
     $('#build_id_'+i).uploadMultipleImages();
     /*{else/}*/

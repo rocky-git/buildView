@@ -114,11 +114,12 @@ class Excel
      * @param int $rowIndex 第几行开始 默认第二行
      * @param int $cellIndex 第几列开始 默认第一列
      * @param null $rowCount 多少行 默认全部 如果是数组指定第哪几行 [3,5]
+     * @param null $callback 回调方法-每行数据
      * @return bool
      * @throws \PhpOffice\PhpSpreadsheet\Exception
      * @throws \PhpOffice\PhpSpreadsheet\Reader\Exception
      */
-    public static function inport($filename, $table, $columnFields, $sheet = 0, $rowIndex = 2, $cellIndex = 1, $rowCount = null)
+    public static function inport($filename, $table, $columnFields, $sheet = 0, $rowIndex = 2, $cellIndex = 1, $rowCount = null,$callback=null)
     {
         $Excel = IOFactory::load($filename);
         $excel_array = $Excel->getSheet($sheet)->toArray();
@@ -138,6 +139,9 @@ class Excel
             $cell = $cellIndex - 1;
             foreach ($columnFields as $k => $field) {
                 $rowData[$field] = $value[$cell];
+                if ($callback instanceof \Closure) {
+                    $rowData = call_user_func($callback, $rowData);
+                }
                 $cell++;
             }
             array_push($data, $rowData);

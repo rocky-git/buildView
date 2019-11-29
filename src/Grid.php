@@ -69,7 +69,15 @@ class Grid extends Field
 
 
     }
-
+	/**
+     * 设置添加按钮参数
+     * @Author: rocky
+     * 2019/11/27 16:50
+     * @param $val 格式：id=1&a=2
+     */
+    public function setAddButtonParam($val){
+        $this->setOption('addButtonParam',$val);
+    }
     /**
      * 设置表头行数
      * @Author: rocky
@@ -424,7 +432,16 @@ class Grid extends Field
             //halt(json_encode($this->tableTitles));
         }
         if (Request::get('table')) {
-            throw new HttpResponseException(json(['code' => 0, 'msg' => '操作成功', 'data' => $tableData, 'count' => $this->db->removeOption('page')->removeOption('order')->count()]));
+            if(empty($this->db->getOptions('group'))){
+                throw new HttpResponseException(json(['code' => 0, 'msg' => '操作成功', 'data' => $tableData, 'count' => $this->db->removeOption('page')->removeOption('order')->count()]));
+            }else{
+                $sql = $this->db->removeOption('page')->removeOption('order')->buildSql();
+                $sql = "SELECT COUNT(*) FROM {$sql} userCount";
+                $res  = Db::query($sql);
+                $count = $res[0]['COUNT(*)'];
+                throw new HttpResponseException(json(['code' => 0, 'msg' => '操作成功', 'data' => $tableData, 'count' => $count]));
+            }
+
         }
         if (Request::get('export')) {
             if (empty($excelData)) {

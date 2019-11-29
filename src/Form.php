@@ -237,9 +237,9 @@ class Form extends Field
                         if ($this->model->$relation() instanceof BelongsTo || $this->model->$relation() instanceof HasOne) {
 
                             $relationData = $post[$relation];
-                            if (empty($this->data)) {
+                            if (empty($this->data) || empty($this->data->$relation)) {
                                 $this->model->$relation()->save($relationData);
-                            } else {
+                            } else{
                                 $this->data->$relation->save($relationData);
                             }
                         } elseif ($this->model->$relation() instanceof HasMany) {
@@ -255,13 +255,22 @@ class Form extends Field
                             $relationData = [];
                             $fields = array_keys($post[$relation]);
                             foreach ($fields as $field) {
-                                foreach ($post[$relation][$field] as $key => $val) {
-                                    $relationData[$key][$field] = $val;
+                                foreach ($post[$relation][$field] as $key => &$val) {
+                                    if(is_array($val)){
+                                        $index = 0;
+                                        foreach ($val as $i=>$v){
+                                            $relationData[$index][$field] = $v;
+                                            $index++;
+                                        }
+                                    } else{
+                                        $relationData[$key][$field] = $val;
+                                    }
                                 }
                             }
                             if (count($deleteIds) > 0) {
                                 $this->model->$relation()->whereIn('id', $deleteIds)->delete();
                             }
+
                             $this->model->$relation()->saveAll($relationData);
                         } elseif ($this->model->$relation() instanceof BelongsToMany) {
                             $relationData = $post[$relation];
@@ -384,18 +393,40 @@ class Form extends Field
                 $rawVal = $val;
             }
         }
-        $names = explode('.', $field);
-        if (count($names) > 1) {
-            $relationMethod = $names[0];
-            if (method_exists($this->model, $relationMethod)) {
-                if ($this->model->$relationMethod() instanceof BelongsTo || $this->model->$relationMethod() instanceof HasOne) {
-                    if (!in_array($names[0], $this->relationArr)) {
-                        array_push($this->relationArr, $names[0]);
+        if(is_array($field)){
+            $fieldArr = [];
+            foreach ($field as $f){
+                $names = explode('.', $f);
+                if (count($names) > 1) {
+                    $relationMethod = $names[0];
+                    if (method_exists($this->model, $relationMethod)) {
+                        if ($this->model->$relationMethod() instanceof BelongsTo || $this->model->$relationMethod() instanceof HasOne) {
+                            if (!in_array($names[0], $this->relationArr)) {
+                                array_push($this->relationArr, $names[0]);
+                            }
+                        }
                     }
+                    $fieldArr[] = "{$relationMethod}[{$names[1]}]";
+                }else{
+                    $fieldArr[] = $names[0];
                 }
             }
-            $field = "{$relationMethod}[{$names[1]}]";
+            $field = $fieldArr;
+        }else{
+            $names = explode('.', $field);
+            if (count($names) > 1) {
+                $relationMethod = $names[0];
+                if (method_exists($this->model, $relationMethod)) {
+                    if ($this->model->$relationMethod() instanceof BelongsTo || $this->model->$relationMethod() instanceof HasOne) {
+                        if (!in_array($names[0], $this->relationArr)) {
+                            array_push($this->relationArr, $names[0]);
+                        }
+                    }
+                }
+                $field = "{$relationMethod}[{$names[1]}]";
+            }
         }
+
         $item = new Field($template, $lable, $field, $val, $rawVal);
         if ($template == 'image') {
             $item->getData(true);
@@ -482,6 +513,7 @@ class Form extends Field
                         foreach ($this->formItem as $k => $f) {
                             if (is_null($f->field)) {
                                 $f->value('');
+                                $f->rawValue('');
                                 $f->field($f->name);
                             }
                             $f->name("{$form['relationMethod']}[{$f->field}][]");
@@ -500,8 +532,13 @@ class Form extends Field
                                 if (is_null($f->field)) {
                                     $f->field($f->name);
                                 }
-
+                                if (is_object($val)) {
+                                    $rawVal = $val->getData($f->field);
+                                } else {
+                                    $rawVal = '';
+                                }
                                 $f->value($val[$f->field]);
+                                $f->rawValue($rawVal);
                                 $f->name("{$form['relationMethod']}[{$f->field}][]");
                                 $hasItemHtml = $hasItemHtml . $f->render();
                             }
