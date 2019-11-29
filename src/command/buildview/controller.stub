@@ -19,6 +19,10 @@ class {%className%} extends Controller
     {
         $grid = new Grid(new {%model%});
 {%grid%}
+        $grid->hideExportButton();
+        $grid->actions(function ($action){
+        	 $action->hideDetail();
+        });
         return $grid->view();
     }
 

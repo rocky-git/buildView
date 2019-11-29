@@ -1,0 +1,25 @@
+<div class="layui-form-item layui-form-text">
+    <label class="layui-form-label">{$label}</label>
+    <div class="layui-input-{$layui}">
+        <div {volist name="attr" id="vo"}{$vo}{/volist} data-name="name_{$build_view_rand}"></div>
+        <input type="hidden" name="{$name}" value="{$value}" data-input="name_{$build_view_rand}" />
+        {$appendHtml|raw}
+        <!--{notempty name="$help"}-->
+        <div class="help-block">{$help}</div>
+        <!--{/notempty}-->
+    </div>
+</div>
+<script>
+    let i = Math.ceil(Math.random()*10000000);
+    $('[data-name=name_{$build_view_rand}]').attr('data-name','newname_'+i);
+    $('[data-input=name_{$build_view_rand}]').attr('data-input','newname_'+i);
+    let input = $('[data-input=newname_'+i+']');
+    layui.rate.render({
+        elem: $('[data-name=newname_'+i+']')  //绑定元素
+        ,value:'{$value}'
+        ,length:{$length|default=5}
+        ,choose: function(value){
+            input.val(value);
+        }
+    });
+</script>

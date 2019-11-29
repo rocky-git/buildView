@@ -36,9 +36,13 @@
         var excel_limit =0;
         var excel_page=0;
         var table = layui.table;
+        var page = 1;
+        if(localStorage.getItem('build_view_url') == '{:md5(request()->url())}'){
+            page = localStorage.getItem('{:md5(request()->url())}')
+        }
         table.render({
             elem: '#{$tableId}'
-            ,skin:'line'
+            ,skin:'{$tableSkin|default="line"}'
             ,url:"{:request()->url()}"
             ,autoSort:false
             ,where:{
@@ -49,15 +53,18 @@
             {/if}
              {if !isset($hidePage)}
             ,page: {
-                limit:20
+                limit:{$pageLimit|default='20'}
+                ,curr: page
                 ,limits:[10, 20, 30, 40, 50, 60, 70, 80, 90, 100, 110, 120, 130, 140, 150, 160, 170, 180, 190, 200]
             }
             {/if}
             ,cellMinWidth: 80 //全局定义常规单元格的最小宽度，layui 2.2.1 新增
-            ,cols: [{$name|raw}]
+            ,cols: {$name|raw}
             ,done:function(res,curr,count){
                 excel_limit = res.data.length;
                 excel_page = curr;
+                localStorage.setItem('build_view_url','{:md5(request()->url())}');
+                localStorage.setItem('{:md5(request()->url())}',curr);
                 $(".layui-table-cell").mouseover(function() {
                     if(this.offsetWidth<this.scrollWidth){
                         var that = this;
@@ -79,7 +86,18 @@
         });
         //监听排序
         table.on('sort({$tableId})', function(obj){
-            console.log(obj);
+            let sortSqlArr = {};
+            {php}
+            $ths = json_decode($name,true);
+            foreach($ths[0] as $th){
+                if(isset($th['sortSql'])){
+                    echo "sortSqlArr['".$th['field']."'] = '".urlencode($th['sortSql'])."';";
+                }
+            }
+            {/php}
+             if(sortSqlArr[obj.field]){
+                 obj.field = sortSqlArr[obj.field];
+             }
             table.reload('{$tableId}',{
                 initSort: obj //记录初始排序，如果不设的话，将无法标记表头的排序状态。
                 ,where: { //请求参数（注意：这里面的参数可任意定义，并非下面固定的格式）

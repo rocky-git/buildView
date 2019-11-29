@@ -4,7 +4,7 @@
         <div class="layui-row" id="hasMany{$name}">
             {$value|raw}
         </div>
-        <div class="layui-input-block"><button type="button" class="layui-btn layui-btn-normal" data-hasMany="hasManyAdd">{:lang('build_view_add_btn')}</button></div>
+        <div class="layui-input-block"><button type="button" class="layui-btn layui-btn-normal" data-hasMany="hasManyAdd{$name}">{:lang('build_view_add_btn')}</button></div>
     </div>
 </fieldset>
 <script>
@@ -13,9 +13,10 @@
     $('button[data-hasMany=hasManyDel]').click(function(){
         $(this).parent().parent().parent('.layui-row').remove();
     });
-    $('button[data-hasMany=hasManyAdd]').click(function(){
+    $('button[data-hasMany=hasManyAdd{$name}]').click(function(){
 
         $('#hasMany{$name}').append(hasMany{$name});
+		 window.form.render();
         $('button[data-hasMany=hasManyDel]').click(function(){
             $(this).parent().parent().parent('.layui-row').remove();
         });

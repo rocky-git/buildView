@@ -38,6 +38,7 @@ class Grid extends Field
     protected $hideAction = false;
     protected $hideColumnSelect = false;
     protected $tableTitles = [];
+    protected $tableColRow = 1;
     protected $actionColumn = null;
     protected $toolsArr = [];
     protected $beforeDel = null;
@@ -68,7 +69,42 @@ class Grid extends Field
 
 
     }
-
+	/**
+     * 设置添加按钮参数
+     * @Author: rocky
+     * 2019/11/27 16:50
+     * @param $val 格式：id=1&a=2
+     */
+    public function setAddButtonParam($val){
+        $this->setOption('addButtonParam',$val);
+    }
+    /**
+     * 设置表头行数
+     * @Author: rocky
+     * 2019/11/9 11:39
+     * @param $row 行数
+     */
+    public function setTableColRow($row){
+        $this->tableColRow = $row;
+    }
+    /**
+     * 设置表格样式
+     * @Author: rocky
+     * 2019/11/9 11:31
+     * @param string $skin 样式
+     */
+    public function setTableSkin($skin = 'row '){
+        $this->table->setOption('tableSkin',$skin);
+    }
+    /**
+     * 设置分页每页限制
+     * @Author: rocky
+     * 2019/11/6 14:01
+     * @param $limit
+     */
+    public function setPageLimit($limit){
+        $this->table->setOption('pageLimit',$limit);
+    }
     public function actions(\Closure $closure)
     {
         $this->actionColumn->setClosure($closure);
@@ -286,7 +322,7 @@ class Grid extends Field
                 ->style('')
                 ->display(function ($val, $data) {
                     return "<input type='text' data-table-sort='true' value='{$val}' data-id='{$data["id"]}' class='layui-input text-center' style='padding-left:0px;' onkeyup=\"value=value.replace(/[^\d]/g,'')\" onblur=\"value=value.replace(/[^\d]/g,'')\">";
-                });
+                })->setColsRow($this->tableColRow);
         }
     }
 
@@ -313,7 +349,9 @@ class Grid extends Field
             $this->db->where('is_deleted', 0);
         }
         if (Request::get('table_sort')) {
-            $this->db->removeOption('order')->order(Request::get('field'), Request::get('order'));
+            $field = urldecode(Request::get('field'));
+            $order = Request::get('order');
+            $sql = $this->db->removeOption('order')->orderRaw("{$field} {$order}");
         }
         if (Request::get('export')) {
             switch (Request::get('export_type')) {
@@ -341,7 +379,7 @@ class Grid extends Field
         $excelData = [];
         //是否隐藏多选
         if (!$this->hideColumnSelect) {
-            $this->tableTitles [] = ['type' => 'checkbox'];
+            $this->tableTitles[0][] = ['type' => 'checkbox','rowspan'=>$this->tableColRow];
         }
         //是否隐藏操作列
         if (!$this->hideAction) {
@@ -353,7 +391,7 @@ class Grid extends Field
             foreach ($this->columns as $column) {
                 $column->setData($val);
                 $tableData[$index][$column->field] = $column->render();
-                if ($column->field != 'actions_tools' && $column->field != 'id' && $this->issetField($val, $column->field)) {
+                if (($column->field != 'actions_tools' && $column->field != 'id' && $this->issetField($val, $column->field)) || $column->excelData) {
                     if (!$column->excelClose) {
                         $excelTitle[$column->field] = $column->title;
                         if (empty($column->excelData)) {
@@ -364,7 +402,15 @@ class Grid extends Field
                     }
                 }
                 if (!is_array($column->value)) {
-                    $totalRowData[$column->field] += $column->value;
+                    if ($column->totalRow) {
+                        if(is_null($column->getClosure())){
+                            $totalRowData[$column->field] += $column->value;
+                        }else{
+                            $totalRowData[$column->field] += $tableData[$index][$column->field];
+                        }
+                    }
+
+
                 }
             }
             array_push($excelData, $excelTr);
@@ -373,16 +419,29 @@ class Grid extends Field
         $totalRow = false;
         foreach ($this->columns as $key => $column) {
             if ($column->totalRow) {
-                $column->cols['totalRowText'] = '<span class="layui-badge">合计：' . number_format($totalRowData[$column->field], 2) . '</span>';
+                $column->cols['totalRowText'] = '<span class="layui-badge">合计：' . $totalRowData[$column->field] . '</span>';
                 if (!$totalRow) {
                     $this->table->totalRow(true);
                     $totalRow = true;
                 }
             }
-            $this->tableTitles[] = $column->cols;
+
+            $this->tableTitles[$column->colsRow][] = $column->cols;
+
+            $this->tableTitles = array_values($this->tableTitles);
+            //halt(json_encode($this->tableTitles));
         }
         if (Request::get('table')) {
-            throw new HttpResponseException(json(['code' => 0, 'msg' => '操作成功', 'data' => $tableData, 'count' => $this->model->removeOption('page')->removeOption('order')->count()]));
+            if(empty($this->db->getOptions('group'))){
+                throw new HttpResponseException(json(['code' => 0, 'msg' => '操作成功', 'data' => $tableData, 'count' => $this->db->removeOption('page')->removeOption('order')->count()]));
+            }else{
+                $sql = $this->db->removeOption('page')->removeOption('order')->buildSql();
+                $sql = "SELECT COUNT(*) FROM {$sql} userCount";
+                $res  = Db::query($sql);
+                $count = $res[0]['COUNT(*)'];
+                throw new HttpResponseException(json(['code' => 0, 'msg' => '操作成功', 'data' => $tableData, 'count' => $count]));
+            }
+
         }
         if (Request::get('export')) {
             if (empty($excelData)) {
@@ -395,6 +454,7 @@ class Grid extends Field
         }
 
         $this->table->setOption('toolbar', implode('', $this->toolsArr));
+       
         $this->table->name(json_encode($this->tableTitles));
         $this->setOption('table', $this->table->render());
         return $this->render();
@@ -460,6 +520,7 @@ class Grid extends Field
     public function column($field, $label)
     {
         $column = new Column($field, $label);
+
         array_push($this->columns, $column);
         return $column;
     }

@@ -7,7 +7,7 @@
 
         <div class="pull-right">
             <!--{if !isset($hideAddButton)}-->
-            <button data-{$formOpen|default="open" }='{:url("form")}?back=1' type="button" data-title="{:lang('build_view_add_btn')}"
+            <button data-{$formOpen|default="open" }='{:url("form")}?back=1&{$addButtonParam|default=""}' type="button" data-title="{:lang('build_view_add_btn')}"
                     class='layui-btn layui-btn-sm layui-btn-primary'><i class="layui-icon layui-icon-add-1"></i>{:lang('build_view_add_btn')}
             </button>
             <!--{/if}-->
@@ -70,6 +70,8 @@
 <!--{/notempty}-->
 <!--{/block}-->
 <!--{block name='content'}-->
+<link href="/vendor/build-view/plugs/mediaelement/mediaelementplayer.css" rel="stylesheet">
+<script src="/vendor/build-view/plugs/mediaelement/mediaelement-and-player.js"></script>
     <div class="layui-card-body layui-anim layui-anim-upbit ">
         <div class="layui-card-body think-box-shadow">
                 {$filter|raw}

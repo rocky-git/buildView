@@ -41,19 +41,21 @@ class Detail extends Field
      */
     public function __construct($model)
     {
-        if ($model instanceof Model) {
-            $this->model = $model;
-            $this->db = $this->model->db();
-            $this->tableFields = $this->model->getTableFields();
-        } else {
-            abort(999, '不是有效的模型');
-        }
-        $id = Request::get('id', false);
-        if ($id) {
-            $this->id = $id;
-            $this->data = $this->model->find($id);;
-            if(empty($this->data)){
-                throw new HttpResponseException(json(['code' => 0, 'msg' => '数据不存在！', 'data' => []]));
+        if (!empty($model)) {
+            if ($model instanceof Model) {
+                $this->model = $model;
+                $this->db = $this->model->db();
+                $this->tableFields = $this->model->getTableFields();
+            } else {
+                abort(999, '不是有效的模型');
+            }
+            $id = Request::get('id', false);
+            if ($id) {
+                $this->id = $id;
+                $this->data = $this->model->find($id);;
+                if (empty($this->data)) {
+                    throw new HttpResponseException(json(['code' => 0, 'msg' => '数据不存在！', 'data' => []]));
+                }
             }
         }
         $this->template = 'detail';
@@ -174,7 +176,7 @@ class Detail extends Field
     public function model()
     {
         $this->queryFind = true;
-        return $this->db->getModel();
+        return $this->db;
     }
 
     /**

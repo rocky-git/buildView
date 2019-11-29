@@ -39,7 +39,20 @@ class Filter
         $this->template( $field,$lable);
         return $this;
     }
-
+    /**
+     * findIn筛选
+     * @Author: rocky
+     * 2019/7/25 16:46
+     * @param $lable 标签
+     * @param $field 字段
+     * @return $this
+     */
+    public function findIn($field, $lable)
+    {
+        $field = $this->paseFilter($field, 'findIn');
+        $this->template( $field,$lable);
+        return $this;
+    }
     protected function template($field, $lable, $template = 'text')
     {
         $field = new Field($template, $lable, $field, Request::param($field));

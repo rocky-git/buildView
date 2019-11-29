@@ -21,6 +21,14 @@
     let name = $('[data-name=name_{$build_view_rand}]').attr('name');
     if(name.indexOf('[]') > -1){
         name = name.replace('[]','');
-        $('[data-name=name_{$build_view_rand}]').attr('name',name+'['+i+']');
+        $('[data-name=name_{$build_view_rand}]').attr('name',name+'[build_radio]['+i+']');
     }
+
+    $('[lay-filter=build_id_'+i+']').each(function(index,item){
+        if($(item).attr('checked')){
+            $(item).prop("checked", "checked");
+        }
+    });
+
+    form.render('radio','build_id_'+i);
 </script>

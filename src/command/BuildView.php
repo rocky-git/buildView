@@ -61,15 +61,14 @@ class BuildView extends Make
     protected function getTableInfo($model){
         $db = db()->name($model);
         $tableInfo= $db->query('SHOW FULL COLUMNS FROM '.$db->getTable());
-
+        $fields = $db->getTableFields();
         $grid = '';
         $detail = '';
         $form = '';
         foreach ($tableInfo as $val){
             $label = $val['Comment']?$val['Comment']:$val['Field'];
-            $grid .= "\t\t".'$grid->'.$val['Field'].'(\''.$label.'\');'.PHP_EOL;
-            $detail .= "\t\t".'$detail->'.$val['Field'].'(\''.$label.'\');'.PHP_EOL;
-
+            $grid .= "\t\t".'$grid->column(\''.$val['Field'].'\',\''.$label.'\');'.PHP_EOL;
+            $detail .= "\t\t".'$detail->column(\''.$val['Field'].'\',\''.$label.'\');'.PHP_EOL;
             if(strstr($val['Type'],'char')){
                 $form .= "\t\t".'$form->text(\''.$val['Field'].'\',\''.$label.'\');'.PHP_EOL;
             }elseif (strstr($val['Type'],'timestamp')){
@@ -89,7 +88,11 @@ class BuildView extends Make
             }else{
                 $form .= "\t\t".'$form->text(\''.$val['Field'].'\',\''.$label.'\');'.PHP_EOL;
             }
-
+        }
+        if(in_array('create_at',$fields)){
+            $grid .= "\t\t".'$grid->filter(function ($filter){
+            $filter->dateBetween(\'create_at\',\'添加时间\');
+        });'.PHP_EOL;
         }
         return [
             $grid,
