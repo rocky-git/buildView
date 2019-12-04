@@ -207,7 +207,9 @@ class Actions
             $width+=100;
             $this->columnHtml .= $val;
         }
-        $this->cols['minWidth'] = $width;
+        if(!isset($this->cols['width'])) {
+            $this->cols['minWidth'] = $width;
+        }
         $this->html = $this->columnHtml;
         $this->columnHtml = '';
         $this->prependArr =[];

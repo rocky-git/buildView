@@ -533,13 +533,34 @@ class Form extends Field
                                     $f->field($f->name);
                                 }
                                 if (is_object($val)) {
-                                    $rawVal = $val->getData($f->field);
+                                    if(is_array($f->field)){
+                                        $rawVal = [];
+                                        foreach ($f->field as $tmp_field){
+                                            $rawVal[] = $val->getData($tmp_field);
+                                        }
+                                    }else{
+                                        $rawVal = $val->getData($f->field);
+                                    }
                                 } else {
-                                    $rawVal = '';
+                                    if(is_array($f->field)){
+                                        $rawVal = [];
+                                    }else{
+                                        $rawVal = '';
+                                    }
+
                                 }
-                                $f->value($val[$f->field]);
+                                if(is_array($f->field)){
+                                    $tmp_nams = [];
+                                    foreach ($f->field as $tmp_field){
+                                        $f->value($val[$tmp_field]);
+                                        $tmp_nams[]= "{$form['relationMethod']}[{$tmp_field}][]";
+                                    }
+                                    $f->name($tmp_nams);
+                                }else{
+                                    $f->value($val[$f->field]);
+                                    $f->name("{$form['relationMethod']}[{$f->field}][]");
+                                }
                                 $f->rawValue($rawVal);
-                                $f->name("{$form['relationMethod']}[{$f->field}][]");
                                 $hasItemHtml = $hasItemHtml . $f->render();
                             }
                             $hasItemHtml = '<div class="layui-row">' . $idField->render() . $hasItemHtml . '<div class="layui-form-item"><div class="layui-input-block"><button type="button" class="layui-btn layui-btn-danger" data-hasMany="hasManyDel">' . lang('build_view_action_remove_btn') . '</button></div></div></div>';

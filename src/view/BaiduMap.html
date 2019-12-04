@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <meta name="viewport" content="initial-scale=1.0, user-scalable=no" />
+    <style type="text/css">
+        body, html,#allmap {width: 100%;height: 100%;overflow: hidden;margin:0;font-family:"微软雅黑";}
+    </style>
+    <link rel="stylesheet" href="/vendor/build-view/plugs/layui/css/layui.css">
+    <link rel="stylesheet" href="/vendor/build-view/theme/css/console.css?at={:date('md')}">
+    <script type="text/javascript" src="http://api.map.baidu.com/api?v=3.0&ak={$ak}"></script>
+    <script src="/vendor/build-view/plugs/layui/layui.all.js"></script>
+    <script src="/vendor/build-view/plugs/require/require.js"></script>
+    <script src="/vendor/build-view/admin.js"></script>
+    <title>百度地图</title>
+</head>
+<body>
+
+<label class="layui-form-label">当前选择位置</label><div class="layui-input-inline"><input type="text" id="suggestId" class="layui-input" style="width: 690px"/></div>
+<div id="searchResultPanel" style="border:1px solid #C0C0C0;width:150px;height:auto; display:none;"></div>
+<button class="layui-btn layui-btn-normal layui-btn-fluid" type="button" id="submitBtn">确认</button>
+<div id="allmap" style="height: 86%"></div>
+</body>
+</html>
+<script type="text/javascript">
+    var lng = 0;
+    var lat = 0;
+    var address = '';
+    // 百度地图API功能
+    var map = new BMap.Map("allmap");    // 创建Map实例
+    map.centerAndZoom(new BMap.Point(116.404, 39.915), 11);  // 初始化地图,设置中心点坐标和地图级别
+    //添加地图类型控件
+    map.addControl(new BMap.MapTypeControl({
+        mapTypes:[
+            BMAP_NORMAL_MAP,
+            BMAP_HYBRID_MAP
+        ]}));
+    map.setCurrentCity("北京");          // 设置地图显示的城市 此项是必须设置的
+    map.enableScrollWheelZoom(true);     //开启鼠标滚轮缩放
+    var geoc = new BMap.Geocoder();
+    //点击事件
+    map.addEventListener("click", showInfo);
+    function showInfo(e){
+        var pt = e.point;
+        lng = pt.lng;
+        lat = pt.lat;
+        geoc.getLocation(pt, function(rs){
+            var addComp = rs.addressComponents;
+            address = addComp.province +  addComp.city + addComp.district +  addComp.street +  addComp.streetNumber;
+            $('#suggestId').val(address);
+        });
+    }
+    function G(id) {
+        return document.getElementById(id);
+    }
+    var ac = new BMap.Autocomplete(    //建立一个自动完成的对象
+        {"input" : "suggestId"
+            ,"location" : map
+        });
+    ac.addEventListener("onhighlight", function(e) {  //鼠标放在下拉列表上的事件
+        var str = "";
+        var _value = e.fromitem.value;
+        var value = "";
+        if (e.fromitem.index > -1) {
+            value = _value.province +  _value.city +  _value.district +  _value.street +  _value.business;
+        }
+        str = "FromItem<br />index = " + e.fromitem.index + "<br />value = " + value;
+
+        value = "";
+        if (e.toitem.index > -1) {
+            _value = e.toitem.value;
+            value = _value.province +  _value.city +  _value.district +  _value.street +  _value.business;
+        }
+        str += "<br />ToItem<br />index = " + e.toitem.index + "<br />value = " + value;
+        G("searchResultPanel").innerHTML = str;
+    });
+
+    ac.addEventListener("onconfirm", function(e) {    //鼠标点击下拉列表后的事件
+        console.log(e);
+        var _value = e.item.value;
+        address = _value.province +  _value.city +  _value.district +  _value.street +  _value.business;
+        geoc.getPoint(address, function(point){
+            lat = point.lat;
+            lng = point.lng;
+        });
+        G("searchResultPanel").innerHTML ="onconfirm<br />index = " + e.item.index + "<br />address = " + address;
+
+        setPlace();
+    });
+
+    function setPlace(){
+        map.clearOverlays();    //清除地图上所有覆盖物
+        function myFun(){
+            var pp = local.getResults().getPoi(0).point;    //获取第一个智能搜索的结果
+            map.centerAndZoom(pp, 18);
+            map.addOverlay(new BMap.Marker(pp));    //添加标注
+        }
+        var local = new BMap.LocalSearch(map, { //智能搜索
+            onSearchComplete: myFun
+        });
+        local.search(address);
+    }
+    $('#submitBtn').click(function () {
+        var res = [];
+        res.lat = lat;
+        res.lng = lng;
+        res.address = address;
+        res.mark = '{$mark}';
+        window.parent.postMessage(res, "/");
+        parent.layer.close(parent.layer.getFrameIndex(window.name));
+    })
+</script>

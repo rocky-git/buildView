@@ -1,0 +1,32 @@
+<div class="layui-form-item layui-form-text">
+    <label class="layui-form-label">{$label}</label>
+    <div class="layui-input-{$layui}">
+        {if isset($required)}<input type="hidden" required>{/if}
+        <input name="{$name[0]}" type="hidden" />
+        <input name="{$name[1]}" type="hidden" />
+        <input readonly {volist name="attr" id="vo"}{$vo}{/volist} autocomplete="off" type="text" {} {$disabled} name="{$name[2]}" value="{$value}"  lay-verify="{$layVerify}" lay-verType="tips" lay-reqText="{:lang('build_view_please_input')}{$label}" placeholder="{:lang('build_view_please_input')}{$label}" class="layui-input {if isset($readonly)}layui-bg-gray{/if}">
+        <button type="button" data-title="百度地图" data-name="name_{$build_view_rand}" data-iframe="/buildview/map" class="layui-btn layui-btn-normal input-group-btn" style="position: absolute;top: 0px; right: 0px;cursor: pointer;z-index: 998">百度地图</button>
+        {$appendHtml|raw}
+        {notempty name="$help"}
+        <div class="help-block">{$help}</div>
+        {/notempty}
+    </div>
+</div>
+<script>
+    let i = Math.ceil(Math.random()*10000000);
+    $('[data-name=name_{$build_view_rand}]').attr('data-iframe','/buildview/map?mark=build_id_'+i);
+    $('[data-name=name_{$build_view_rand}]').attr('data-name','build_id_'+i);
+    //添加监听事件。
+    if (typeof window.addEventListener != "undefined"){
+        window.addEventListener("message", areaFunc, false);
+    }else if (typeof window.attachEvent != 'undefined'){
+        //兼容不支持addEventLinstener的IE。
+        window.attachEvent("onmessage", areaFunc);
+    }
+    function areaFunc(e){
+        var res = e.data;
+        $('[data-name='+res.mark+']').prev().prev().prev().val(res.lat);
+        $('[data-name='+res.mark+']').prev().prev().val(res.lng);
+        $('[data-name='+res.mark+']').prev().val(res.address);
+    }
+</script>

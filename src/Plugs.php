@@ -234,5 +234,17 @@ class Plugs extends Controller
             $this->error(lang($e->getMessage()));
         }
     }
-
+	 /**
+     * 调起百度地图
+     * @Author: rocky
+     * 2019/12/4 17:39
+     * @return mixed
+     */
+    public function map(){
+        $path = __DIR__ . '/view/BaiduMap.html';
+        $content = file_get_contents($path);
+        $ak = config('baidu.ak','6yOCGNRifiDEOO63RIfSODq6YVb0TrLI');
+        $mark = $this->request->get('mark');
+        return View::display($content,['ak'=>$ak,'mark'=>$mark], ['strip_space' => false]);
+    }
 }

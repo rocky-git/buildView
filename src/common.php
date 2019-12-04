@@ -70,6 +70,11 @@ if (!is_dir($path)) {
     $plug = new \buildView\Plugs();
     return $plug->qiniuToken();
 });
+//定义百度地图路由
+\think\facade\Route::any('buildview/map',function(){
+    $plug = new \buildView\Plugs();
+    return $plug->map();
+});
 
 //语言
 $lang = 'zh-cn';

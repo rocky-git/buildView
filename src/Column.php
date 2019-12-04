@@ -52,7 +52,15 @@ class Column
         $this->cols['title'] = $title;
 
     }
-
+    /**
+     * 设置列类型
+     * @Author: rocky
+     * 2019/11/9 11:07
+     * @param $type 列类型
+     */
+    public function type($type){
+        $this->cols['type'] = $type;
+    }
     /**
      * 设置默认值
      * @Author: rocky
