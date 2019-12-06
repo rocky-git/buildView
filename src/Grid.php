@@ -32,6 +32,7 @@ class Grid extends Field
     //db对象
     protected $db;
     protected $filter = null;
+    protected $filterCallBack = null;
     //关联字段链接
     protected $realtionMethodArr = [];
     protected $table = null;
@@ -76,7 +77,25 @@ class Grid extends Field
      * @param $val 格式：id=1&a=2
      */
     public function setAddButtonParam($val){
-        $this->setOption('addButtonParam',$val);
+        $this->table->setOption('addButtonParam',$val);
+    }
+    /**
+     * 设置编辑按钮参数
+     * @Author: rocky
+     * 2019/11/27 16:50
+     * @param $val 格式：id=1&a=2
+     */
+    public function setEditButtonParam($val){
+        $this->table->setOption('editButtonParam',$val);
+    }
+    /**
+     * 设置详情按钮参数
+     * @Author: rocky
+     * 2019/11/27 16:50
+     * @param $val 格式：id=1&a=2
+     */
+    public function setDetailButtonParam($val){
+        $this->setOption('detailButtonParam',$val);
     }
     /**
      * 设置表头行数
@@ -144,7 +163,7 @@ class Grid extends Field
 
                         if (in_array('is_deleted', $this->tableFields)) {
                             if ($deleteIds == 'all') {
-                                $res = $this->model->where('1=1')->setField('is_deleted', 1);
+                                $res = $this->db->where('1=1')->setField('is_deleted', 1);
                             } else {
                                 $res = $this->model->whereIn($this->model->getPk(), $deleteIds)->setField('is_deleted', 1);
                             }
@@ -229,7 +248,7 @@ class Grid extends Field
             }
         } else {
             if ($deleteIds == 0) {
-                $res = $this->model->where('1=1')->delete();
+                $res = $this->db->where('1=1')->delete();
             } else {
                 $res = $this->model->whereIn($this->model->getPk(), $deleteIds)->delete();
             }
@@ -322,7 +341,7 @@ class Grid extends Field
                 ->style('')
                 ->display(function ($val, $data) {
                     return "<input type='text' data-table-sort='true' value='{$val}' data-id='{$data["id"]}' class='layui-input text-center' style='padding-left:0px;' onkeyup=\"value=value.replace(/[^\d]/g,'')\" onblur=\"value=value.replace(/[^\d]/g,'')\">";
-                })->setColsRow($this->tableColRow);
+                })->rowspan($this->tableColRow+1);
         }
     }
 
@@ -332,7 +351,7 @@ class Grid extends Field
         if ($callback instanceof \Closure) {
             $this->model->setQuery($this->db);
             $this->filter = new Filter($this->db);
-            call_user_func($callback, $this->filter);
+            $this->filterCallBack = $callback;
         }
     }
 
@@ -345,6 +364,7 @@ class Grid extends Field
     public function view()
     {
         $this->dataSave();
+
         if (in_array('is_deleted', $this->tableFields)) {
             $this->db->where('is_deleted', 0);
         }
@@ -429,7 +449,6 @@ class Grid extends Field
             $this->tableTitles[$column->colsRow][] = $column->cols;
 
             $this->tableTitles = array_values($this->tableTitles);
-            //halt(json_encode($this->tableTitles));
         }
         if (Request::get('table')) {
             if(empty($this->db->getOptions('group'))){
@@ -450,6 +469,7 @@ class Grid extends Field
             Excel::export($this->options['title'], $excelTitle, $excelData);
         }
         if (!is_null($this->filter)) {
+            call_user_func($this->filterCallBack, $this->filter);
             $this->setOption('filter', $this->filter->render());
         }
 

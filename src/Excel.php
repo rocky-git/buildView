@@ -139,10 +139,10 @@ class Excel
             $cell = $cellIndex - 1;
             foreach ($columnFields as $k => $field) {
                 $rowData[$field] = $value[$cell];
-                if ($callback instanceof \Closure) {
-                    $rowData = call_user_func($callback, $rowData);
-                }
                 $cell++;
+            }
+			if ($callback instanceof \Closure) {
+                $rowData = call_user_func($callback, $rowData);
             }
             array_push($data, $rowData);
         }

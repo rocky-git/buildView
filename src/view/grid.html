@@ -7,7 +7,7 @@
 
         <div class="pull-right">
             <!--{if !isset($hideAddButton)}-->
-            <button data-{$formOpen|default="open" }='{:url("form")}?back=1&{$addButtonParam|default=""}' type="button" data-title="{:lang('build_view_add_btn')}"
+            <button data-{$formOpen|default="open" }='{:url("form")}?back=1&{$addButtonParam|raw|default=""}' type="button" data-title="{:lang('build_view_add_btn')}"
                     class='layui-btn layui-btn-sm layui-btn-primary'><i class="layui-icon layui-icon-add-1"></i>{:lang('build_view_add_btn')}
             </button>
             <!--{/if}-->

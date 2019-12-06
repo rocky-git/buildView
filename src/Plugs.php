@@ -243,7 +243,12 @@ class Plugs extends Controller
     public function map(){
         $path = __DIR__ . '/view/BaiduMap.html';
         $content = file_get_contents($path);
-        $ak = config('baidu.ak','6yOCGNRifiDEOO63RIfSODq6YVb0TrLI');
+        $baiduConfig = config('baidu.');
+        if(!isset($baiduConfig['ak']) || empty($baiduConfig['ak'])){
+            $ak = '6yOCGNRifiDEOO63RIfSODq6YVb0TrLI';
+        }else{
+            $ak = $baiduConfig['ak'];
+        }
         $mark = $this->request->get('mark');
         return View::display($content,['ak'=>$ak,'mark'=>$mark], ['strip_space' => false]);
     }

@@ -112,7 +112,7 @@
             var data = obj.data;
 
             if(obj.event === 'detail'){
-                var url = '{:url("detail")}?id='+data.id+'&form_open={$formOpen}&back=1';
+                var url = '{:url("detail")}?id='+data.id+'&form_open={$formOpen}&back=1&{$detailButtonParam|raw|default=""}';
                 if('{$formOpen|default="open"}' == 'open'){
                     $.form.href(url, this);
                 }else{
@@ -124,7 +124,7 @@
                     layer.close(index);
                 });
             } else if(obj.event === 'edit'){
-                var url = '{:url("form")}?id='+data.id+'&back=1';
+                var url = '{:url("form")}?id='+data.id+'&back=1&{$editButtonParam|raw|default=""}';
                 if('{$formOpen|default="open"}' == 'open'){
                     $.form.href(url, this);
                 }else{
