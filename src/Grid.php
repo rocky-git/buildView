@@ -77,7 +77,7 @@ class Grid extends Field
      * @param $val 格式：id=1&a=2
      */
     public function setAddButtonParam($val){
-        $this->table->setOption('addButtonParam',$val);
+        $this->setOption('addButtonParam',$val);
     }
     /**
      * 设置编辑按钮参数
