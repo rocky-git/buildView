@@ -16,7 +16,14 @@
     $('button[data-hasMany=hasManyAdd{$name}]').click(function(){
 
         $('#hasMany{$name}').append(hasMany{$name});
-		 window.form.render();
+		window.form.render();
+		$('[required]').map(function ($parent) {
+            if (($parent = $(this).parent()) && $parent.is('label')) {
+                $parent.addClass('label-required-prev');
+            } else {
+                $parent.prevAll('label').addClass('label-required-next');
+            }
+        });
         $('button[data-hasMany=hasManyDel]').click(function(){
             $(this).parent().parent().parent('.layui-row').remove();
         });

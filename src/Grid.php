@@ -364,7 +364,10 @@ class Grid extends Field
     public function view()
     {
         $this->dataSave();
-
+		if (!is_null($this->filter)) {
+            call_user_func($this->filterCallBack, $this->filter);
+            $this->setOption('filter', $this->filter->render());
+        }
         if (in_array('is_deleted', $this->tableFields)) {
             $this->db->where('is_deleted', 0);
         }
@@ -468,11 +471,7 @@ class Grid extends Field
             }
             Excel::export($this->options['title'], $excelTitle, $excelData);
         }
-        if (!is_null($this->filter)) {
-            call_user_func($this->filterCallBack, $this->filter);
-            $this->setOption('filter', $this->filter->render());
-        }
-
+       
         $this->table->setOption('toolbar', implode('', $this->toolsArr));
        
         $this->table->name(json_encode($this->tableTitles));
