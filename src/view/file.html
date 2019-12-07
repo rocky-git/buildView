@@ -49,7 +49,7 @@ if(!isset($uptype)){
         }
         /*{/if}*/
 
-        $("input[name={$name}]").val(val);
+        $("input[name={$name}]").val(val).trigger('change');
         $('#build_id_'+i).prev('i').addClass('color-green layui-icon-vercode').removeClass('layui-icon-upload-drag');
         $('#build_id_'+i).prev('i').prev('i').show();
     });

@@ -180,8 +180,14 @@ class Field
             }
         }
         foreach ($this->options as $key => $option) {
-            if (in_array($key, ['min', 'max', 'readonly', 'disabled'])) {
-                $this->options[$key] = "{$key}='{$option}' ";
+            if($this->template == 'number'){
+                if (in_array($key, ['min', 'max', 'readonly', 'disabled'])) {
+                    $this->options[$key] = "{$key}='{$option}' ";
+                }
+            }else{
+                if (in_array($key, ['readonly', 'disabled'])) {
+                    $this->options[$key] = "{$key}='{$option}' ";
+                }
             }
         }
         $path = __DIR__ . '/view/' . $this->template . '.html';
