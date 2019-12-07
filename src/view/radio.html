@@ -13,15 +13,16 @@
 <script>
     let i = Math.ceil(Math.random()*10000000)
     $('[data-name=name_{$build_view_rand}]').attr('lay-filter','build_id_'+i);
+    $('[lay-filter=build_id_'+i+']').attr('data-name','build_id_'+i);
     /*{if isset($event)}*/
     form.on('radio(build_id_'+i+')', function (data) {
         {$event|raw}
     });
     /*{/if}*/
-    let name = $('[data-name=name_{$build_view_rand}]').attr('name');
+    let name = $('[lay-filter=build_id_'+i+']').attr('name');
     if(name.indexOf('[]') > -1){
         name = name.replace('[]','');
-        $('[data-name=name_{$build_view_rand}]').attr('name',name+'[build_radio]['+i+']');
+        $('[lay-filter=build_id_'+i+']').attr('name',name+'[build_radio]['+i+']');
     }
 
     $('[lay-filter=build_id_'+i+']').each(function(index,item){
