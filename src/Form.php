@@ -474,12 +474,14 @@ class Form extends Field
         $fields = explode('.', $field);
         $val = $this->data;
         $rawVal = $this->data;
+        $tableFields = $this->tableFields;
         foreach ($fields as $f) {
             if (isset($val[$f])) {
                 if (is_object($val)) {
-                    if(in_array($f,$this->tableFields)){
+                    $tableFields = $val->getTableFields();
+                    if (in_array($f, $tableFields)) {
                         $rawVal = $val->getData($f);
-                    }else{
+                    } else {
                         $rawVal = '';
                     }
                 } else {

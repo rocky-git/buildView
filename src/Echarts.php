@@ -58,7 +58,7 @@ class Echarts extends Field
      * @param string $type 图表类型
      * @param string $dateField 日期字段
      */
-    public function create($model, $title, $filter, $type = 'line', $dateField = 'create_at')
+    public function create($model, $title, $filter='', $type = 'line', $dateField = 'create_at')
     {
         $this->clone_db = null;
         if ($model instanceof Model) {
