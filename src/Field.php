@@ -171,7 +171,8 @@ class Field
 
         if (is_array($this->options['value'])) {
             $this->options['value'] = array_filter($this->options['value']);
-        } elseif (isset($this->options['getData']) && $this->options['getData'] == true) {
+        }
+		if (isset($this->options['getData']) && $this->options['getData'] == true) {
             $this->options['value'] = $this->options['rawValue'];
         }
         if (empty($this->options['value']) && !is_numeric($this->options['value'])) {
