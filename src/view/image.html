@@ -26,7 +26,7 @@ $value = implode('|',$value);
     <label class="layui-form-label">{$label}</label>
     <div class="layui-input-{$layui}" style="padding: 5px">
         {if isset($required)}<input type="hidden" required>{/if}
-        <input {volist name="attr" id="vo"}{$vo}{/volist} type="hidden" name="{$name}" lay-verify="{$layVerify}" data-uptype="{$uptype}" lay-verType="tips" data-name="name_{$build_view_rand}" lay-reqText="{:lang('build_view_please_select')}{$label}" data-url="{$value}" value="{$value}" data-width="{$size[0]|default=''}" data-height="{$size[1]|default=''}">
+        <input {volist name="attr" id="vo"}{$vo}{/volist} type="hidden" name="{$name}" lay-verify="{$layVerify}" data-type="{$uploadType|default='png,jpg,gif,jpeg'}" data-uptype="{$uptype}" lay-verType="tips" data-name="name_{$build_view_rand}" lay-reqText="{:lang('build_view_please_select')}{$label}" data-url="{$value}" value="{$value}" data-width="{$size[0]|default=''}" data-height="{$size[1]|default=''}">
         {$appendHtml|raw}
         {notempty name="$help"}
         <div class="help-block">{$help}</div>
@@ -57,7 +57,7 @@ $value = implode('|',$value);
     };
     /*! 上传单个图片 */
     $.fn.uploadOneImages = function () {
-        var name = $(this).attr('name') || 'image', type = $(this).data('type') || 'png,jpg,gif',width = $(this).data('width') || '',height = $(this).data('height') || '',uptype = $(this).data('uptype');
+        var name = $(this).attr('name') || 'image', type = $(this).data('type') || 'png,jpg,gif,jpeg',width = $(this).data('width') || '',height = $(this).data('height') || '',uptype = $(this).data('uptype');
         var $tpl = $('<a data-files="btn" class="uploadimages"></a>').attr('data-field', name).attr('data-type', type).attr('data-width', width).attr('data-height', height).attr('data-uptype', uptype);
         $tpl.uploadFiles(function (url) {
             $($tpl.data('input')).val(url).trigger('change');
@@ -70,7 +70,7 @@ $value = implode('|',$value);
 
     /*! 上传多个图片 */
     $.fn.uploadMultipleImages = function () {
-        var type = $(this).data('type') || 'png,jpg,gif', name = $(this).attr('name') || 'umt-image',width = $(this).data('width') || '',height = $(this).data('height') || '',uptype = $(this).data('uptype');
+        var type = $(this).data('type') || 'png,jpg,gif,jpeg', name = $(this).attr('name') || 'umt-image',width = $(this).data('width') || '',height = $(this).data('height') || '',uptype = $(this).data('uptype');
         var $tpl = $('<a class="uploadimages"></a>').attr('data-files', 'mul').attr('data-field', name).attr('data-type', type).attr('data-width', width).attr('data-height', height).attr('data-uptype', uptype);
         $tpl.uploadFiles(function (url) {
             $($tpl.data('input')).val(url).trigger('change');
