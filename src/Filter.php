@@ -216,6 +216,11 @@ class Filter
     public function render()
     {
         $html = '';
+        $gets = request()->get();
+        
+        foreach ($gets as $key=>$val){
+            $html .= '<input type="hidden" name="'.$key.'" value="'.$val.'" />';
+        }
         foreach ($this->formItem as $form) {
             $html .= ' <div class="layui-inline"">' . $form->render() . '</div>';
         }
