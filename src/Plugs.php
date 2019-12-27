@@ -47,6 +47,7 @@ class Plugs extends Controller
             $name = "thumb/" . md5_file($file->getRealPath()) . "{$width}x{$height}." . $this->extend;
             $image = Image::open($file);
             $saveFile = 'upload/' . $name;
+			file_exists(dirname($saveFile)) || mkdir(dirname($saveFile), 0755, true);
             $image->thumb($width, $height, Image::THUMB_CENTER)->save($saveFile);
             $fileDatas = file_get_contents($saveFile);
             unlink($saveFile);

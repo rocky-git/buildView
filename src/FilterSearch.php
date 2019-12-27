@@ -100,9 +100,8 @@ class FilterSearch
         return $this;
     }
     protected function getField($field){
-        if($field[0] == '_'){
-            return substr($field,1);
-        }
+        $fields = explode('-',$field);
+        $field = end($fields);
         return $field;
     }
     // 下划线转驼峰

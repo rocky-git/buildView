@@ -102,7 +102,7 @@ class Filter
             $fields = explode('.', $field);
             $field = end($fields);
             if (count($fields) > 1) {
-                $field = '_' . $field;
+				$field = implode('-',$fields);
                 $this->filter->relationWhere($fields[0], function ($q) use ($field, $method) {
                     $q->$method($field,$this->requestMethod);
                 });
