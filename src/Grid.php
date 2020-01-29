@@ -144,6 +144,32 @@ class Grid extends Field
             Db::startTrans();
             try {
                 switch ($action) {
+                    case 'buldview_drag_sort':
+                        $start_data = Request::post('start_data');
+                        $end_data = Request::post('end_data');
+                        $data = $this->model->field("{$this->model->getPk()},{$this->sortField}")->select();
+                        $pks = $data->column($this->model->getPk());
+                        $start_key = array_search($start_data[$this->model->getPk()],$pks);
+                        $end_key = array_search($end_data[$this->model->getPk()],$pks);
+                        $sortData = $pks[$start_key];
+                        unset($pks[$start_key]);
+                        array_splice($pks,$end_key,0,$sortData);
+
+                        $i=1;
+                        $updateData = [];
+                        foreach ($pks as $key=>$val){
+                            $updateData[$key][$this->model->getPk()] = $val;
+                            $updateData[$key][$this->sortField] = $i;
+                            $i++;
+                        }
+                        $res = $this->model->saveAll($updateData);
+                        Db::commit();
+                        if ($res) {
+                            throw new HttpResponseException(json(['code' => 1, 'msg' => lang('build_view_action_success'), 'data' => []]));
+                        } else {
+                            throw new HttpResponseException(json(['code' => 0, 'msg' => lang('build_view_action_error'), 'data' => []]));
+                        }
+                        break;
                     case 'buldview_sort':
                         $id = Request::post('id');
                         $value = Request::post('value');
@@ -336,6 +362,7 @@ class Grid extends Field
     {
         $this->sortField = $field;
         if (in_array($field, $this->tableFields)) {
+            $this->table->setOption('sortField',$field);
             $this->column($field, "<button id='sortButton' class='layui-btn layui-btn-xs layui-btn-normal'style='width:46px' title='" . lang('build_view_grid_sort') . "' type='button'>" . lang('build_view_grid_sort') . "</button")
                 ->width(80)
                 ->style('')
@@ -442,7 +469,7 @@ class Grid extends Field
         $totalRow = false;
         foreach ($this->columns as $key => $column) {
             if ($column->totalRow) {
-                $column->cols['totalRowText'] = '<span class="layui-badge">合计：' . $totalRowData[$column->field] . '</span>';
+                $column->cols['totalRow'] = true;
                 if (!$totalRow) {
                     $this->table->totalRow(true);
                     $totalRow = true;
