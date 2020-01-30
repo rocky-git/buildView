@@ -145,29 +145,62 @@ class Grid extends Field
             try {
                 switch ($action) {
                     case 'buldview_drag_sort':
-                        $start_data = Request::post('start_data');
-                        $end_data = Request::post('end_data');
-                        $data = $this->model->field("{$this->model->getPk()},{$this->sortField}")->select();
-                        $pks = $data->column($this->model->getPk());
-                        $start_key = array_search($start_data[$this->model->getPk()],$pks);
-                        $end_key = array_search($end_data[$this->model->getPk()],$pks);
-                        $sortData = $pks[$start_key];
-                        unset($pks[$start_key]);
-                        array_splice($pks,$end_key,0,$sortData);
-
-                        $i=1;
-                        $updateData = [];
-                        foreach ($pks as $key=>$val){
-                            $updateData[$key][$this->model->getPk()] = $val;
-                            $updateData[$key][$this->sortField] = $i;
-                            $i++;
-                        }
-                        $res = $this->model->saveAll($updateData);
-                        Db::commit();
-                        if ($res) {
-                            throw new HttpResponseException(json(['code' => 1, 'msg' => lang('build_view_action_success'), 'data' => []]));
-                        } else {
-                            throw new HttpResponseException(json(['code' => 0, 'msg' => lang('build_view_action_error'), 'data' => []]));
+                        $count = $this->model->count($this->sortField);
+                        $distinctCount = $this->model->count("distinct {$this->sortField}");
+                        if($count == $distinctCount){
+                             $sortable_datas = Request::post('sortable_data');
+                             $sortable_type = Request::post('sortable_type');
+                             if($sortable_type == 1){
+                                 $sortable_data = $sortable_datas[1];
+                             }else{
+                                 $sortable_data = end($sortable_datas);
+                                 
+                             }
+                            $sortStart = $sortable_data[$this->sortField];
+                            $updateData = [];
+                            foreach ($sortable_datas as $key=>$val){
+                                $updateData[$key][$this->model->getPk()] = $val[$this->model->getPk()];
+                                $updateData[$key][$this->sortField] = $sortStart;
+                                $sortStart++;
+                            }
+                            $res = $this->model->saveAll($updateData);
+                            Db::commit();
+                            if ($res) {
+                                throw new HttpResponseException(json(['code' => 2, 'msg' => lang('build_view_action_success'), 'data' => $updateData]));
+                            } else {
+                                throw new HttpResponseException(json(['code' => 0, 'msg' => lang('build_view_action_error'), 'data' => []]));
+                            }
+                        }else{
+                            $sortable_datas = Request::post('sortable_data');
+                            $data = $this->model->field("{$this->model->getPk()},{$this->sortField}")->select();
+                            $pks = $data->column($this->model->getPk());
+                            $sortable_type = Request::post('sortable_type');
+                            if($sortable_type == 1){
+                                $start_data = reset($sortable_datas);
+                                $end_data =  $sortable_datas[1];
+                            }else{
+                                $start_data = end($sortable_datas);
+                                $end_data =  prev($sortable_datas);
+                            }
+                            $start_key = array_search($start_data[$this->model->getPk()],$pks);
+                            $end_key = array_search($end_data[$this->model->getPk()],$pks);
+                            $sortData = $pks[$start_key];
+                            unset($pks[$start_key]);
+                            array_splice($pks,$end_key,0,$sortData);
+                            $i=1;
+                            $updateData = [];
+                            foreach ($pks as $key=>$val){
+                                $updateData[$key][$this->model->getPk()] = $val;
+                                $updateData[$key][$this->sortField] = $i;
+                                $i++;
+                            }
+                            $res = $this->model->saveAll($updateData);
+                            Db::commit();
+                            if ($res) {
+                                throw new HttpResponseException(json(['code' => 1, 'msg' => lang('build_view_action_success'), 'data' => []]));
+                            } else {
+                                throw new HttpResponseException(json(['code' => 0, 'msg' => lang('build_view_action_error'), 'data' => []]));
+                            }
                         }
                         break;
                     case 'buldview_sort':
@@ -363,11 +396,12 @@ class Grid extends Field
         $this->sortField = $field;
         if (in_array($field, $this->tableFields)) {
             $this->table->setOption('sortField',$field);
-            $this->column($field, "<button id='sortButton' class='layui-btn layui-btn-xs layui-btn-normal'style='width:46px' title='" . lang('build_view_grid_sort') . "' type='button'>" . lang('build_view_grid_sort') . "</button")
+            $this->column($field,'排序值')->hide();
+            $this->column($field.'_html', "<button id='sortButton' class='layui-btn layui-btn-xs layui-btn-normal'style='width:46px' title='" . lang('build_view_grid_sort') . "' type='button'>" . lang('build_view_grid_sort') . "</button")
                 ->width(80)
                 ->style('')
-                ->display(function ($val, $data) {
-                    return "<input type='text' data-table-sort='true' value='{$val}' data-id='{$data["id"]}' class='layui-input text-center' style='padding-left:0px;' onkeyup=\"value=value.replace(/[^\d]/g,'')\" onblur=\"value=value.replace(/[^\d]/g,'')\">";
+                ->display(function ($val, $data) use($field) {
+                    return "<input type='text' data-table-sort='true' value='{$data[$field]}' data-id='{$data["id"]}' class='layui-input text-center' style='padding-left:0px;' onkeyup=\"value=value.replace(/[^\d]/g,'')\" onblur=\"value=value.replace(/[^\d]/g,'')\">";
                 })->rowspan($this->tableColRow+1);
         }
     }

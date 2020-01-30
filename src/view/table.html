@@ -37,8 +37,9 @@
         var excel_page=0;
         var table = layui.table;
         var page = 1;
-        var sortable_start = false,sortable_end = false;
-        var sortable_start_data,sortable_end_data;
+        var sortable_start = false,sortable_update = 0;
+        var sortable_data = [];
+        var sortable_type = 1;
         if(localStorage.getItem('build_view_url') == '{:md5(request()->url())}'){
             page = localStorage.getItem('{:md5(request()->url())}')
         }
@@ -67,26 +68,48 @@
                 /*{if isset($sortField)}*/
                 require(['/vendor/build-view/plugs/Sortable.min.js'],function(Sortable){
                     var sortable = new Sortable(document.querySelector('tbody'), {
-                        // Element dragging started
-                        onStart: function (/**Event*/evt) {
-                            sortable_start = true;
-                            evt.item.click();
-                        },
-
                         // Element dragging ended
                         onEnd: function (/**Event*/evt) {
-                            if(evt.newIndex != evt.oldIndex){
-                                sortable_end = true;
+                            var newIndex = evt.newIndex;
+                            var oldIndex = evt.oldIndex;
+                            if(newIndex != oldIndex){
+                                sortable_start = true;
+                                sortable_data = [];
                                 if(evt.newIndex < evt.oldIndex){
                                     index = evt.newIndex+1;
-
+                                    startIndex = newIndex;
+                                    endIndex = oldIndex;
+                                    for(var i=startIndex;i<=endIndex;i++){
+                                        evt.from.rows[i].click();
+                                    }
+                                    sortable_type = 1;
                                 }else{
                                     index = evt.newIndex-1;
-
+                                    startIndex = oldIndex;
+                                    endIndex = newIndex;
+                                    for(var i=startIndex;i<=endIndex;i++){
+                                        evt.from.rows[i].click();
+                                    }
+                                    sortable_type = 2;
                                 }
-                                evt.from.rows[index].click();
+                                sortable_start = false;
+                                $.post("{:request()->url()}",{sortable_data:sortable_data,sortable_type:sortable_type,field:'buldview_drag_sort'},function(res) {
+                                    if(res.code == 1){
+                                        $.form.reload();
+                                    }else if(res.code == 2){
+                                        for(var i=startIndex;i<=endIndex;i++){
+                                            sortData = res.data;
+                                            data  = sortData.shift();
+                                            $(evt.from.rows[i]).find('input[data-table-sort]').val(data.{$sortField});
+                                                sortable_update = data.{$sortField};
+                                                evt.from.rows[i].click();
+                                        }
+                                    }
+                                });
                             }
-                        },
+
+                        }
+
                     });
                 });
                 /*{/if}*/
@@ -163,14 +186,12 @@
         });
         table.on('row({$tableId})', function(obj){
             if(sortable_start){
-                sortable_start = false;
-                sortable_start_data = obj.data;
+                sortable_data.push(obj.data);
             }
-            if(sortable_end){
-                sortable_end = false;
-                sortable_end_data = obj.data;
-                $.post("{:request()->url()}",{start_data:sortable_start_data,end_data:sortable_end_data,field:'buldview_drag_sort'});
+            if(sortable_update>0){
+                obj.update({'{$sortField}':sortable_update});
             }
+
         });
         //刷新
         $('#sortButton').click(function(){
