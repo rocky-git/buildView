@@ -1,0 +1,56 @@
+
+<link rel="stylesheet" href="/vendor/build-view/plugs/nestable/jquery.nestable.min.css">
+<style>
+    .dd-handle {
+        display: block;
+        margin: 5px 0;
+        height: auto;
+        max-height: 40;
+        padding: 5px 10px;
+        color: #333;
+        text-decoration: none;
+        font-weight: 700;
+        border: 1px solid #ccc;
+        background: #ffffff;
+        border-radius: 3px;
+        box-sizing: border-box;
+    }
+</style>
+<div class="layui-btn-group" style="margin-bottom: 20px">
+<button class="layui-btn layui-btn-sm" onclick="$('.dd').nestable('expandAll')"><i class="layui-icon layui-icon-addition"></i>展开</button>
+<button class="layui-btn layui-btn-sm layui-btn-normal" onclick="$('.dd').nestable('collapseAll')"><i class="layui-icon layui-icon-subtraction"></i>收缩</button>
+<button class="layui-btn layui-btn-sm layui-btn-warm" onclick="$.form.reload()"><i class="layui-icon layui-icon-refresh-3"></i>刷新</button>
+</div>
+<div class="dd" id="{$nestableId}">
+    <ol class="dd-list"></ol>
+</div>
+
+<script type="text/javascript" src="vendor/build-view/plugs/nestable/jquery.nestable.min.js"></script>
+<script data-exec-on-popstate>
+    $(document).ready(function(){
+        $('.dd-list').html(decodeURIComponent("{$html|raw}"));
+        $('#{$nestableId}').nestable([]).on('change',function () {
+            data = $('#{$nestableId}').nestable('serialize');
+            $.post("{:request()->url()}",{data:data,field:'buldview_sort_drag'});
+        });
+
+        $('[lay-event]').mousedown(function () {
+            var id = $(this).parent().parent().parent().data('id');
+            event = $(this).attr('lay-event')
+            if(event == 'edit'){
+                var url = '{:url("form")}?id='+id+'&back=1';
+                if('{$formOpen|default="open"}' == 'open'){
+                    $.form.href(url, this);
+                }else{
+                    return $.form.modal(url, 'open_type=modal', $(this).attr('data-title') || "{:lang('build_view_grid_edit')}");
+                }
+            }else if(event =='del'){
+                layer.confirm("{:lang('build_view_table_delete_tip')}", function(index){
+                    $.form.load("{:request()->url()}", {field: 'delete', value: id, id: id}, 'post');
+                    layer.close(index);
+                });
+            }
+        })
+    });
+
+</script>

@@ -34,16 +34,18 @@ class Actions
     protected $hideDelButton = false;
     protected $prependArr =[];
     protected $appendArr = [];
+    protected $buttonSize = 'sm';
 
     public $cols = [
         'align' => 'center'
     ];
-    public function __construct($field, $title)
+    public function __construct($field, $title,$size='sm')
     {
         $this->field = $field;
         $this->title = $title;
         $this->cols['field'] = $this->field;
         $this->cols['title'] = $title;
+        $this->buttonSize = $size;
     }
     /**
      * 设置删除按钮文字
@@ -184,9 +186,9 @@ class Actions
         $this->detailText = $this->detailText ? $this->detailText : lang('build_view_grid_detail');
         $this->delText = $this->delText ? $this->delText : lang('build_view_grid_del');
         $this->editText = $this->editText ? $this->editText : lang('build_view_grid_edit');
-        $this->detailButton = '<a class="layui-btn layui-btn-primary layui-btn-sm" lay-event="detail" ><i class="layui-icon layui-icon-about"></i>'.$this->detailText.'</a>';
-        $this->delButton = '<a class="layui-btn layui-btn-danger layui-btn-sm" lay-event="del"><i class="layui-icon layui-icon-delete"></i>'.$this->delText.'</a>';
-        $this->editButton = '<a class="layui-btn layui-btn-sm" lay-event="edit"><i class="layui-icon layui-icon-edit"></i>'.$this->editText.'</a>';
+        $this->detailButton = '<a class="layui-btn layui-btn-primary layui-btn-'.$this->buttonSize.'" lay-event="detail" ><i class="layui-icon layui-icon-about"></i>'.$this->detailText.'</a>';
+        $this->delButton = '<a class="layui-btn layui-btn-danger layui-btn-'.$this->buttonSize.'" lay-event="del"><i class="layui-icon layui-icon-delete"></i>'.$this->delText.'</a>';
+        $this->editButton = '<a class="layui-btn layui-btn-'.$this->buttonSize.'" lay-event="edit"><i class="layui-icon layui-icon-edit"></i>'.$this->editText.'</a>';
         if (!$this->hideDetailButton) {
             $width+=100;
             $this->columnHtml .= $this->detailButton;

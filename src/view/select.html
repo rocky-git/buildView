@@ -7,7 +7,7 @@
         <select {volist name="attr" id="vo"}{$vo}{/volist} name="{$name}" lay-filter="{$name}" lay-verify="{$layVerify}" lay-verType="tips" data-name="name_{$build_view_rand}" lay-reqText="{:lang('build_view_please_select')}{$label}" lay-search {$required} {if isset($multiple)}xm-select="{$name}" xm-select-search-type="dl" xm-select-search{/if}>
         <option value="">{:lang('build_view_please_select')}{$label}</option>
         <!--{foreach $options as $key=>$val}-->
-        <option value="{$key}" {if !empty($value) || $value =='0'}{eq name="$value" value="$key"}selected{/eq}{/if}>{$val}</option>
+        <option value="{$key}" {if !empty($value) || $value =='0'}{eq name="$value" value="$key"}selected{/eq}{/if}>{$val|raw}</option>
             <!--{/foreach}-->
         </select>
         {$appendHtml|raw}
