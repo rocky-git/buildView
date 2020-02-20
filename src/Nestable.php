@@ -274,9 +274,9 @@ class Nestable extends Field
             $resHtml = call_user_func_array($this->displayClosure, [$data, $action]);
         }
         if (!$this->hideAction) {
-            $resHtml .= "<div class='pull-right' style='line-height: 40px'>" . $action->render() . "</div>";
+            $resHtml .= "<div class='pull-right' style='position:absolute;top:50%;right:5px;-webkit-transform: translateY(-50%);-webkit-transform: translateY(-50%);-moz-transform:  translateY(-50%);-ms-transform: translateY(-50%);transform:  translateY(-50%);'>" . $action->render() . "</div>";
         }
-        $itemHtml .= "<div class='dd-handle'><i class='fa fa-bars'></i>&nbsp;&nbsp;" . $resHtml . "</div>";
+        $itemHtml .= "<div class='dd-handle' style='position: relative'><i class='fa fa-bars'></i>&nbsp;&nbsp;" . $resHtml . "</div>";
         if (isset($data['children'])) {
             $itemHtml .= "<ol class='dd-list'>";
             foreach ($data['children'] as $v) {
