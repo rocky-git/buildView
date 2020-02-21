@@ -1,6 +1,6 @@
 
 <div class="layui-form layui-box layui-inline text-left">
-    <select name="{$domId}" lay-filter="{$domId}" lay-search  {if isset($multiple)}xm-select="{$domId}" xm-select-skin="normal" xm-select-direction="up" xm-select-search{/if}>
+    <select name="{$domId}" lay-filter="{$domId}" {if $search !== false}lay-search xm-select-search{/if} {if isset($multiple)}xm-select="{$domId}" xm-select-skin="normal" xm-select-direction="up"{/if}>
     <option value="">{:lang('build_view_please_select')}{$label}</option>
     {foreach $options as $key=>$val}
     <option value="{$key}" {if !empty($value) || $value =='0'}{eq name="$value" value="$key"}selected{/eq}{/if}>{$val}</option>
