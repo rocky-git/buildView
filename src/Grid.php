@@ -74,28 +74,42 @@ class Grid extends Field
      * 设置添加按钮参数
      * @Author: rocky
      * 2019/11/27 16:50
-     * @param $val 格式：id=1&a=2
+     * @param $val 格式：id=1&a=2 或数组 ['id'=>1,'a'=>2]
      */
     public function setAddButtonParam($val){
-        $this->setOption('addButtonParam',$val);
+        if(is_array($val)){
+            $this->setOption('addButtonParam',http_build_query($val));
+        }else{
+            $this->setOption('addButtonParam',$val);
+        }
+
     }
     /**
      * 设置编辑按钮参数
      * @Author: rocky
      * 2019/11/27 16:50
-     * @param $val 格式：id=1&a=2
+     * @param $val 格式：id=1&a=2 或数组 ['id'=>1,'a'=>2]
      */
     public function setEditButtonParam($val){
-        $this->table->setOption('editButtonParam',$val);
+        if(is_array($val)){
+            $this->setOption('editButtonParam',http_build_query($val));
+        }else{
+            $this->setOption('editButtonParam',$val);
+        }
+
     }
     /**
      * 设置详情按钮参数
      * @Author: rocky
      * 2019/11/27 16:50
-     * @param $val 格式：id=1&a=2
+     * @param $val 格式：id=1&a=2 或数组 ['id'=>1,'a'=>2]
      */
     public function setDetailButtonParam($val){
-        $this->setOption('detailButtonParam',$val);
+        if(is_array($val)){
+            $this->setOption('detailButtonParam',http_build_query($val));
+        }else{
+            $this->setOption('detailButtonParam',$val);
+        }
     }
     /**
      * 设置表头行数
