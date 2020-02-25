@@ -92,9 +92,9 @@ class Grid extends Field
      */
     public function setEditButtonParam($val){
         if(is_array($val)){
-            $this->setOption('editButtonParam',http_build_query($val));
+            $this->table->setOption('editButtonParam',http_build_query($val));
         }else{
-            $this->setOption('editButtonParam',$val);
+            $this->table->setOption('editButtonParam',$val);
         }
 
     }
@@ -106,9 +106,9 @@ class Grid extends Field
      */
     public function setDetailButtonParam($val){
         if(is_array($val)){
-            $this->setOption('detailButtonParam',http_build_query($val));
+            $this->table->setOption('detailButtonParam',http_build_query($val));
         }else{
-            $this->setOption('detailButtonParam',$val);
+            $this->table->setOption('detailButtonParam',$val);
         }
     }
     /**
