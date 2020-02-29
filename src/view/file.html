@@ -13,7 +13,7 @@ if(!isset($uptype)){
         <input {volist name="attr" id="vo"}{$vo}{/volist} type="text" class="layui-input" name="{$name}" value="{$value}" readonly >
         <i  style="background:#ffffff;font-size: 18px;position: absolute;top: 8px; right: 115px;cursor: pointer;{empty name="$value"}display: none;{/empty}" class="layui-icon layui-icon-close" file-colse="true"></i>
         <i class="layui-icon layui-icon-upload-drag font-s14"  style="font-size: 18px;position: absolute;top: 8px; right: 80px;cursor: pointer;z-index: 999" ></i>
-        <button data-file="{if isset($multiple)}mtl{else/}one{/if}"   style="position: absolute;top: 0px; right: 0px;cursor: pointer;z-index: 998"  data-uptype="{$uptype}"  data-names="name_{$build_view_rand}" {if !isset($baseUrl)}data-safe="true"{/if} data-field="{$name}" data-type="{$uploadType|default='*'}" type="button" class="layui-btn layui-btn-primary input-group-btn">&nbsp;&nbsp;&nbsp;{:lang('build_view_upload_file')}</button>
+        <button data-file="{if isset($multiple)}mtl{else/}one{/if}"   style="position: absolute;top: 0px; right: 0px;cursor: pointer;z-index: 998"  data-uptype="{$uptype}"  data-names="name_{$build_view_rand}" {if isset($safe) && $safe}data-safe="true"{/if} data-field="{$name}" data-type="{$uploadType|default='*'}" type="button" class="layui-btn layui-btn-primary input-group-btn">&nbsp;&nbsp;&nbsp;{:lang('build_view_upload_file')}</button>
         {$appendHtml|raw}
         {notempty name="$help"}
         <div class="help-block">{$help}</div>

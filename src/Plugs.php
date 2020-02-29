@@ -65,7 +65,7 @@ class Plugs extends Controller
         $info = File::instance($this->uptype)->save($name, $fileDatas);
         if (is_array($info) && isset($info['url'])) {
             if ($this->uptype == 'local') {
-                return json(['uploaded' => true, 'filename' => $info['key'], 'url' => $info['url']]);
+                return json(['uploaded' => true, 'filename' => $this->safe ? $name :$info['key'], 'url' => $info['url']]);
             } else {
                 return json(['uploaded' => true, 'filename' => $name, 'url' => $info['url']]);
             }
