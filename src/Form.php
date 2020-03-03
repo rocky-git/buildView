@@ -222,6 +222,7 @@ class Form extends Field
     {
         if (Request::isPost()) {
             $post = Request::post();
+            $this->checkRule($post);
             Db::startTrans();
             try {
                 if (!is_null($this->beforeSave)) {
@@ -231,7 +232,7 @@ class Form extends Field
                     }
                 }
                 if ($this->model instanceof Model) {
-                    $this->checkRule($post);
+
                     $res = $this->model->save($post);
                     foreach ($this->relationArr as $relation) {
                         if ($this->model->$relation() instanceof BelongsTo || $this->model->$relation() instanceof HasOne) {
