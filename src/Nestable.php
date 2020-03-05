@@ -35,7 +35,8 @@ class Nestable extends Field
     protected $displayClosure = null;
     protected $updateSortData = [];
     protected $deletedData = [];
-
+    protected $filter = null;
+    protected $filterCallBack = null;
     /**
      * Form constructor.
      * @param 模型
@@ -93,12 +94,12 @@ class Nestable extends Field
                         break;
 
                     case 'delete':
-                        $id  = Request::post('id');
+                        $id = Request::post('id');
                         if (!is_null($this->beforeDel)) {
                             call_user_func($this->beforeDel, $deleteIds);
                         }
                         $this->buildDeleteData($id);
-                        array_push($this->deletedData,$id);
+                        array_push($this->deletedData, $id);
                         $deleteIds = $this->deletedData;
                         if (in_array('is_deleted', $this->tableFields)) {
                             if ($deleteIds == 'all') {
@@ -136,15 +137,17 @@ class Nestable extends Field
             }
         }
     }
-    
-    protected function buildDeleteData($id){
-        $datas = $this->model->where($this->parentId,$id)->select();
-        foreach ($datas as $val){
+
+    protected function buildDeleteData($id)
+    {
+        $datas = $this->model->where($this->parentId, $id)->select();
+        foreach ($datas as $val) {
             $this->deletedData[] = $val[$this->db->getPk()];
             $this->buildDeleteData($val[$this->db->getPk()]);
         }
     }
-    protected function buildUpateSrotData($data,$pid=0)
+
+    protected function buildUpateSrotData($data, $pid = 0)
     {
 
         static $i = 0;
@@ -154,12 +157,30 @@ class Nestable extends Field
             $this->sortField => $i,
             $this->parentId => $pid
         ];
-        if(isset($data['children'])){
-            foreach ($data['children'] as $v){
-                $this->buildUpateSrotData($v,$data['id']);
+        if (isset($data['children'])) {
+            foreach ($data['children'] as $v) {
+                $this->buildUpateSrotData($v, $data['id']);
             }
-
         }
+    }
+
+    function getTree($list, $pid = 0)
+    {
+        $tree = [];
+        if (!empty($list)) {        //先修改为以id为下标的列表
+            $newList = [];
+            foreach ($list as $k => $v) {
+                $newList[$v['id']] = $v;
+            }        //然后开始组装成特殊格式
+            foreach ($newList as $value) {
+                if ($pid == $value[$this->parentId]) {//先取出顶级
+                    $tree[] = &$newList[$value['id']];
+                } elseif (isset($newList[$value[$this->parentId]])) {//再判定非顶级的pid是否存在，如果存在，则再pid所在的数组下面加入一个字段items，来将本身存进去
+                    $newList[$value[$this->parentId]]['children'][] = &$newList[$value['id']];
+                }
+            }
+        }
+        return $tree;
     }
 
     protected function buildNestedArray($nodes = [], $parentId = 0)
@@ -168,6 +189,7 @@ class Nestable extends Field
 
         if (empty($nodes)) {
             $nodes = $this->db->removeOption('order')->field("*,{$this->db->getPk()} as id,{$this->titleField} as title")->order($this->sortField)->select();
+
         }
         foreach ($nodes as $node) {
             if ($node[$this->parentId] == $parentId) {
@@ -274,9 +296,9 @@ class Nestable extends Field
             $resHtml = call_user_func_array($this->displayClosure, [$data, $action]);
         }
         if (!$this->hideAction) {
-            $resHtml .= "<div class='pull-right' style='position:absolute;top:50%;right:5px;-webkit-transform: translateY(-50%);-webkit-transform: translateY(-50%);-moz-transform:  translateY(-50%);-ms-transform: translateY(-50%);transform:  translateY(-50%);'>" . $action->render() . "</div>";
+            $resHtml .= "<div style=' flex: 1;text-align: right;' >" . $action->render() . "</div>";
         }
-        $itemHtml .= "<div class='dd-handle' style='position: relative'><i class='fa fa-bars'></i>&nbsp;&nbsp;" . $resHtml . "</div>";
+        $itemHtml .= "<div class='dd-handle' style='display:flex;align-items: center;'><i class='fa fa-bars'></i>&nbsp;&nbsp;" . $resHtml . "</div>";
         if (isset($data['children'])) {
             $itemHtml .= "<ol class='dd-list'>";
             foreach ($data['children'] as $v) {
@@ -287,19 +309,70 @@ class Nestable extends Field
         $itemHtml .= "</li>";
         return $itemHtml;
     }
-
+    //过滤
+    public function filter($callback)
+    {
+        if ($callback instanceof \Closure) {
+            $this->model->setQuery($this->db);
+            $this->filter = new Filter($this->db);
+            $this->filterCallBack = $callback;
+        }
+    }
     /*
      * 输出视图
      */
     public function view()
     {
         $this->dataSave();
+        if (!is_null($this->filter)) {
+            call_user_func($this->filterCallBack, $this->filter);
+            $this->setOption('filter', $this->filter->render());
+        }
         if (in_array('is_deleted', $this->tableFields)) {
             $this->db->where('is_deleted', 0);
         }
-        $this->data = $this->buildNestedArray();
+        $build_tree_id = Request::get('build_tree_id');
+        if($build_tree_id){
+            $children_ids =  $this->getAllNextId($build_tree_id);
+            $parent_ids =  $this->getAllParentId($build_tree_id);
+            $ids = array_merge($parent_ids,$children_ids);
+            array_push($ids,$build_tree_id);
+            $nodes = $this->model->whereIn('id',$ids)->select();
+        }else{
+            $nodes = $this->db->removeOption('order')->field("*,{$this->db->getPk()} as id,{$this->titleField} as title")->order($this->sortField)->select();
+        }
+        $this->data = $this->getTree($nodes->toArray());
         $this->nestable->setOption('html', rawurlencode($this->buildHtml()));
         $this->setOption('table', $this->nestable->render());
         return $this->render();
+    }
+    protected function getAllParentId($id,$data=[]){
+        $pids = Db::name($this->model->getTable())->where('id',$id)->column($this->parentId);
+
+        if(count($pids)>0){
+            foreach($pids as $v){
+                $data[] = $v;
+                $data = $this->getAllParentId($v,$data); //注意写$data 返回给上级
+            }
+        }
+        if(count($data)>0){
+            return $data;
+        }else{
+            return [];
+        }
+    }
+    protected function getAllNextId($id,$data=[]){
+        $pids = Db::name($this->model->getTable())->where($this->parentId,$id)->column('id');
+        if(count($pids)>0){
+            foreach($pids as $v){
+                $data[] = $v;
+                $data = $this->getAllNextId($v,$data); //注意写$data 返回给上级
+            }
+        }
+        if(count($data)>0){
+            return $data;
+        }else{
+            return [];
+        }
     }
 }
