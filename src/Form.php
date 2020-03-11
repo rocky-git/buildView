@@ -187,11 +187,15 @@ class Form extends Field
     //表单提交验证规则
     private function checkRule($post)
     {
-        if (array_key_exists($this->model->getPk(), $post)) {
-            //更新
-            $validate = Validate::make($this->updateRules['rule'], $this->updateRules['msg']);
-        } else {
-            //新增
+        if($this->model instanceof Model){
+            if (array_key_exists($this->model->getPk(), $post)) {
+                //更新
+                $validate = Validate::make($this->updateRules['rule'], $this->updateRules['msg']);
+            } else {
+                //新增
+                $validate = Validate::make($this->createRules['rule'], $this->createRules['msg']);
+            }
+        }else{
             $validate = Validate::make($this->createRules['rule'], $this->createRules['msg']);
         }
         $result = $validate->check($post);
