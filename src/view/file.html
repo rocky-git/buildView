@@ -1,3 +1,5 @@
+<link href="/vendor/build-view/plugs/mediaelement/mediaelementplayer.css" rel="stylesheet">
+<script src="/vendor/build-view/plugs/mediaelement/mediaelement-and-player.js"></script>
 {php}
 if(!isset($uptype)){
     if(function_exists('sysconf')){
@@ -14,6 +16,9 @@ if(!isset($uptype)){
         <i  style="background:#ffffff;font-size: 18px;position: absolute;top: 8px; right: 115px;cursor: pointer;{empty name="$value"}display: none;{/empty}" class="layui-icon layui-icon-close" file-colse="true"></i>
         <i class="layui-icon layui-icon-upload-drag font-s14"  style="font-size: 18px;position: absolute;top: 8px; right: 80px;cursor: pointer;z-index: 999" ></i>
         <button data-file="{if isset($multiple)}mtl{else/}one{/if}"   style="position: absolute;top: 0px; right: 0px;cursor: pointer;z-index: 998"  data-uptype="{$uptype}"  data-names="name_{$build_view_rand}" {if isset($safe) && $safe}data-safe="true"{/if} data-field="{$name}" data-type="{$uploadType|default='*'}" type="button" class="layui-btn layui-btn-primary input-group-btn">&nbsp;&nbsp;&nbsp;{:lang('build_view_upload_file')}</button>
+        {if isset($video)}
+        <video src='{$value}' controls  style="display: none" data-name="video_{$build_view_rand}" id="video_{$build_view_rand}_id" width='{$width|default="100%"}' height='{$height|default="100px"}'></video>
+        {/if}
         {$appendHtml|raw}
         {notempty name="$help"}
         <div class="help-block">{$help}</div>
@@ -21,11 +26,19 @@ if(!isset($uptype)){
     </div>
 
 </div>
+
 <script>
+    var video_{$build_view_rand} = null;
+    /*{if isset($video) && !empty($value)}*/
+    video_{$build_view_rand} = new MediaElementPlayer('video_{$build_view_rand}_id',/* Options */);
+    /*{/if}*/
     $('[file-colse]').click(function () {
        $(this).prev('input').val('');
        $(this).hide();
        $('#build_id_'+i).prev('i').removeClass('color-green layui-icon-vercode').addClass('layui-icon-upload-drag');
+        /*{if isset($video)}*/
+        video_{$build_view_rand}.remove();
+        /*{/if}*/
     });
     let i = Math.ceil(Math.random()*10000000);
     $('[data-names=name_{$build_view_rand}]').attr('id','build_id_'+i);
@@ -48,7 +61,12 @@ if(!isset($uptype)){
             val =$("input[name={$name}]").val()  +'|'+ val;
         }
         /*{/if}*/
-
+        /*{if isset($video)}*/
+        video_id = $('[data-name=video_{$build_view_rand}]').attr('id');
+        $('[data-name=video_{$build_view_rand}]').attr('style','display:none')
+        video_{$build_view_rand} = new MediaElementPlayer(video_id,/* Options */);
+        video_{$build_view_rand}.setSrc(val);
+        /*{/if}*/
         $("input[name={$name}]").val(val).trigger('change');
         $('#build_id_'+i).prev('i').addClass('color-green layui-icon-vercode').removeClass('layui-icon-upload-drag');
         $('#build_id_'+i).prev('i').prev('i').show();
@@ -56,21 +74,5 @@ if(!isset($uptype)){
     if($("input[name={$name}]").val() != ''){
         $('#build_id_'+i).prev('i').addClass('color-green layui-icon-vercode').removeClass('layui-icon-upload-drag');
     }
-    // layui.use('upload', function(){
-    //     var upload = layui.upload;
-    //     upload.render({
-    //         elem: '#{$name}'
-    //         ,url: "{:url('admin/Plugs/upload')}" //必填项
-    //         ,method: ''  //可选项。HTTP类型，默认post
-    //         ,data: {} //可选项。额外的参数，如：{id: 123, abc: 'xxx'}
-    //         ,accept:"{$uploadType|default='file'}"
-    //         ,done: function(res){
-    //             $("#{$name}").find('i').addClass('color-green layui-icon-vercode').removeClass('layui-icon-upload-drag');
-    //         },
-    //         error: function(){
-    //             $("#{$name}").find('i').removeClass('color-green layui-icon-vercode').addClass('layui-icon-upload-drag');
-    //             $.msg('上传失败');
-    //         }
-    //     });
-    // });
+
 </script>
