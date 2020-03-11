@@ -38,6 +38,7 @@ if(!isset($uptype)){
        $('#build_id_'+i).prev('i').removeClass('color-green layui-icon-vercode').addClass('layui-icon-upload-drag');
         /*{if isset($video)}*/
         video_{$build_view_rand}.remove();
+		$('[data-name=video_{$build_view_rand}]').attr('style','display:none');
         /*{/if}*/
     });
     let i = Math.ceil(Math.random()*10000000);
