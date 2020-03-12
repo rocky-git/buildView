@@ -32,6 +32,12 @@
                 /*{if isset($format)}*/
                 ,format:'{$format}'
                 /*{/if}*/
+                /*{if isset($minTime)}*/
+                ,min:'{$minTime}'
+                /*{/if}*/
+                /*{if isset($maxTime)}*/
+                ,max:'{$maxTime}'
+                /*{/if}*/
             });
             $('[data-name=name_{$build_view_rand}_2]').attr('id','build_id_2'+i);
             laydate.render({
@@ -39,6 +45,12 @@
                 ,type: 'date'
                  /*{if isset($format)}*/
                 ,format:'{$format}'
+                /*{/if}*/
+                /*{if isset($minTime)}*/
+                ,min:'{$minTime}'
+                /*{/if}*/
+                /*{if isset($maxTime)}*/
+                ,max:'{$maxTime}'
                 /*{/if}*/
             });
         /*{else/}*/
@@ -49,6 +61,12 @@
                 ,range: true
                 /* {if isset($format)}*/
                 ,format:'{$format}'
+                /*{/if}*/
+                /*{if isset($minTime)}*/
+                ,min:'{$minTime}'
+                /*{/if}*/
+                /*{if isset($maxTime)}*/
+                ,max:'{$maxTime}'
                 /*{/if}*/
             });
         /*{/if}*/

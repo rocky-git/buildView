@@ -21,6 +21,12 @@
        /* {if isset($format)}*/
             ,format:'{$format}'
        /* {/if}*/
+            /*{if isset($minTime)}*/
+            ,min:'{$minTime}'
+            /*{/if}*/
+            /*{if isset($maxTime)}*/
+            ,max:'{$maxTime}'
+            /*{/if}*/
         });
     });
 </script>

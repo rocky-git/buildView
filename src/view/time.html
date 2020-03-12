@@ -18,9 +18,15 @@
         laydate.render({
             elem: '#'+'build_id_'+i
             ,type: 'time'
-        {if isset($format)}
+            /* {if isset($format)}*/
             ,format:'{$format}'
-        {/if}
+            /*{/if}*/
+            /*{if isset($minTime)}*/
+            ,min:'{$minTime}'
+            /*{/if}*/
+            /*{if isset($maxTime)}*/
+            ,max:'{$maxTime}'
+            /*{/if}*/
         });
     });
 </script>

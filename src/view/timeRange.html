@@ -40,6 +40,12 @@
             /*{if isset($format)}*/
             ,format:'{$format}'
             /*{/if}*/
+            /*{if isset($minTime)}*/
+            ,min:'{$minTime}'
+            /*{/if}*/
+            /*{if isset($maxTime)}*/
+            ,max:'{$maxTime}'
+            /*{/if}*/
         });
         /*{else/}*/
         $('[data-name=name_{$build_view_rand}]').attr('id','build_id_'+i);
@@ -49,6 +55,12 @@
             ,range: true
             /* {if isset($format)}*/
             ,format:'{$format}'
+            /*{/if}*/
+            /*{if isset($minTime)}*/
+            ,min:'{$minTime}'
+            /*{/if}*/
+            /*{if isset($maxTime)}*/
+            ,max:'{$maxTime}'
             /*{/if}*/
         });
         /*{/if}*/
