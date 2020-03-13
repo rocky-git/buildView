@@ -62,34 +62,6 @@
             $(this).trigger('click');
         });
     });
-        $.post("{:url($load[1])}",{q:data.value},function(result,status){
-            var data = result.data;
-            var str = '';
-            for(var x in data){
-                str += '<option value = "' + data[x].id + '">' + data[x].text + '</option>'
-            }
-            var load = false;
-            $('select').each(function (index,item) {
-                if(load){
-                    load =false;
-                    $(item).attr('lay-filter')
-                    $(item).html(str);
-                    layui.use([ 'formSelects'], function(){
-                        let formSelects = layui.formSelects;
-                        var xm_select = $(item).attr('xm-select');
-                        formSelects.render(xm_select,{
-                            init:[],
-                        });
-                    });
-                }
-                if($(item).attr('lay-filter') == 'build_id_'+i){
-                    load =true;
-                }
-            });
-            $('select[name={$load[0]}]').html(str);
-            form.render('select');
-        });
-    });
     /*{/if}*/
     /*{if isset($multiple)}*/
     $('[data-name=build_id_'+i+']').attr('xm-select','build_id_'+i);
