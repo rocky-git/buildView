@@ -367,7 +367,7 @@ class Form extends Field
                 }
 
             } else {
-                if ($template == 'checkbox' || $template == 'select') {
+                if ($template == 'checkbox' || $template == 'select' || $template == 'selectGroup') {
                     if (method_exists($this->model, $field)) {
                         if ($this->model->$field() instanceof BelongsToMany) {
                             array_push($this->relationArr, $field);
