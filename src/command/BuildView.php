@@ -125,7 +125,9 @@ class BuildView extends Make
                 mkdir(dirname($pathname), 0755, true);
             }
             list($grid,$detail,$form) = $this->getTableInfo($model);
-            file_put_contents($pathname, $this->buildClasss($classname_model,'model'));
+            if (!is_file($pathname)) {
+                file_put_contents($pathname, $this->buildClasss($classname_model,'model'));
+            }
             $classname_models = $this->getClassNames('common','model\\BaseModel');
             $pathname = $this->getPathName($classname_models);
             if (!is_file($pathname)) {
@@ -145,11 +147,12 @@ class BuildView extends Make
             $output->writeln('<error>' . $classname . ' already exists!</error>');
             return false;
         }
-
         if (!is_dir(dirname($pathname))) {
             mkdir(dirname($pathname), 0755, true);
         }
-        file_put_contents($pathname, $this->buildClasss($classname,'controller',$model,$classname_model,$grid,$detail,$form));
+        if (!is_file($pathname)) {
+            file_put_contents($pathname, $this->buildClasss($classname,'controller',$model,$classname_model,$grid,$detail,$form));
+        }
         $output->writeln('<info>' . $this->type . ' created successfully.</info>');
     }
 }
