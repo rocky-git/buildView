@@ -443,9 +443,6 @@ class Grid extends Field
             call_user_func($this->filterCallBack, $this->filter);
             $this->setOption('filter', $this->filter->render());
         }
-        if (in_array('is_deleted', $this->tableFields)) {
-            $this->db->where('is_deleted', 0);
-        }
         if (Request::get('table_sort')) {
             $field = urldecode(Request::get('field'));
             $order = Request::get('order');
