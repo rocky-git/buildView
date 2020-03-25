@@ -26,5 +26,12 @@
     "psr-4": {
       "buildView\\": "src"
     }
+  },
+  "extra": {
+    "think": {
+      "services": [
+        "buildView\\RegisterService"
+      ]
+    }
   }
 }
