@@ -9,7 +9,7 @@
 namespace buildView;
 
 use think\Collection;
-use think\Db;
+use think\facade\Db;
 use think\exception\HttpResponseException;
 use think\facade\Request;
 use think\facade\Validate;
@@ -190,13 +190,13 @@ class Form extends Field
         if($this->model instanceof Model){
             if (array_key_exists($this->model->getPk(), $post)) {
                 //更新
-                $validate = Validate::make($this->updateRules['rule'], $this->updateRules['msg']);
+                $validate = Validate::rule($this->updateRules['rule'])->message($this->updateRules['msg']);
             } else {
                 //新增
-                $validate = Validate::make($this->createRules['rule'], $this->createRules['msg']);
+                $validate = Validate::rule($this->createRules['rule'])->message($this->createRules['msg']);
             }
         }else{
-            $validate = Validate::make($this->createRules['rule'], $this->createRules['msg']);
+            $validate = Validate::rule($this->createRules['rule'])->message($this->createRules['msg']);
         }
         $result = $validate->check($post);
         if (!$result) {

@@ -13,7 +13,7 @@ namespace buildView;
 use PhpOffice\PhpSpreadsheet\IOFactory;
 use PhpOffice\PhpSpreadsheet\Spreadsheet;
 use think\Collection;
-use think\Db;
+use think\facade\Db;
 
 class Excel
 {

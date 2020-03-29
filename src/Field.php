@@ -8,6 +8,7 @@
 
 namespace buildView;
 
+use think\facade\App;
 use think\facade\View;
 
 /**
@@ -195,7 +196,7 @@ class Field
         if (file_exists($path)) {
             $content = file_get_contents($path);
         } else {
-            $path = app()->getModulePath() . 'view/build_view/' . $this->template . '.html';
+            $path = App::getAppPath() . 'view/build_view/' . $this->template . '.html';
 
             $content = file_get_contents($path);
         }

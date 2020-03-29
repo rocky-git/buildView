@@ -40,7 +40,7 @@
 <fieldset class="layui-elem-field" >
     <legend style="margin-bottom:0px">{:lang('build_view_filter_search_desc')}</legend>
     <div class="layui-field-box">
-    <form class="layui-form layui-form-pane form-search" action="{:url('','',false)}" onsubmit="return filterSubmit(this)" method="get" autocomplete="off">
+    <form class="layui-form layui-form-pane form-search" action="{:url('',[],false)}" onsubmit="return filterSubmit(this)" method="get" autocomplete="off">
         {$filter|raw}
         <div class="layui-form-item layui-inline">
             <button class="layui-btn layui-btn-primary"><i class="layui-icon">&#xe615;</i> {:lang('build_view_filter_search')}</button>

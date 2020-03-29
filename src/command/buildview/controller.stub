@@ -2,12 +2,12 @@
 
 namespace {%namespace%};
 
-use think\Controller;
+use app\common\controller\BaseController;
 use buildView\Detail;
 use buildView\Form;
 use buildView\Grid;
 use {%model_namespace%};
-class {%className%} extends Controller
+class {%className%} extends BaseController
 {
     /**
      * 列表

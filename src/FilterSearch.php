@@ -12,7 +12,7 @@ namespace buildView;
 use library\Controller;
 use library\logic\Logic;
 use library\logic\Page;
-use think\Db;
+use think\facade\Db;
 use think\db\Query;
 use think\Model;
 use think\model\Relation;

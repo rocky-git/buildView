@@ -10,7 +10,7 @@ namespace buildView;
 
 
 use Faker\Provider\File;
-use think\Db;
+use think\facade\Db;
 use think\exception\HttpResponseException;
 use think\facade\Request;
 use think\Model;
@@ -74,7 +74,6 @@ class Nestable extends Field
     private function dataSave()
     {
         if (Request::isPost()) {
-            $this->model->setQuery(null);
             $action = Request::post('field');
             Db::startTrans();
             try {
@@ -313,7 +312,6 @@ class Nestable extends Field
     public function filter($callback)
     {
         if ($callback instanceof \Closure) {
-            $this->model->setQuery($this->db);
             $this->filter = new Filter($this->db);
             $this->filterCallBack = $callback;
         }

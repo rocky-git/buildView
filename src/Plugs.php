@@ -3,12 +3,13 @@
 
 namespace buildView;
 
+use app\common\controller\BaseController;
 use library\driver\Qiniu;
-use library\File;
 use OSS\Core\OssException;
 use OSS\OssClient;
-use think\Controller;
+use think\admin\Storage;
 use think\facade\Cache;
+use think\facade\Filesystem;
 use think\Image;
 
 /**
@@ -16,7 +17,7 @@ use think\Image;
  * Class Plugs
  * @package app\admin\controller\api
  */
-class Plugs extends Controller
+class Plugs extends BaseController
 {
     /**
      * Plupload 插件上传文件
@@ -30,24 +31,29 @@ class Plugs extends Controller
         if (!($file = $this->getUploadFile()) || empty($file)) {
             return json(['uploaded' => false, 'error' => ['message' => '文件上传异常，文件可能过大或未上传']]);
         }
-        if (!$file->checkExt(strtolower(sysconf('storage_local_exts'))) && strstr('.', $file->getInfo('name'))) {
+        $this->extension = $file->getOriginalExtension();
+        if (!in_array($this->extension, explode(',', sysconf('storage.allow_exts')))) {
             return json(['uploaded' => false, 'error' => ['message' => '文件上传类型受限，请在后台配置']]);
         }
-        if ($file->checkExt('php,sh') && strstr('.', $file->getInfo('name'))) {
+        if (in_array($this->extension, ['php', 'sh'])) {
             return json(['uploaded' => false, 'error' => ['message' => '可执行文件禁止上传到本地服务器']]);
         }
         $width = input('post.width');
         $height = input('post.height');
         $this->safe = boolval(input('safe'));
         $this->uptype = $this->getUploadType();
-        //$this->extend = pathinfo($file->getInfo('name'), PATHINFO_EXTENSION);
         $this->extend = strtolower(pathinfo($this->request->post('name'), PATHINFO_EXTENSION));
         $this->extend = $this->extend ? $this->extend : 'tmp';
         if ($width != '' && $height != '') {
             $name = "thumb/" . md5_file($file->getRealPath()) . "{$width}x{$height}." . $this->extend;
             $image = Image::open($file);
             $saveFile = 'upload/' . $name;
-			file_exists(dirname($saveFile)) || mkdir(dirname($saveFile), 0755, true);
+			if(!file_exists(dirname($saveFile))){
+			    $res = mkdir(dirname($saveFile), 0755, true);
+			    if(!$res){
+                    return json(['uploaded' => false, 'error' => ['message' => 'upload目录没有写权限']]);
+                }
+            }
             $image->thumb($width, $height, Image::THUMB_CENTER)->save($saveFile);
             $fileDatas = file_get_contents($saveFile);
             unlink($saveFile);
@@ -58,11 +64,12 @@ class Plugs extends Controller
         if (!empty($this->request->post('chunks'))) {
             if ($this->uptype == 'local') {
                 return $this->localChunkUpload($file, $name);
-            } elseif ($this->uptype == 'oss') {
+            } elseif ($this->uptype == 'alioss') {
                 return $this->ossChunkUpload($file, $name);
             }
         }
-        $info = File::instance($this->uptype)->save($name, $fileDatas);
+
+        $info = Storage::instance($this->uptype)->set($name, $fileDatas);
         if (is_array($info) && isset($info['url'])) {
             if ($this->uptype == 'local') {
                 return json(['uploaded' => true, 'filename' => $this->safe ? $name :$info['key'], 'url' => $info['url']]);
@@ -89,7 +96,7 @@ class Plugs extends Controller
         $chunks = $this->request->post('chunks');
         $chunk = $this->request->post('chunk');
         if ($chunks == ($chunk + 1)) {
-            $file->move("upload/{$names[0]}", "{$names[1]}{$chunk}", true, false);
+            Filesystem::disk('public')->putFileAs($names[0],$file,"{$names[1]}{$chunk}");
             set_time_limit(0);
             $put_filename = "upload/{$name}";
             if (file_exists($put_filename)) {
@@ -108,7 +115,7 @@ class Plugs extends Controller
                     $image = Image::open($put_filename);
                     $image->thumb($width, $height, Image::THUMB_CENTER)->save($put_filename);
                 }
-                $info = File::instance($this->uptype)->info($name);
+                $info = Storage::instance($this->uptype)->info($name);
                 return json(['uploaded' => true, 'filename' => $info['key'], 'url' => $info['url']]);
             } else {
                 return json(['uploaded' => false, 'error' => ['message' => '上传失败']]);
@@ -130,10 +137,10 @@ class Plugs extends Controller
      */
     protected function ossChunkUpload($file, $name)
     {
-        $keyid = sysconf('storage_oss_keyid');
-        $secret = sysconf('storage_oss_secret');
-        $bucket = sysconf('storage_oss_bucket');
-        $endpoint = sysconf('storage_oss_endpoint');
+        $keyid = sysconf('storage.alioss_access_key');
+        $secret = sysconf('storage.alioss_secret_key');
+        $bucket =  sysconf('storage.alioss_bucket');
+        $endpoint =  sysconf('storage.alioss_point');
         $oss = new OssClient($keyid, $secret, $endpoint);
         $chunks = $this->request->post('chunks');
         $chunk = $this->request->post('chunk');
@@ -186,7 +193,7 @@ class Plugs extends Controller
                 $res = $oss->completeMultipartUpload($bucket, $filename, $uploadId, $uploadParts);
                 $xml = simplexml_load_string($res['body']);
                 $info = json_decode(json_encode($xml), TRUE);
-                $url = File::instance('oss')->url($info['Key']);
+                $url = Storage::instance('alioss')->url($info['Key']);
                 return json(['uploaded' => true, 'filename' => $info['Key'], 'url' => $url]);
             } catch (OssException $e) {
                 return json(['uploaded' => false,'filename'=>$filename, 'error' => ['message' => $e->getMessage()]]);
@@ -203,8 +210,8 @@ class Plugs extends Controller
     private function getUploadType()
     {
         $this->uptype = input('uptype');
-        if (!in_array($this->uptype, ['local', 'oss', 'qiniu'])) {
-            $this->uptype = sysconf('storage_type');
+        if (!in_array($this->uptype, ['local', 'alioss', 'qiniu'])) {
+            $this->uptype = sysconf('storage.type');
         }
         return $this->uptype;
     }
@@ -218,8 +225,8 @@ class Plugs extends Controller
      */
     public function qiniuToken()
     {
-        $token = File::instance('qiniu')->buildUploadToken(null, 3600 * 3);
-        $upload = File::instance('qiniu')->upload();
+        $token = Storage::instance('qiniu')->buildUploadToken(null, 3600 * 3);
+        $upload = Storage::instance('qiniu')->upload();
         return json(['upload' => $upload, 'token' => $token]);
     }
 

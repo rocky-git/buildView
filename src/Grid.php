@@ -10,7 +10,7 @@ namespace buildView;
 
 
 use Faker\Provider\File;
-use think\Db;
+use think\facade\Db;
 use think\exception\HttpResponseException;
 use think\facade\Request;
 use think\Model;
@@ -153,7 +153,6 @@ class Grid extends Field
     private function dataSave()
     {
         if (Request::isPost()) {
-            $this->model->setQuery(null);
             $action = Request::post('field');
             Db::startTrans();
             try {
@@ -255,7 +254,7 @@ class Grid extends Field
                         }
                         break;
                     default:
-                        $updateData = Request::except('id', 'post');
+                        $updateData = Request::except(['id'], 'post');
                         $res = $this->model->whereIn($this->model->getPk(), Request::post('id'))->update($updateData);
                         Db::commit();
                         if ($res) {
@@ -424,7 +423,6 @@ class Grid extends Field
     public function filter($callback)
     {
         if ($callback instanceof \Closure) {
-            $this->model->setQuery($this->db);
             $this->filter = new Filter($this->db);
             $this->filterCallBack = $callback;
         }
@@ -454,7 +452,7 @@ class Grid extends Field
                     $this->data = $this->model->select();
                     break;
                 case 'page':
-                    $this->data = $this->db->page(Request::get('page'), Request::get('limit'))->select();
+                    $this->data = $this->db->page(Request::get('page',1), Request::get('limit',20))->select();
 
                     break;
                 case 'select':
@@ -463,7 +461,7 @@ class Grid extends Field
             }
         } else {
             if ($this->isPage) {
-                $this->data = $this->db->page(Request::get('page'), Request::get('limit'))->select();
+                $this->data = $this->db->page(Request::get('page',1), Request::get('limit',20))->select();
             } else {
                 $this->data = $this->db->select();
             }

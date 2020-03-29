@@ -9,6 +9,7 @@ use think\console\input\Option;
 use think\console\Output;
 use think\facade\App;
 use think\facade\Config;
+use think\facade\Db;
 
 class BuildView extends Make
 {
@@ -32,15 +33,12 @@ class BuildView extends Make
 
         return $stubPath . $name.'.stub';
     }
+    
     protected function getClassNames($module,$name)
     {
-        return parent::getClassName($this->getNamespace('app', $module) . '\\' . $name) . (Config::get('controller_suffix') ? ucfirst(Config::get('url_controller_layer')) : '');
+        return parent::getClassName($this->getNamespace( $module) . '\\' . $name) . (Config::get('controller_suffix') ? ucfirst(Config::get('url_controller_layer')) : '');
     }
-
-    protected function getNamespace($appNamespace, $module)
-    {
-        return parent::getNamespace($appNamespace, $module) ;
-    }
+    
     protected function buildClasss($name,$type,$model='',$model_namespace='',$grid='',$detail='',$form='')
     {
         $stub = file_get_contents($this->getStubs($type));
@@ -59,7 +57,7 @@ class BuildView extends Make
         ], $stub);
     }
     protected function getTableInfo($model){
-        $db = db()->name($model);
+        $db = Db::name($model);
         $tableInfo= $db->query('SHOW FULL COLUMNS FROM '.$db->getTable());
         $fields = $db->getTableFields();
         $grid = '';
@@ -114,7 +112,7 @@ class BuildView extends Make
             }else{
                 $classname_model = $this->getClassNames('common','model\\'.$model);
             }
-           
+         
             $this->getTableInfo($model);
             $pathname = $this->getPathName($classname_model);
             if (is_file($pathname)) {
@@ -153,6 +151,6 @@ class BuildView extends Make
         if (!is_file($pathname)) {
             file_put_contents($pathname, $this->buildClasss($classname,'controller',$model,$classname_model,$grid,$detail,$form));
         }
-        $output->writeln('<info>' . $this->type . ' created successfully.</info>');
+        $output->writeln('<info>created successfully.</info>');
     }
 }

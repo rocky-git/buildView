@@ -78,7 +78,7 @@ function window_recurse_copy($src, $dst)
     //关闭文件
     closedir($dir);
 }
-error_reporting(E_ERROR | E_PARSE);
+
 
 
 //发布静态资源
