@@ -43,6 +43,7 @@ class Grid extends Field
     protected $actionColumn = null;
     protected $toolsArr = [];
     protected $beforeDel = null;
+    protected $dataAfter = null;
     protected $sortField = 'sort';
 
     /**
@@ -142,7 +143,10 @@ class Grid extends Field
     {
         $this->actionColumn->setClosure($closure);
     }
-
+    //数据查询后回调操作
+    public function dataAfter(\Closure $closure){
+        $this->dataAfter = $closure;
+    }
     //删除前回调
     public function deling(\Closure $closure)
     {
@@ -467,6 +471,9 @@ class Grid extends Field
             } else {
                 $this->data = $this->db->select();
             }
+        }
+        if(!is_null($this->dataAfter)){
+            $this->data = call_user_func($this->dataAfter, $this->data);
         }
         //导出表格表头
         $excelTitle = [];
