@@ -15,7 +15,6 @@
     let i = Math.ceil(Math.random()*10000000)
     $('[data-name=name_{$build_view_rand}]').attr('lay-filter','build_id_'+i);
     let name = $('[data-name=name_{$build_view_rand}]').attr('name');
-	
     if((name.split('[]')).length-1 > 1){
         name = name.replace('[]','');
         $('[data-name=name_{$build_view_rand}]').attr('name',name+'['+i+']');

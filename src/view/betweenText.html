@@ -1,0 +1,17 @@
+<div class="layui-form-item layui-form-text">
+    <label class="layui-form-label">{$label}</label>
+    <div class="layui-inline">
+        {if isset($required)}<input type="hidden" required>{/if}
+        <span class="layui-input-inline">
+            <input {volist name="attr" id="vo"}{$vo}{/volist} autocomplete="off" type="text" {$readonly} {$disabled} name="{$name[0]}" value="{$value[0]}"  lay-verify="{$layVerify}" lay-verType="tips" lay-reqText="{:lang('build_view_please_input')}{$label}" placeholder="{:lang('build_view_please_input')}开始{$label}" class="layui-input {if isset($readonly)}layui-bg-gray{/if}">
+        </span>
+        <span class="layui-form-mid">&nbsp;&nbsp;- </span>
+        <span class="layui-input-inline">
+            <input {volist name="attr" id="vo"}{$vo}{/volist} autocomplete="off" type="text" {$readonly} {$disabled} name="{$name[1]}" value="{$value[1]}"  lay-verify="{$layVerify}" lay-verType="tips" lay-reqText="{:lang('build_view_please_input')}{$label}" placeholder="{:lang('build_view_please_input')}结束{$label}" class="layui-input {if isset($readonly)}layui-bg-gray{/if}">
+        </span>
+        {$appendHtml|raw}
+        {notempty name="$help"}
+        <div class="help-block">{$help}</div>
+        {/notempty}
+    </div>
+</div>

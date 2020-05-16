@@ -40,6 +40,19 @@ class Filter
         return $this;
     }
     /**
+     * between筛选
+     * @Author: rocky
+     * 2019/7/25 16:46
+     * @param $lable 标签
+     * @param $field 字段
+     * @return $this
+     */
+    public function between($field, $lable){
+        $field = $this->paseFilter($field, 'between');
+        $this->template( [$field.'_start',$field.'_end'],$lable,'betweenText');
+        return $this;
+    }
+    /**
      * findIn筛选
      * @Author: rocky
      * 2019/7/25 16:46
@@ -55,17 +68,20 @@ class Filter
     }
     protected function template($field, $lable, $template = 'text')
     {
-        $field = new Field($template, $lable, $field, Request::param($field));
+        if($template == 'betweenText'){
+            $params = [Request::param($field[0]),Request::param($field[1])];
+        }else{
+            $params = Request::param($field);
+        }
+        $field = new Field($template, $lable, $field, $params);
         $field->layui('inline');
         array_push($this->formItem, $field);
         return $field;
     }
-
     public function db()
     {
         return $this->filter->query();
     }
-
     /**
      * 日期区间筛选
      * @Author: rocky

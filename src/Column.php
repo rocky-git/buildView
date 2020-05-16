@@ -51,6 +51,7 @@ class Column
         $this->cols['field'] = $this->field;
         $this->cols['title'] = $title;
 
+
     }
     /**
      * 设置列类型

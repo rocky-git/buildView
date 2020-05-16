@@ -667,7 +667,7 @@ class Echarts extends Field
         $week = date('w', $time);
         $date = [];
         for ($i = 0; $i <= 6; $i++) {
-            $date[$i] = date($format, strtotime('+' . $i - $week + 1 . ' days', $time));
+            $date[$i] = date($format, strtotime('+' . $i - $week . ' days', $time));
         }
         return $date;
     }

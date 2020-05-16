@@ -40,7 +40,7 @@ class FilterSearch
     //关联数据库
     protected $relationModel;
     //方法
-    protected $method = ['like', 'eq', 'dateBetween', 'findIn', 'in'];
+    protected $method = ['like', 'eq', 'dateBetween', 'findIn', 'in','between'];
     //数据库字段
     protected $tableFields = [];
     /**
@@ -69,10 +69,9 @@ class FilterSearch
     private function filterField($method, $fields, $request = 'get')
     {
 
-        $data = $this->request->$request();
+        $data = $this->request->$request();;
         foreach (is_array($fields) ? $fields : explode(',', $fields) as $field) {
-            if (isset($data[$field]) && $data[$field] !== '') {
-
+            if ((isset($data[$field]) && $data[$field] !== '') || ($method == 'between' && isset($data[$field.'_start']) && isset($data[$field.'_end']) && $data[$field.'_start'] != '' && $data[$field.'_end'] != '')) {
                 $dbField = $this->getField($field);
                 if(in_array($dbField,$this->tableFields)){
                     switch ($method) {
@@ -81,9 +80,13 @@ class FilterSearch
                             break;
                         case 'eq':
                             $this->db->where($dbField, $data[$field]);
-
+                        case 'between':
+                            if (!empty($data[$field . '_start'])) {
+                                $this->db->whereBetween($dbField, [$data[$field . '_start'], $data[$field . '_end']]);
+                            }
                             break;
                         case 'dateBetween':
+
                             list($start, $end) = explode(' - ', $data[$field]);
                             $this->db->whereBetween($dbField, ["{$start} 00:00:00", "{$end} 23:59:59"]);
                             break;

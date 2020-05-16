@@ -43,8 +43,8 @@ class Grid extends Field
     protected $actionColumn = null;
     protected $toolsArr = [];
     protected $beforeDel = null;
-    protected $dataAfter = null;
     protected $sortField = 'sort';
+    protected $dataAfter = null;
 
     /**
      * Form constructor.
@@ -71,6 +71,7 @@ class Grid extends Field
 
 
     }
+
 	/**
      * 设置添加按钮参数
      * @Author: rocky
@@ -143,16 +144,15 @@ class Grid extends Field
     {
         $this->actionColumn->setClosure($closure);
     }
-    //数据查询后回调操作
-    public function dataAfter(\Closure $closure){
-        $this->dataAfter = $closure;
-    }
+
     //删除前回调
     public function deling(\Closure $closure)
     {
         $this->beforeDel = $closure;
     }
-
+    public function dataAfter(\Closure $closure){
+        $this->dataAfter = $closure;
+    }
     //数据操作
     private function dataSave()
     {
@@ -172,7 +172,7 @@ class Grid extends Field
                                  $sortable_data = $sortable_datas[1];
                              }else{
                                  $sortable_data = end($sortable_datas);
-                                 
+
                              }
                             $sortStart = $sortable_data[$this->sortField];
                             $updateData = [];
@@ -473,7 +473,7 @@ class Grid extends Field
             }
         }
         if(!is_null($this->dataAfter)){
-            $this->data = call_user_func($this->dataAfter, $this->data);
+            $this->data = call_user_func_array($this->dataAfter,[$this->data]);
         }
         //导出表格表头
         $excelTitle = [];
@@ -550,9 +550,9 @@ class Grid extends Field
             }
             Excel::export($this->options['title'], $excelTitle, $excelData);
         }
-       
+
         $this->table->setOption('toolbar', implode('', $this->toolsArr));
-       
+
         $this->table->name(json_encode($this->tableTitles));
         $this->setOption('table', $this->table->render());
         return $this->render();
