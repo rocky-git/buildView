@@ -10,6 +10,7 @@ use OSS\OssClient;
 use think\Controller;
 use think\facade\Cache;
 use think\Image;
+use think\facade\View;
 
 /**
  * 后台插件管理
