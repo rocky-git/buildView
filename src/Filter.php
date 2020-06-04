@@ -39,6 +39,13 @@ class Filter
         $this->template( $field,$lable);
         return $this;
     }
+	public function xselect($options)
+    {
+        $item = end($this->formItem);
+        $item->template = __FUNCTION__;
+        $item->options($options);
+        return $this;
+    }
     /**
      * between筛选
      * @Author: rocky
