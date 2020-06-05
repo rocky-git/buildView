@@ -66,9 +66,7 @@
     /*{if isset($multiple)}*/
     $('[data-name=build_id_'+i+']').attr('xm-select','build_id_'+i);
     $('[data-name=build_id_'+i+']').attr('data-name','build_id_'+i);
-    layui.extend({
-        formSelects:'/vendor/build-view/plugs/formSelect/formSelects-v4',
-    });
+    
     layui.use([ 'formSelects'], function(){
         let formSelects = layui.formSelects;
         formSelects.render('build_id_'+i,{
