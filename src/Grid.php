@@ -8,7 +8,7 @@
 
 namespace buildView;
 
-
+use app\admin\service\NodeService;
 use Faker\Provider\File;
 use think\Db;
 use think\exception\HttpResponseException;
@@ -71,7 +71,6 @@ class Grid extends Field
 
 
     }
-
 	/**
      * 设置添加按钮参数
      * @Author: rocky
@@ -253,6 +252,12 @@ class Grid extends Field
                         }
                         Db::commit();
                         if ($res) {
+							$class = strtolower(request()->module() .'/'.\app\common\tools\Str::uncamelize(request()->controller()));
+                            $classList = NodeService::getClassList();
+                            $title = $classList[$class];
+                            if(!empty($title)){
+                                sysoplog($title, '删除');
+                            }
                             throw new HttpResponseException(json(['code' => 1, 'msg' => lang('build_view_action_del_success'), 'data' => []]));
                         } else {
                             throw new HttpResponseException(json(['code' => 0, 'msg' => lang('build_view_action_error'), 'data' => []]));
