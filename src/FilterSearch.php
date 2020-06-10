@@ -74,6 +74,7 @@ class FilterSearch
             if ((isset($data[$field]) && $data[$field] !== '') || ($method == 'between' && isset($data[$field.'_start']) && isset($data[$field.'_end']) && $data[$field.'_start'] != '' && $data[$field.'_end'] != '')) {
                 $dbField = $this->getField($field);
                 if(in_array($dbField,$this->tableFields)){
+					$dbField = $this->db->getTable().'.'.$dbField;
                     switch ($method) {
                         case 'like':
                             $this->db->whereLike($dbField, "%$data[$field]%");
