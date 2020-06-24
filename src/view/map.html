@@ -4,7 +4,7 @@
         {if isset($required)}<input type="hidden" required>{/if}
         <input name="{$name[0]}" type="hidden" />
         <input name="{$name[1]}" type="hidden" />
-        <input readonly {volist name="attr" id="vo"}{$vo}{/volist} autocomplete="off" type="text" {} {$disabled} name="{$name[2]}" value="{$value[2]}"  lay-verify="{$layVerify}" lay-verType="tips" lay-reqText="{:lang('build_view_please_input')}{$label}" placeholder="{:lang('build_view_please_input')}{$label}" class="layui-input {if isset($readonly)}layui-bg-gray{/if}">
+        <input readonly {volist name="attr" id="vo"}{$vo}{/volist} autocomplete="off" type="text" {} {$disabled} name="{$name[2]}" value="{$value[2]}"  lay-verify="{$layVerify}" lay-verType="tips" lay-reqText="{:lang('build_view_please_input')}{$label}" placeholder="请定位{$label}" class="layui-input {if isset($readonly)}layui-bg-gray{/if}">
         <button type="button" data-title="百度地图" data-name="name_{$build_view_rand}" data-iframe="/buildview/map" class="layui-btn layui-btn-normal input-group-btn" style="position: absolute;top: 0px; right: 0px;cursor: pointer;z-index: 998">百度地图</button>
         {$appendHtml|raw}
         {notempty name="$help"}
