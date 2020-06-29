@@ -10,6 +10,7 @@
 namespace buildView;
 
 
+use PhpOffice\PhpSpreadsheet\Cell\DataType;
 use PhpOffice\PhpSpreadsheet\IOFactory;
 use PhpOffice\PhpSpreadsheet\Spreadsheet;
 use think\Collection;
@@ -65,7 +66,7 @@ class Excel
                 $val = call_user_func($callback, $val);
             }
             foreach ($columnTitle as $fkey => $fval) {
-                $worksheet->setCellValueByColumnAndRow($i, $key + 2, self::filterEmoji($val[$fkey]));
+                $worksheet->getCellByColumnAndRow($i, $key + 2)->setValueExplicit(self::filterEmoji($val[$fkey]),DataType::TYPE_STRING);
                 $i++;
             }
             $i = 1;
