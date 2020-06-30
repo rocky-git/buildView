@@ -236,7 +236,6 @@ class Form extends Field
                     }
                 }
                 if ($this->model instanceof Model) {
-
                     $res = $this->model->save($post);
                     foreach ($this->relationArr as $relation) {
                         if ($this->model->$relation() instanceof BelongsTo || $this->model->$relation() instanceof HasOne) {
@@ -290,6 +289,7 @@ class Form extends Field
 
                             $this->data->$relation()->detach();
                             if (count($relationData) > 0) {
+
                                 $res = $this->data->$relation()->saveAll($relationData);
                             }
                         }
@@ -367,7 +367,7 @@ class Form extends Field
                 }
 
             } else {
-                if ($template == 'checkbox' || $template == 'select' || $template == 'selectGroup') {
+                if ($template == 'checkbox' || $template == 'select' || $template == 'selectGroup' || $template == 'selectIframe') {
                     if (method_exists($this->model, $field)) {
                         if ($this->model->$field() instanceof BelongsToMany) {
                             array_push($this->relationArr, $field);
