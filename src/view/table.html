@@ -120,6 +120,8 @@
                 var url = '{:url("detail")}?id='+data.id+'&form_open={$formOpen}&back=1&{$detailButtonParam|raw|default=""}';
                 if('{$formOpen|default="open"}' == 'open'){
                     $.form.href(url, this);
+                }else if('{$formOpen|default="open"}' == 'full'){
+                    return $.form.full(url, 'open_type=modal', $(this).attr('data-title') || "{:lang('build_view_grid_detail')}");
                 }else{
                     return $.form.modal(url, 'open_type=modal', $(this).attr('data-title') || "{:lang('build_view_grid_detail')}");
                 }
@@ -132,6 +134,8 @@
                 var url = '{:url("form")}?id='+data.id+'&back=1&{$editButtonParam|raw|default=""}';
                 if('{$formOpen|default="open"}' == 'open'){
                     $.form.href(url, this);
+                }else if('{$formOpen|default="open"}' == 'full'){
+                    return $.form.full(url, 'open_type=modal', $(this).attr('data-title') || "{:lang('build_view_grid_edit')}");
                 }else{
                     return $.form.modal(url, 'open_type=modal', $(this).attr('data-title') || "{:lang('build_view_grid_edit')}");
                 }
