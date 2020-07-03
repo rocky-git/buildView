@@ -73,8 +73,9 @@ class FilterSearch
         foreach (is_array($fields) ? $fields : explode(',', $fields) as $field) {
             if ((isset($data[$field]) && $data[$field] !== '') || ($method == 'between' && isset($data[$field.'_start']) && isset($data[$field.'_end']) && $data[$field.'_start'] != '' && $data[$field.'_end'] != '')) {
                 $dbField = $this->getField($field);
+
                 if(in_array($dbField,$this->tableFields)){
-					$dbField = $this->db->getTable().'.'.$dbField;
+                    $dbField = $this->db->getTable().'.'.$dbField;
                     switch ($method) {
                         case 'like':
                             $this->db->whereLike($dbField, "%$data[$field]%");
@@ -149,7 +150,7 @@ class FilterSearch
                     }
                     call_user_func($callback, $this->relationModel);
                 }
-                $relationSql = $this->relationModel->query()->buildSql();
+                $relationSql = $this->relationModel->query()->removeWhereField('is_deleted')->buildSql();
 
                 $res = strpos($relationSql, 'WHERE');
                 if ($res !== false) {
@@ -187,5 +188,5 @@ class FilterSearch
         }
         return $this;
     }
-   
+
 }
