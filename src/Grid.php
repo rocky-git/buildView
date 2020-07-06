@@ -8,6 +8,7 @@
 
 namespace buildView;
 
+
 use app\admin\service\NodeService;
 use Faker\Provider\File;
 use think\Db;
@@ -45,7 +46,7 @@ class Grid extends Field
     protected $beforeDel = null;
     protected $sortField = 'sort';
     protected $dataAfter = null;
-
+    public $pageCount = 0;
     /**
      * Form constructor.
      * @param 模型
@@ -71,6 +72,7 @@ class Grid extends Field
 
 
     }
+
 	/**
      * 设置添加按钮参数
      * @Author: rocky
@@ -252,7 +254,7 @@ class Grid extends Field
                         }
                         Db::commit();
                         if ($res) {
-							$class = strtolower(request()->module() .'/'.\app\common\tools\Str::uncamelize(request()->controller()));
+                            $class = strtolower(request()->module() .'/'.\app\common\tools\Str::uncamelize(request()->controller()));
                             $classList = NodeService::getClassList();
                             $title = $classList[$class];
                             if(!empty($title)){
@@ -478,7 +480,7 @@ class Grid extends Field
             }
         }
         if(!is_null($this->dataAfter)){
-            $this->data = call_user_func_array($this->dataAfter,[$this->data]);
+            $this->data = call_user_func_array($this->dataAfter,[$this->db->removeOption('page')->select()]);
         }
         //导出表格表头
         $excelTitle = [];
@@ -539,12 +541,19 @@ class Grid extends Field
         }
         if (Request::get('table')) {
             if(empty($this->db->getOptions('group'))){
-                throw new HttpResponseException(json(['code' => 0, 'msg' => '操作成功', 'data' => $tableData, 'count' => $this->db->removeOption('page')->removeOption('order')->count()]));
+                $count = $this->db->removeOption('page')->removeOption('order')->count();
+                if($this->pageCount > 0){
+                    $count = $this->pageCount;
+                }
+                throw new HttpResponseException(json(['code' => 0, 'msg' => '操作成功', 'data' => $tableData, 'count' => $count]));
             }else{
                 $sql = $this->db->removeOption('page')->removeOption('order')->buildSql();
                 $sql = "SELECT COUNT(*) FROM {$sql} userCount";
                 $res  = Db::query($sql);
                 $count = $res[0]['COUNT(*)'];
+                if($this->pageCount > 0){
+                    $count = $this->pageCount;
+                }
                 throw new HttpResponseException(json(['code' => 0, 'msg' => '操作成功', 'data' => $tableData, 'count' => $count]));
             }
 
@@ -557,12 +566,13 @@ class Grid extends Field
         }
 
         $this->table->setOption('toolbar', implode('', $this->toolsArr));
-
         $this->table->name(json_encode($this->tableTitles));
         $this->setOption('table', $this->table->render());
         return $this->render();
     }
-
+    public function setPageCount($count){
+        $this->pageCount = $count;
+    }
     private function issetField($data, $field)
     {
         $fields = explode('.', $field);
