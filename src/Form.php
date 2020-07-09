@@ -367,7 +367,7 @@ class Form extends Field
                 }
 
             } else {
-                if ($template == 'checkbox' || $template == 'select' || $template == 'selectGroup' || $template == 'selectIframe' || $template == 'selectServiceIframe') {
+                if ($template == 'checkbox' || $template == 'select' || $template == 'selectGroup' || $template == 'selectIframe' || $template == 'selectServiceIframe' || $template == 'selectCourseIframe') {
                     if (method_exists($this->model, $field)) {
                         if ($this->model->$field() instanceof BelongsToMany) {
                             array_push($this->relationArr, $field);
