@@ -247,6 +247,9 @@ class Form extends Field
                                 $this->data->$relation->save($relationData);
                             }
                         } elseif ($this->model->$relation() instanceof HasMany) {
+                            if($post[$relation] === false){
+                                continue;
+                            }
                             if (empty($this->data)) {
                                 $pk = $this->model->getPk();
                                 $this->data = $this->model->find($this->model->$pk);
@@ -275,8 +278,10 @@ class Form extends Field
                                 $this->model->$relation()->whereIn('id', $deleteIds)->delete();
                             }
 
-                            $this->model->$relation()->saveAll($relationData);
+                              $this->model->$relation()->saveAll($relationData);
+
                         } elseif ($this->model->$relation() instanceof BelongsToMany) {
+
                             $relationData = $post[$relation];
                             if (is_string($relationData)) {
                                 $relationData = explode(',', $relationData);
@@ -293,10 +298,13 @@ class Form extends Field
                                 $res = $this->data->$relation()->saveAll($relationData);
                             }
                         }
+
                     }
                     if (!is_null($this->afterSave)) {
+
                         call_user_func_array($this->afterSave, [Request::post(), $this->model]);
                     }
+
                 } else {
                     //不传入模型的时候默认配置表
                     foreach ($post as $name => $value) {
@@ -312,6 +320,7 @@ class Form extends Field
                 }
 
                 Db::commit();
+
                 if ($res || $this->model == null) {
                     throw new HttpResponseException(json(['code' => 1, 'msg' => lang('build_view_action_success'), 'data' => []]));
                 } else {
