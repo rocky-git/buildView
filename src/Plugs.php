@@ -66,6 +66,7 @@ class Plugs extends Controller
         $info = File::instance($this->uptype)->save($name, $fileDatas);
         if (is_array($info) && isset($info['url'])) {
             if ($this->uptype == 'local') {
+				$this->compressImage($info['file']);
                 return json(['uploaded' => true, 'filename' => $this->safe ? $name :$info['key'], 'url' => $info['url']]);
             } else {
                 return json(['uploaded' => true, 'filename' => $name, 'url' => $info['url']]);
@@ -74,7 +75,29 @@ class Plugs extends Controller
             return json(['uploaded' => false, 'error' => ['message' => '文件处理失败，请稍候再试！']]);
         }
     }
-
+	 /**
+     * 压缩图片
+     * @param $filename 文件路径
+     */
+    private function compressImage($filename){
+        list($width, $height, $type, $attr) = getimagesize($filename);
+        if($type > 1 && $type < 17){
+            $extension = image_type_to_extension($type,false);
+            $fun = "imagecreatefrom".$extension;
+            $image = $fun($filename);
+            $image_thump = imagecreatetruecolor($width,$height);
+            if($type == 3){
+                $alpha = imagecolorallocatealpha($image_thump, 0, 0, 0, 127);
+                imagefill($image_thump, 0, 0, $alpha);
+                imagesavealpha($image_thump, true);
+            }
+            imagecopyresampled($image_thump,$image,0,0,0,0,$width,$height,$width,$height);
+            imagedestroy($image);
+            $funcs = "image".$extension;
+            $funcs($image_thump,$filename);
+            imagedestroy($image_thump);
+        }
+    }
     /**
      * 本地分片上传
      * @Author: rocky
