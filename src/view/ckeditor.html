@@ -12,6 +12,7 @@
     require(['ckeditor'], function () {
         let i = Math.ceil(Math.random()*10000000);
         $('[data-name=name_{$build_view_rand}]').attr('id','build_id_'+i);
+		$('#build_id_'+i).attr('data-name','build_id_'+i);
         window.createEditor('#'+'build_id_'+i, {height: {$height|default='500'}{if isset($width)},width: {$width}{/if}});
     });
 </script>
