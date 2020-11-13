@@ -93,7 +93,7 @@ class FilterSearch
                             $this->db->whereBetween($dbField, ["{$start} 00:00:00", "{$end} 23:59:59"]);
                             break;
                         case 'findIn':
-                            $this->db->where("FIND_IN_SET($data[$field],$dbField)");
+                            $this->db->where("FIND_IN_SET($dbField,$data[$field])");
                             break;
                         case 'in':
                             $this->db->whereIn($dbField, $data[$field]);
