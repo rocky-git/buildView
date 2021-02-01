@@ -388,6 +388,7 @@ class Column
     {
 
         $this->htmlAttr[] = "<img src='_VALUE_' data-tips-image='' style='width: {$width}px;height: {$height}px;border-radius: {$radius}%'>";
+        return $this;
     }
 
     public function rate($length)
