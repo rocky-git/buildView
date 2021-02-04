@@ -71,7 +71,7 @@ class FilterSearch
 
         $data = $this->request->$request();;
         foreach (is_array($fields) ? $fields : explode(',', $fields) as $field) {
-            if ((isset($data[$field]) && $data[$field] !== '') || ($method == 'between' && isset($data[$field.'_start']) && isset($data[$field.'_end']) && $data[$field.'_start'] != '' && $data[$field.'_end'] != '')) {
+            if ((isset($data[$field]) && $data[$field] !== '') || $method == 'between') {
                 $dbField = $this->getField($field);
 
                 if(in_array($dbField,$this->tableFields)){
@@ -83,8 +83,12 @@ class FilterSearch
                         case 'eq':
                             $this->db->where($dbField, $data[$field]);
                         case 'between':
-                            if (!empty($data[$field . '_start'])) {
+                            if(!empty($data[$field . '_start']) && !empty($data[$field . '_end'])){
                                 $this->db->whereBetween($dbField, [$data[$field . '_start'], $data[$field . '_end']]);
+                            }elseif (!empty($data[$field . '_start'])){
+                                $this->db->where($dbField,'>=', $data[$field . '_start']);
+                            }elseif (!empty($data[$field . '_end'])){
+                                $this->db->where($dbField,'<=', $data[$field . '_end']);
                             }
                             break;
                         case 'dateBetween':
